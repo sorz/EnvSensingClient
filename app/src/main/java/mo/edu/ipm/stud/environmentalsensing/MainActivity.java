@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment;
         switch (position) {
             case 0:
-                fragment = ConnectSensorFragment.newInstance("", "");
+                fragment = PairSensorFragment.newInstance();
                 break;
             default:
                 fragment = new Fragment();

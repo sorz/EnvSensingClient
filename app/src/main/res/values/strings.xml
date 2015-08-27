@@ -14,4 +14,8 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_pair_sensor">Select Sensordrone</string>
+    <string name="bluetooth_disabled">Bluetooth is disabled now.</string>
+    <string name="enable_bluetooth">Enable Bluetooth</string>
+    <string name="from_paired_devices">From paired devices</string>
 </resources>
