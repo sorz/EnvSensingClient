@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:text="@string/enable_bluetooth"
             android:layout_gravity="center_horizontal"
-            android:id="@+id/button_enable_bluetooth"/>
+            android:id="@+id/button_enable_bluetooth" />
     </LinearLayout>
 
     <LinearLayout
@@ -35,15 +35,32 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/from_paired_devices"/>
-
+            android:text="@string/from_paired_devices" />
         <ListView
             android:id="@+id/list_paired_devices"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </ListView>
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/pair_new_devices" />
 
+        <ListView
+            android:id="@+id/list_unpaired_devices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </ListView>
+
+        <Button
+            android:id="@+id/button_scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scan"
+            android:layout_gravity="end" />
+
+    </LinearLayout>
 
 </LinearLayout>

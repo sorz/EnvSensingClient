@@ -18,4 +18,6 @@
     <string name="bluetooth_disabled">Bluetooth is disabled now.</string>
     <string name="enable_bluetooth">Enable Bluetooth</string>
     <string name="from_paired_devices">From paired devices</string>
+    <string name="pair_new_devices">Or pair new devices</string>
+    <string name="scan">Scan</string>
 </resources>

@@ -3,7 +3,10 @@ package mo.edu.ipm.stud.environmentalsensing;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,8 +27,11 @@ public class PairSensorFragment extends Fragment {
 
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> pairedDeviceAdapter;
+    private ArrayAdapter<String> unpairedDeviceAdapter;
+    private BroadcastReceiver scanReceiver;
 
     private ListView listPairedDevices;
+    private ListView listUnpairedDevices;
 
     /**
      * Use this factory method to create a new instance of
@@ -52,7 +58,10 @@ public class PairSensorFragment extends Fragment {
             enableBluetooth();
         }
 
-        pairedDeviceAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
+        pairedDeviceAdapter =
+                new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
+        unpairedDeviceAdapter =
+                new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1);
     }
 
 
@@ -70,9 +79,18 @@ public class PairSensorFragment extends Fragment {
                 enableBluetooth();
             }
         });
+        Button buttonScan = (Button) view.findViewById(R.id.button_scan);
+        buttonScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanDevices();
+            }
+        });
 
         listPairedDevices = (ListView) view.findViewById(R.id.list_paired_devices);
+        listUnpairedDevices = (ListView) view.findViewById(R.id.list_unpaired_devices);
         listPairedDevices.setAdapter(pairedDeviceAdapter);
+        listUnpairedDevices.setAdapter(unpairedDeviceAdapter);
         loadPairedDevices();
 
         return view;
@@ -96,9 +114,50 @@ public class PairSensorFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        bluetoothAdapter.cancelDiscovery();
+        if (scanReceiver != null)
+            getActivity().unregisterReceiver(scanReceiver);
+    }
+
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    }
+
+    private void scanDevices() {
+        if (scanReceiver == null) {
+            scanReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                        BluetoothDevice device =
+                                intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        unpairedDeviceAdapter.add(device.getName() + "\n" + device.getAddress());
+                    } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                        View view = getView();
+                        if (view != null)
+                            view.findViewById(R.id.button_scan).setEnabled(false);
+                    } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                        View view = getView();
+                        if (view != null)
+                            view.findViewById(R.id.button_scan).setEnabled(true);
+                    }
+                }
+            };
+
+            getActivity().registerReceiver(scanReceiver,
+                    new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            getActivity().registerReceiver(scanReceiver,
+                    new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
+            getActivity().registerReceiver(scanReceiver,
+                    new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+        }
+        unpairedDeviceAdapter.clear();
+        bluetoothAdapter.startDiscovery();
     }
 
     private void loadPairedDevices() {
@@ -107,7 +166,6 @@ public class PairSensorFragment extends Fragment {
         for (BluetoothDevice device : pairedDevices) {
             pairedDeviceAdapter.add(device.getName() + "\n" + device.getAddress());
         }
-        pairedDeviceAdapter.notifyDataSetChanged();
     }
 
 }
