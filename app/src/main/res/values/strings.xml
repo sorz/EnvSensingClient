@@ -22,4 +22,6 @@
     <string name="scan">Scan</string>
     <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordron device. Select it anyway?</string>
     <string name="dialog_select_device_confirm_title">Selection confirm</string>
+    <string name="pref_bluetooth_mac">Bluetooth device</string>
+    <string name="title_section_settings">Settings</string>
 </resources>

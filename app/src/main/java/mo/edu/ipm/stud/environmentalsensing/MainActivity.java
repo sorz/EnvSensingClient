@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.title_section1).withIdentifier(1),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_settings).withIdentifier(1),
                         new PrimaryDrawerItem().withName(R.string.title_section2).withIdentifier(1),
                         new PrimaryDrawerItem().withName(R.string.title_section3).withIdentifier(1)
                 )
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment;
         switch (position) {
             case 0:
-                fragment = PairSensorFragment.newInstance();
+                fragment = new SettingsFragment();
                 break;
             default:
                 fragment = new Fragment();

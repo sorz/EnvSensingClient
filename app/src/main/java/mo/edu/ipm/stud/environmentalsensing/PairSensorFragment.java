@@ -2,6 +2,7 @@ package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -9,8 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -191,17 +194,19 @@ public class PairSensorFragment extends Fragment {
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            selectDevice(name, mac);
+                            selectDevice(mac);
                         }
                     })
                     .show();
         else
-            selectDevice(name, mac);
+            selectDevice(mac);
     }
 
-    private void selectDevice(String name, String mac) {
-        // TODO: Save MAC address and return.
-        System.out.println(name);
+    private void selectDevice(String mac) {
+        SharedPreferences.Editor editor =
+                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putString("pref_bluetooth_mac", mac);
+        editor.apply();
     }
 
 }
