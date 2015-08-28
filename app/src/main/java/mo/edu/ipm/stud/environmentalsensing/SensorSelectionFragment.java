@@ -2,7 +2,6 @@ package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -10,10 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +25,10 @@ import java.util.Set;
 /**
  * A {@link Fragment} used to pair and select the sensor device.
  */
-public class PairSensorFragment extends Fragment {
+public class SensorSelectionFragment extends Fragment {
     static private final int REQUEST_ENABLE_BT = 0;
 
+    private OnSensorSelectedListener callback;
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> pairedDeviceAdapter;
     private ArrayAdapter<String> unpairedDeviceAdapter;
@@ -39,17 +37,8 @@ public class PairSensorFragment extends Fragment {
     private ListView listPairedDevices;
     private ListView listUnpairedDevices;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment.
-     * @return A new instance of fragment ConnectSensorFragment.
-     */
-    public static PairSensorFragment newInstance() {
-        return new PairSensorFragment();
-    }
-
-    public PairSensorFragment() {
-        // Required empty public constructor
+    public interface OnSensorSelectedListener {
+        public void onSensorSelected(String mac);
     }
 
     @Override
@@ -75,7 +64,6 @@ public class PairSensorFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        getActivity().setTitle(R.string.title_pair_sensor);
         View view = inflater.inflate(R.layout.fragment_connect_sensor, container, false);
 
         Button buttonEnableBt = (Button) view.findViewById(R.id.button_enable_bluetooth);
@@ -139,6 +127,18 @@ public class PairSensorFragment extends Fragment {
             getActivity().unregisterReceiver(scanReceiver);
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        callback = (OnSensorSelectedListener) activity;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.title_select_sensor);
+    }
+
     private void enableBluetooth() {
         Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -194,19 +194,13 @@ public class PairSensorFragment extends Fragment {
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            selectDevice(mac);
+                            callback.onSensorSelected(mac);
                         }
                     })
                     .show();
         else
-            selectDevice(mac);
+            callback.onSensorSelected(mac);
     }
 
-    private void selectDevice(String mac) {
-        SharedPreferences.Editor editor =
-                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-        editor.putString("pref_bluetooth_mac", mac);
-        editor.apply();
-    }
 
 }

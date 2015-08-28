@@ -1,7 +1,10 @@
 package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -13,7 +16,9 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class MainActivity extends AppCompatActivity
-        implements Drawer.OnDrawerItemClickListener {
+        implements Drawer.OnDrawerItemClickListener,
+        SensorSelectionFragment.OnSensorSelectedListener,
+        SettingsFragment.OnDisplayDialogListener {
 
     private Drawer drawer;
 
@@ -71,4 +76,32 @@ public class MainActivity extends AppCompatActivity
                 .commit();
         return false;
     }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 0)
+            fragmentManager.popBackStack();
+        else
+            super.onBackPressed();
+    }
+
+    @Override
+    public void onDisplaySensorSelectionDialog() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new SensorSelectionFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onSensorSelected(String mac) {
+        SharedPreferences.Editor editor =
+                PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString("pref_bluetooth_mac", mac);
+        editor.apply();
+
+        getFragmentManager().popBackStack();
+    }
+
 }

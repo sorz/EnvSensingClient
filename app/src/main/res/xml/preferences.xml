@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
+    <Preference
         android:key="pref_bluetooth_mac"
-        android:title="@string/pref_bluetooth_mac"
-        android:summary="%s" />
+        android:title="@string/pref_bluetooth_mac" />
 
 </PreferenceScreen>
