@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -16,7 +17,9 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 public class MainActivity extends AppCompatActivity
-        implements Drawer.OnDrawerItemClickListener,
+        implements FragmentManager.OnBackStackChangedListener,
+        Drawer.OnDrawerItemClickListener,
+        Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener {
 
@@ -29,8 +32,14 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getFragmentManager().addOnBackStackChangedListener(this);
 
         // Set up the drawer.
+        // Reference:
+        // https://github.com/mikepenz/MaterialDrawer
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -41,8 +50,10 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem().withName(R.string.title_section3).withIdentifier(1)
                 )
                 .withOnDrawerItemClickListener(this)
+                .withOnDrawerNavigationListener(this)
                 .build();
         drawer.setSelectionAtPosition(0);
+
     }
 
     @Override
@@ -79,11 +90,32 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        if (drawer.isDrawerOpen()) {
+            drawer.closeDrawer();
+        } else {
+            FragmentManager fragmentManager = getFragmentManager();
+            if (fragmentManager.getBackStackEntryCount() > 0)
+                fragmentManager.popBackStack();
+            else
+                super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        // Display the homeAsUpIndicator if back stack is not empty.
+        drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(
+                getFragmentManager().getBackStackEntryCount() == 0);
+    }
+
+    @Override
+    public boolean onNavigationClickListener(View view) {
         FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() > 0)
+        if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
-        else
-            super.onBackPressed();
+            return true;
+        }
+        return false;
     }
 
     @Override
