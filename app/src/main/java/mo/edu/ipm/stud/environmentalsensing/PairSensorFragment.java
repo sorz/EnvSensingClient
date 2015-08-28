@@ -1,10 +1,12 @@
 package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -93,6 +96,17 @@ public class PairSensorFragment extends Fragment {
         listUnpairedDevices.setAdapter(unpairedDeviceAdapter);
         loadPairedDevices();
 
+        AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = (String) parent.getAdapter().getItem(position);
+                String[] nameMac = item.split("\n");
+                selectDeviceWithConfirm(nameMac[0], nameMac[1]);
+            }
+        };
+        listPairedDevices.setOnItemClickListener(itemClickListener);
+        listUnpairedDevices.setOnItemClickListener(itemClickListener);
+
         return view;
     }
 
@@ -166,6 +180,28 @@ public class PairSensorFragment extends Fragment {
         for (BluetoothDevice device : pairedDevices) {
             pairedDeviceAdapter.add(device.getName() + "\n" + device.getAddress());
         }
+    }
+
+    private void selectDeviceWithConfirm(final String name, final String mac) {
+        if (!name.startsWith("Sensordrone"))
+            new AlertDialog.Builder(getActivity())
+                    .setMessage(getString(R.string.dialog_select_device_confirm_message, name, mac))
+                    .setTitle(R.string.dialog_select_device_confirm_title)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            selectDevice(name, mac);
+                        }
+                    })
+                    .show();
+        else
+            selectDevice(name, mac);
+    }
+
+    private void selectDevice(String name, String mac) {
+        // TODO: Save MAC address and return.
+        System.out.println(name);
     }
 
 }
