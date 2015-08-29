@@ -37,7 +37,7 @@ public class RecordService extends Service {
     public void onCreate() {
         running = true;
         Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.putExtra(MainActivity.EXTRA_SECTION, MainActivity.SECTION_RECORDING);
+        notificationIntent.setAction(MainActivity.ACTION_SHOW_RECORD_STATUS);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)

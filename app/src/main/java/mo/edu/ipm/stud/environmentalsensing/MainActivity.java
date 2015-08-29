@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
@@ -24,10 +25,10 @@ public class MainActivity extends AppCompatActivity
         SettingsFragment.OnDisplayDialogListener,
         RecordConfigFragment.OnRecordingStartedListener,
         RecordStatusFragment.OnRecordingStoppedListener {
-    public static final String EXTRA_SECTION = "extra-section";
-    public static final int SECTION_STATUS = 1;
-    public static final int SECTION_SETTINGS = 2;
-    public static final int SECTION_RECORDING = 3;
+    public static final String ACTION_SHOW_RECORD_STATUS = "action-show-record-status";
+    private static final int SECTION_STATUS = 1;
+    private static final int SECTION_SETTINGS = 2;
+    private static final int SECTION_RECORDING = 3;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -47,11 +48,9 @@ public class MainActivity extends AppCompatActivity
 
         // Enable RecordService display recording section directly.
         // In this case, do not add the drawer.
-        // TODO: Not work, fix me.
-        int sectionId = getIntent().getIntExtra(EXTRA_SECTION, 0);
-        System.out.println(sectionId);
-        if (sectionId > 0) {
-            switchSection(sectionId);
+        if (ACTION_SHOW_RECORD_STATUS.equals(getIntent().getAction()) &&
+                RecordService.isRunning()) {
+            switchSection(SECTION_RECORDING);
             return;
         }
 
@@ -80,6 +79,16 @@ public class MainActivity extends AppCompatActivity
             drawer.setSelectionAtPosition(1);
         else
             drawer.setSelectionAtPosition(0);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        if (ACTION_SHOW_RECORD_STATUS.equals(intent.getAction())) {
+            if (drawer == null)
+                switchSection(SECTION_RECORDING);
+            else
+                drawer.setSelection(SECTION_RECORDING);
+        }
     }
 
     private void switchSection(int id) {
@@ -114,7 +123,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen()) {
+        if (drawer != null && drawer.isDrawerOpen()) {
             drawer.closeDrawer();
         } else {
             FragmentManager fragmentManager = getFragmentManager();
@@ -144,6 +153,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // When drawer is disabled (i.e. start with ACTION_SHOW_RECORD_STATUS),
+                // onClick event of home (up) button will be handle here
+                // other than onNavigationClickListener().
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onDisplaySensorSelectionDialog() {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, new SensorSelectionFragment())
@@ -170,8 +193,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRecordingStopped() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new RecordConfigFragment())
-                .commit();
+        if (drawer == null)
+            // This activity start with ACTION_SHOW_RECORD_STATUS by RecordService.
+            finish();
+        else
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.container, new RecordConfigFragment())
+                    .commit();
     }
 }
