@@ -8,10 +8,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sensorcon.sensordrone.DroneEventHandler;
@@ -23,6 +25,7 @@ import com.sensorcon.sensordrone.android.Drone;
  * A {@link Fragment} used to display status of sensor.
  */
 public class SensorStatusFragment extends Fragment implements DroneEventHandler {
+    static private final String TAG = "SensorStatusFragment";
     static private final int REQUEST_ENABLE_BT = 0;
 
     private Drone drone;
@@ -31,6 +34,8 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
     private View layoutConnected;
     private View layoutDisconnected;
     private Button buttonConnect;
+    private TextView textMacAddress;
+    private TextView textBatteryStatus;
 
 
     @Override
@@ -48,11 +53,19 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.title_section_status);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sensor_status, container, false);
         layoutConnected = view.findViewById(R.id.layout_connected);
         layoutDisconnected = view.findViewById(R.id.layout_disconnected);
+        textMacAddress = (TextView) view.findViewById(R.id.text_mac_address);
+        textBatteryStatus = (TextView) view.findViewById(R.id.text_battery_status);
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
@@ -101,6 +114,8 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         layoutConnected = null;
         layoutDisconnected = null;
         buttonConnect = null;
+        textMacAddress = null;
+        textBatteryStatus = null;
     }
 
     @Override
@@ -131,6 +146,18 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         buttonConnect.setEnabled(false);
     }
 
+    /**
+     * Refresh status of Drone.
+     *
+     * This will send measure requests to Drone, and update views on parseEvent().
+     */
+    private void refreshStatus() {
+        if (! drone.isConnected)
+            return;
+        drone.checkIfCharging();
+        drone.measureBatteryVoltage();
+    }
+
 
     /**
      * Callback of Drone.
@@ -156,18 +183,28 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
             });
             return;
         }
+        Log.d(TAG, "Drone event received: " + event);
+
+        if (layoutConnected == null)
+            // Views has been destroyed, ignore.
+            return;
 
         if (event.matches(DroneEventObject.droneEventType.CONNECTED)) {
-            if (layoutConnected != null) {
-                layoutDisconnected.setVisibility(View.GONE);
-                layoutConnected.setVisibility(View.VISIBLE);
-            }
+            layoutDisconnected.setVisibility(View.GONE);
+            layoutConnected.setVisibility(View.VISIBLE);
+            textMacAddress.setText(drone.lastMAC);
+            refreshStatus();
         } else if (event.matches(DroneEventObject.droneEventType.DISCONNECTED) ||
-                event.matches(DroneEventObject.droneEventType.CONNECTION_LOST)) {
-            if (layoutConnected != null) {
-                layoutDisconnected.setVisibility(View.VISIBLE);
-                layoutConnected.setVisibility(View.GONE);
-            }
+            event.matches(DroneEventObject.droneEventType.CONNECTION_LOST)) {
+            layoutDisconnected.setVisibility(View.VISIBLE);
+            layoutConnected.setVisibility(View.GONE);
+        } else if (event.matches(DroneEventObject.droneEventType.BATTERY_VOLTAGE_MEASURED) ||
+                event.matches(DroneEventObject.droneEventType.CHARGING_STATUS)) {
+            textBatteryStatus.setText(getString(R.string.battery_voltage_and_charging_status,
+                    drone.batteryVoltage_Volts,
+                    drone.isCharging ? getString(R.string.battery_in_charging)
+                                     : getString(R.string.battery_not_in_charging)
+            ));
         }
     }
 }

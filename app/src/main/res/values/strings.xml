@@ -25,9 +25,14 @@
     <string name="pref_bluetooth_mac">Sensordrone Bluetooth address</string>
     <string name="press_to_select">Press to select</string>
     <string name="connect_fail">Connect fail.</string>
-    <string name="disconnected">Disconnected</string>
+    <string name="sensor_not_connect">Sensordrone is not connected.</string>
     <string name="connect">Connect</string>
-    <string name="connected">Connected</string>
+    <string name="sensor_connected">Sensordrone is connected.</string>
     <string name="disconnect">Disconnect</string>
     <string name="bluetooth_not_found">Cannot access Bluetooth.</string>
+    <string name="mac_address">MAC address</string>
+    <string name="battery_status">Battery status</string>
+    <string name="battery_voltage_and_charging_status">%1$.2fV (%2$s)</string>
+    <string name="battery_in_charging">in charging</string>
+    <string name="battery_not_in_charging">not changing</string>
 </resources>
