@@ -27,5 +27,9 @@
     <string name="need_to_select_sensor">Please go settings to select Sensordrone first.</string>
     <string name="version_number">Version number</string>
     <string name="version_hardware_firmware">Hardware v%1$s, firmware v%2$s.%3$s</string>
+    <string name="record_service_running">Recording environmental indicators cyclically.</string>
+    <string name="start">Start</string>
+    <string name="title_section_recording">Recording</string>
+    <string name="title_record_config">Start a recording task</string>
 
 </resources>

@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity
         Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener {
+    static final int SECTION_STATUS = 0;
+    static final int SECTION_SETTINGS = 1;
+    static final int SECTION_RECORDING = 2;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -46,9 +49,14 @@ public class MainActivity extends AppCompatActivity
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_status).withIdentifier(1),
+                                .withName(R.string.title_section_status)
+                                .withIdentifier(SECTION_STATUS),
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_settings).withIdentifier(1)
+                                .withName(R.string.title_section_recording)
+                                .withIdentifier(SECTION_RECORDING),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_settings)
+                                .withIdentifier(SECTION_SETTINGS)
                 )
                 .withOnDrawerItemClickListener(this)
                 .withOnDrawerNavigationListener(this)
@@ -63,12 +71,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         Fragment fragment;
-        switch (position) {
-            case 0:
+        switch (drawerItem.getIdentifier()) {
+            case SECTION_STATUS:
                 fragment = new SensorStatusFragment();
                 break;
-            case 1:
+            case SECTION_SETTINGS:
                 fragment = new SettingsFragment();
+                break;
+            case SECTION_RECORDING:
+                if (RecordService.isRunning())
+                    fragment = new Fragment(); // TODO: RecordStatusFragment()
+                else
+                    fragment = new RecordConfigFragment();
                 break;
             default:
                 fragment = new Fragment();
