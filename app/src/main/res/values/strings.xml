@@ -12,7 +12,6 @@
 
     <string name="action_settings">Settings</string>
 
-<!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_select_sensor">Select Sensordrone</string>
     <string name="bluetooth_disabled">Bluetooth is disabled now.</string>
@@ -20,9 +19,9 @@
     <string name="from_paired_devices">From paired devices</string>
     <string name="pair_new_devices">Or pair new devices</string>
     <string name="scan">Scan</string>
-    <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordron device. Select it anyway?</string>
+    <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordrone device. Select it anyway?</string>
     <string name="dialog_select_device_confirm_title">Selection confirm</string>
-    <string name="pref_bluetooth_mac">Sensordrone Bluetooth address</string>
+    <string name="pref_bluetooth_mac">Sensordrone address</string>
     <string name="press_to_select">Press to select</string>
     <string name="connect_fail">Connect fail.</string>
     <string name="sensor_not_connect">Sensordrone is not connected.</string>
@@ -35,7 +34,7 @@
     <string name="battery_voltage_and_charging_status">%1$.2fV (%2$s)</string>
     <string name="battery_in_charging">in charging</string>
     <string name="battery_not_in_charging">not changing</string>
-    <string name="need_to_select_sensor">Please go settings to select Sendordone first.</string>
+    <string name="need_to_select_sensor">Please go settings to select Sensordrone first.</string>
     <string name="version_number">Version number</string>
     <string name="version_hardware_firmware">Hardware v%1$s, firmware v%2$s.%3$s</string>
 
