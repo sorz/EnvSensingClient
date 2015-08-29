@@ -2,6 +2,7 @@ package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,9 +24,10 @@ public class MainActivity extends AppCompatActivity
         SettingsFragment.OnDisplayDialogListener,
         RecordConfigFragment.OnRecordingStartedListener,
         RecordStatusFragment.OnRecordingStoppedListener {
-    static final int SECTION_STATUS = 0;
-    static final int SECTION_SETTINGS = 1;
-    static final int SECTION_RECORDING = 2;
+    public static final String EXTRA_SECTION = "extra-section";
+    public static final int SECTION_STATUS = 1;
+    public static final int SECTION_SETTINGS = 2;
+    public static final int SECTION_RECORDING = 3;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -42,6 +44,16 @@ public class MainActivity extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().addOnBackStackChangedListener(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Enable RecordService display recording section directly.
+        // In this case, do not add the drawer.
+        // TODO: Not work, fix me.
+        int sectionId = getIntent().getIntExtra(EXTRA_SECTION, 0);
+        System.out.println(sectionId);
+        if (sectionId > 0) {
+            switchSection(sectionId);
+            return;
+        }
 
         // Set up the drawer.
         // Reference:
@@ -70,10 +82,9 @@ public class MainActivity extends AppCompatActivity
             drawer.setSelectionAtPosition(0);
     }
 
-    @Override
-    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+    private void switchSection(int id) {
         Fragment fragment;
-        switch (drawerItem.getIdentifier()) {
+        switch (id) {
             case SECTION_STATUS:
                 fragment = new SensorStatusFragment();
                 break;
@@ -93,6 +104,11 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
+    }
+
+    @Override
+    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+        switchSection(drawerItem.getIdentifier());
         return false;
     }
 

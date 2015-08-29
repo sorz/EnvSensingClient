@@ -1,7 +1,7 @@
 package mo.edu.ipm.stud.environmentalsensing;
 
 import android.app.Notification;
-import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -14,13 +14,12 @@ import android.util.Log;
  */
 public class RecordService extends Service {
     static private final String TAG = "RecordService";
-    static private final int NOTIFICATION = R.string.record_service_running;
+    static private final int ONGOING_NOTIFICATION_ID = 1;
     // Reference:
     // https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android
     static private boolean running = false;
 
     private final IBinder binder = new LocalBinder();
-    private NotificationManager notificationManager;
 
     public class LocalBinder extends Binder {
         RecordService getService() {
@@ -37,36 +36,35 @@ public class RecordService extends Service {
     @Override
     public void onCreate() {
         running = true;
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        showNotification();
-        System.out.println("created");
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.putExtra(MainActivity.EXTRA_SECTION, MainActivity.SECTION_RECORDING);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setWhen(System.currentTimeMillis())
+                .setTicker(getText(R.string.record_service_running))
+                .setContentTitle(getText(R.string.app_name))
+                .setContentText(getText(R.string.record_service_running))
+                .build();
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        notificationManager.cancel(NOTIFICATION);
         running = false;
+        stopForeground(true);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Received start id " + startId + ": " + intent);
-        return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     static public boolean isRunning() {
         return running;
     }
 
-    private void showNotification() {
-        Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setWhen(System.currentTimeMillis())
-                .setTicker(getText(R.string.record_service_running))
-                .setContentTitle(getText(R.string.app_name))
-                .setContentText(getText(R.string.record_service_running))
-                .build();
-        notificationManager.notify(NOTIFICATION, notification);
-    }
 }
