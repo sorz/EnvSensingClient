@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,6 +21,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.Set;
+
+import mo.edu.ipm.stud.environmentalsensing.R;
 
 
 /**

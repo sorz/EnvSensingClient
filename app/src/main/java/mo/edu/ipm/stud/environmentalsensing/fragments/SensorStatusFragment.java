@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -20,6 +20,10 @@ import android.widget.Toast;
 import com.sensorcon.sensordrone.DroneEventHandler;
 import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
+
+import mo.edu.ipm.stud.environmentalsensing.R;
+import mo.edu.ipm.stud.environmentalsensing.SensorConnectAsyncTask;
+import mo.edu.ipm.stud.environmentalsensing.SensorDrone;
 
 
 /**

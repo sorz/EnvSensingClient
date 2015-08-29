@@ -17,6 +17,12 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
+import mo.edu.ipm.stud.environmentalsensing.fragments.RecordStatusFragment;
+import mo.edu.ipm.stud.environmentalsensing.fragments.SensorSelectionFragment;
+import mo.edu.ipm.stud.environmentalsensing.fragments.SensorStatusFragment;
+import mo.edu.ipm.stud.environmentalsensing.fragments.SettingsFragment;
+
 public class MainActivity extends AppCompatActivity
         implements FragmentManager.OnBackStackChangedListener,
         Drawer.OnDrawerItemClickListener,

@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.fragments;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+
+import mo.edu.ipm.stud.environmentalsensing.R;
 
 /**
  * A PreferenceFragment which list all settings.

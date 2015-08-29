@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import mo.edu.ipm.stud.environmentalsensing.R;
+import mo.edu.ipm.stud.environmentalsensing.RecordService;
 
 /**
  * A {@link Fragment} used to configure and start a new recording task.
