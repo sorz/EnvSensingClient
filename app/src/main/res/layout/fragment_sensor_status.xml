@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/swipe_container"
-    android:padding="10dp">
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -50,13 +51,14 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/sensor_connected"
                     android:layout_marginTop="20dp"
-                    android:layout_marginBottom="15dp"
+                    android:layout_marginBottom="20dp"
                     android:layout_gravity="center_horizontal" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -72,19 +74,35 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="@string/version_number" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:id="@+id/text_version" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:text="@string/battery_status" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:id="@+id/text_battery_status" />
-
                 </RelativeLayout>
 
                 <Button

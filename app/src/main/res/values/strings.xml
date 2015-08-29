@@ -36,4 +36,7 @@
     <string name="battery_in_charging">in charging</string>
     <string name="battery_not_in_charging">not changing</string>
     <string name="need_to_select_sensor">Please go settings to select Sendordone first.</string>
+    <string name="version_number">Version number</string>
+    <string name="version_hardware_firmware">Hardware v%1$s, firmware v%2$s.%3$s</string>
+
 </resources>

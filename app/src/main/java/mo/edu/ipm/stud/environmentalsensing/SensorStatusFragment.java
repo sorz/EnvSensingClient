@@ -40,6 +40,7 @@ public class SensorStatusFragment extends Fragment
     private Button buttonConnect;
     private TextView textMacAddress;
     private TextView textBatteryStatus;
+    private TextView textVersion;
 
 
     @Override
@@ -71,6 +72,7 @@ public class SensorStatusFragment extends Fragment
         layoutDisconnected = view.findViewById(R.id.layout_disconnected);
         textMacAddress = (TextView) view.findViewById(R.id.text_mac_address);
         textBatteryStatus = (TextView) view.findViewById(R.id.text_battery_status);
+        textVersion = (TextView) view.findViewById(R.id.text_version);
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
@@ -128,6 +130,7 @@ public class SensorStatusFragment extends Fragment
         buttonConnect = null;
         textMacAddress = null;
         textBatteryStatus = null;
+        textVersion = null;
     }
 
     @Override
@@ -210,6 +213,8 @@ public class SensorStatusFragment extends Fragment
             layoutDisconnected.setVisibility(View.GONE);
             layoutConnected.setVisibility(View.VISIBLE);
             textMacAddress.setText(drone.lastMAC);
+            textVersion.setText(getString(R.string.version_hardware_firmware,
+                    drone.hardwareVersion, drone.firmwareVersion, drone.firmwareRevision));
             swipeLayout.setEnabled(true);
             swipeLayout.setRefreshing(true);
             onRefresh();
