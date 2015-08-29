@@ -1,6 +1,9 @@
 package mo.edu.ipm.stud.environmentalsensing;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
@@ -20,11 +23,15 @@ import com.sensorcon.sensordrone.android.Drone;
  * A {@link Fragment} used to display status of sensor.
  */
 public class SensorStatusFragment extends Fragment implements DroneEventHandler {
+    static private final int REQUEST_ENABLE_BT = 0;
+
     private Drone drone;
     private SharedPreferences preferences;
 
     private View layoutConnected;
     private View layoutDisconnected;
+    private Button buttonConnect;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +53,7 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         View view = inflater.inflate(R.layout.fragment_sensor_status, container, false);
         layoutConnected = view.findViewById(R.id.layout_connected);
         layoutDisconnected = view.findViewById(R.id.layout_disconnected);
-        final Button buttonConnect = (Button) view.findViewById(R.id.button_connect);
+        buttonConnect = (Button) view.findViewById(R.id.button_connect);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
         layoutConnected.setVisibility(drone.isConnected ? View.VISIBLE : View.GONE);
@@ -56,19 +63,22 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String mac = preferences.getString("pref_bluetooth_mac", null);
-                if (mac == null)
-                    return;  // TODO: pop a message.
-                new SensorConnectAsyncTask() {
-                    @Override
-                    protected void onPostExecute (Boolean result) {
-                        if (!result)
-                            Toast.makeText(getActivity(),
-                                    R.string.connect_fail, Toast.LENGTH_SHORT).show();
-                        buttonConnect.setEnabled(true);
-                    }
-                }.execute(mac);
-                buttonConnect.setEnabled(false);
+                if (preferences.getString("pref_bluetooth_mac", null) == null)
+                    return;  // TODO: Show sensor selection fragment.
+
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter == null) {
+                    Toast.makeText(getActivity(),
+                            R.string.bluetooth_not_found, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (bluetoothAdapter.isEnabled()) {
+                    connectSensor();
+                } else {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                    // Connect on onActivityResult() if Bluetooth is enabled instead of now.
+                }
             }
         });
 
@@ -79,17 +89,53 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
             }
         });
 
-
         return view;
     }
 
     @Override
     public void onDestroyView() {
+        // Reference:
+        // https://stackoverflow.com/questions/26369905/activitys-ondestroy-fragments-
+        // ondestroyview-set-null-practices
         super.onDestroyView();
         layoutConnected = null;
         layoutDisconnected = null;
+        buttonConnect = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                if (resultCode == Activity.RESULT_OK)
+                    // This request only be sent when user request to connect sensor.
+                    // So we connect it immediately after this request be accepted.
+                    connectSensor();
+        }
+    }
+
+    /**
+     * Connect sensor without check preconditions.
+     */
+    private void connectSensor() {
+        String mac = preferences.getString("pref_bluetooth_mac", "");
+        new SensorConnectAsyncTask() {
+            @Override
+            protected void onPostExecute(Boolean result) {
+                if (!result)
+                    Toast.makeText(getActivity(),
+                            R.string.connect_fail, Toast.LENGTH_SHORT).show();
+                buttonConnect.setEnabled(true);
+            }
+        }.execute(mac);
+        buttonConnect.setEnabled(false);
+    }
+
+
+    /**
+     * Callback of Drone.
+     * Maintain updated status of Drone.
+     */
     @Override
     public void parseEvent(final DroneEventObject event) {
         // This may be invoke in thread other than UI thread. (e.g. CONNECTED may fired

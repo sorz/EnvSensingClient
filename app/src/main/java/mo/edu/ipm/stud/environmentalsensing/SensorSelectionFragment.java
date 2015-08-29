@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.Set;
 
@@ -43,7 +44,7 @@ public class SensorSelectionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            // TODO: exit with a message.
+            Toast.makeText(getActivity(), R.string.bluetooth_not_found, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!bluetoothAdapter.isEnabled()) {

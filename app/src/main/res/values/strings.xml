@@ -29,4 +29,5 @@
     <string name="connect">Connect</string>
     <string name="connected">Connected</string>
     <string name="disconnect">Disconnect</string>
+    <string name="bluetooth_not_found">Cannot access Bluetooth.</string>
 </resources>
