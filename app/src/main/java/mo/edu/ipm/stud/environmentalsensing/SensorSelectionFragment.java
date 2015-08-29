@@ -34,9 +34,6 @@ public class SensorSelectionFragment extends Fragment {
     private ArrayAdapter<String> unpairedDeviceAdapter;
     private BroadcastReceiver scanReceiver;
 
-    private ListView listPairedDevices;
-    private ListView listUnpairedDevices;
-
     public interface OnSensorSelectedListener {
         public void onSensorSelected(String mac);
     }
@@ -81,8 +78,8 @@ public class SensorSelectionFragment extends Fragment {
             }
         });
 
-        listPairedDevices = (ListView) view.findViewById(R.id.list_paired_devices);
-        listUnpairedDevices = (ListView) view.findViewById(R.id.list_unpaired_devices);
+        ListView listPairedDevices = (ListView) view.findViewById(R.id.list_paired_devices);
+        ListView listUnpairedDevices = (ListView) view.findViewById(R.id.list_unpaired_devices);
         listPairedDevices.setAdapter(pairedDeviceAdapter);
         listUnpairedDevices.setAdapter(unpairedDeviceAdapter);
         loadPairedDevices();
@@ -136,6 +133,8 @@ public class SensorSelectionFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Reference:
+        // https://stackoverflow.com/questions/28389841/change-actionbar-title-using-fragments
         getActivity().setTitle(R.string.title_select_sensor);
     }
 
@@ -145,6 +144,9 @@ public class SensorSelectionFragment extends Fragment {
     }
 
     private void scanDevices() {
+        // Reference:
+        // http://developer.android.com/intl/zh-cn/guide/topics/connectivity/
+        // bluetooth.html#DiscoveringDevices
         if (scanReceiver == null) {
             scanReceiver = new BroadcastReceiver() {
                 @Override
@@ -178,6 +180,9 @@ public class SensorSelectionFragment extends Fragment {
     }
 
     private void loadPairedDevices() {
+        // Reference:
+        // http://developer.android.com/intl/zh-cn/guide/topics/connectivity/
+        // bluetooth.html#QueryingPairedDevices
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         pairedDeviceAdapter.clear();
         for (BluetoothDevice device : pairedDevices) {
