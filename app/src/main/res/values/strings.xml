@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
-    <string name="title_section_status">Status</string>
+    <string name="title_section_sensor_status">Sensor status</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_select_sensor">Select Sensordrone</string>
     <string name="bluetooth_disabled">Bluetooth is disabled now.</string>

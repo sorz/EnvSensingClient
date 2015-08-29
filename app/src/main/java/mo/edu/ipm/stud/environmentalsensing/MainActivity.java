@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity
         RecordConfigFragment.OnRecordingStartedListener,
         RecordStatusFragment.OnRecordingStoppedListener {
     public static final String ACTION_SHOW_RECORD_STATUS = "action-show-record-status";
-    private static final int SECTION_STATUS = 1;
+    private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
 
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_status)
-                                .withIdentifier(SECTION_STATUS),
+                                .withName(R.string.title_section_sensor_status)
+                                .withIdentifier(SECTION_SENSOR_STATUS),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_recording)
                                 .withIdentifier(SECTION_RECORDING),
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
     private void switchSection(int id) {
         Fragment fragment;
         switch (id) {
-            case SECTION_STATUS:
+            case SECTION_SENSOR_STATUS:
                 fragment = new SensorStatusFragment();
                 break;
             case SECTION_SETTINGS:
