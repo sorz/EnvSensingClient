@@ -155,7 +155,8 @@ public class SensorStatusFragment extends Fragment
                 if (!result)
                     Toast.makeText(getActivity(),
                             R.string.connect_fail, Toast.LENGTH_SHORT).show();
-                buttonConnect.setEnabled(true);
+                if (buttonConnect != null)
+                    buttonConnect.setEnabled(true);
             }
         }.execute(mac);
         buttonConnect.setEnabled(false);
