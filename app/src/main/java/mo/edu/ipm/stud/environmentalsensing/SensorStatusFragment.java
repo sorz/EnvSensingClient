@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +25,16 @@ import com.sensorcon.sensordrone.android.Drone;
 /**
  * A {@link Fragment} used to display status of sensor.
  */
-public class SensorStatusFragment extends Fragment implements DroneEventHandler {
+public class SensorStatusFragment extends Fragment
+        implements DroneEventHandler, SwipeRefreshLayout.OnRefreshListener {
     static private final String TAG = "SensorStatusFragment";
     static private final int REQUEST_ENABLE_BT = 0;
 
     private Drone drone;
     private SharedPreferences preferences;
+    private int leftStatusEventCount;
 
+    private SwipeRefreshLayout swipeLayout;
     private View layoutConnected;
     private View layoutDisconnected;
     private Button buttonConnect;
@@ -62,6 +66,7 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sensor_status, container, false);
+        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         layoutConnected = view.findViewById(R.id.layout_connected);
         layoutDisconnected = view.findViewById(R.id.layout_disconnected);
         textMacAddress = (TextView) view.findViewById(R.id.text_mac_address);
@@ -69,9 +74,11 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
-        layoutConnected.setVisibility(drone.isConnected ? View.VISIBLE : View.GONE);
-        layoutDisconnected.setVisibility(drone.isConnected ? View.GONE : View.VISIBLE);
-
+        swipeLayout.setOnRefreshListener(this);
+        // Send a pseudo event to trigger view initialization.
+        parseEvent(new DroneEventObject(drone.isConnected ?
+                DroneEventObject.droneEventType.CONNECTED :
+                DroneEventObject.droneEventType.DISCONNECTED));
 
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +118,7 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
         // https://stackoverflow.com/questions/26369905/activitys-ondestroy-fragments-
         // ondestroyview-set-null-practices
         super.onDestroyView();
+        swipeLayout = null;
         layoutConnected = null;
         layoutDisconnected = null;
         buttonConnect = null;
@@ -151,13 +159,18 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
      *
      * This will send measure requests to Drone, and update views on parseEvent().
      */
-    private void refreshStatus() {
-        if (! drone.isConnected)
+    @Override
+    public void onRefresh() {
+        if (!drone.isConnected) {
+            swipeLayout.setRefreshing(false);
             return;
+        }
+        // The number of measure requests sent.
+        // Make parseEvent() know when to setRefreshing(false).
+        leftStatusEventCount = 2;
         drone.checkIfCharging();
         drone.measureBatteryVoltage();
     }
-
 
     /**
      * Callback of Drone.
@@ -193,18 +206,26 @@ public class SensorStatusFragment extends Fragment implements DroneEventHandler 
             layoutDisconnected.setVisibility(View.GONE);
             layoutConnected.setVisibility(View.VISIBLE);
             textMacAddress.setText(drone.lastMAC);
-            refreshStatus();
+            swipeLayout.setEnabled(true);
+            swipeLayout.setRefreshing(true);
+            onRefresh();
         } else if (event.matches(DroneEventObject.droneEventType.DISCONNECTED) ||
             event.matches(DroneEventObject.droneEventType.CONNECTION_LOST)) {
             layoutDisconnected.setVisibility(View.VISIBLE);
             layoutConnected.setVisibility(View.GONE);
+            swipeLayout.setEnabled(false);
+            swipeLayout.setRefreshing(false);
         } else if (event.matches(DroneEventObject.droneEventType.BATTERY_VOLTAGE_MEASURED) ||
                 event.matches(DroneEventObject.droneEventType.CHARGING_STATUS)) {
+            leftStatusEventCount --;
             textBatteryStatus.setText(getString(R.string.battery_voltage_and_charging_status,
                     drone.batteryVoltage_Volts,
                     drone.isCharging ? getString(R.string.battery_in_charging)
                                      : getString(R.string.battery_not_in_charging)
             ));
         }
+
+        if (leftStatusEventCount <= 0)
+            swipeLayout.setRefreshing(false);
     }
 }
