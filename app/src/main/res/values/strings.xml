@@ -31,5 +31,7 @@
     <string name="start">Start</string>
     <string name="title_section_recording">Recording</string>
     <string name="title_record_config">Start a recording task</string>
+    <string name="title_record_status">Recording</string>
+    <string name="stop">Stop</string>
 
 </resources>

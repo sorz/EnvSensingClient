@@ -20,7 +20,9 @@ public class MainActivity extends AppCompatActivity
         Drawer.OnDrawerItemClickListener,
         Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
-        SettingsFragment.OnDisplayDialogListener {
+        SettingsFragment.OnDisplayDialogListener,
+        RecordConfigFragment.OnRecordingStartedListener,
+        RecordStatusFragment.OnRecordingStoppedListener {
     static final int SECTION_STATUS = 0;
     static final int SECTION_SETTINGS = 1;
     static final int SECTION_RECORDING = 2;
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SECTION_RECORDING:
                 if (RecordService.isRunning())
-                    fragment = new Fragment(); // TODO: RecordStatusFragment()
+                    fragment = new RecordStatusFragment();
                 else
                     fragment = new RecordConfigFragment();
                 break;
@@ -143,4 +145,17 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().popBackStack();
     }
 
+    @Override
+    public void onRecordingStarted() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new RecordStatusFragment())
+                .commit();
+    }
+
+    @Override
+    public void onRecordingStopped() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new RecordConfigFragment())
+                .commit();
+    }
 }

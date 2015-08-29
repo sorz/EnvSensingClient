@@ -1,5 +1,6 @@
 package mo.edu.ipm.stud.environmentalsensing;
 
+import android.app.Activity;
 import android.app.Fragment;
 
 import android.content.Intent;
@@ -13,11 +14,22 @@ import android.widget.Button;
  * A {@link Fragment} used to configure and start a new recording task.
  */
 public class RecordConfigFragment extends Fragment {
+    private OnRecordingStartedListener callback;
+
+    public interface OnRecordingStartedListener {
+        public void onRecordingStarted();
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.title_record_config);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        callback = (OnRecordingStartedListener) activity;
     }
 
     @Override
@@ -37,10 +49,10 @@ public class RecordConfigFragment extends Fragment {
     }
 
     private void startService() {
-        if (RecordService.isRunning())
-            return;
-        Intent intent = new Intent(getActivity(), RecordService.class);
-        getActivity().startService(intent);
-        // TODO: Switch to RecordStatusFragment.
+        if (!RecordService.isRunning()) {
+            Intent intent = new Intent(getActivity(), RecordService.class);
+            getActivity().startService(intent);
+        }
+        callback.onRecordingStarted();
     }
 }

@@ -45,6 +45,7 @@ public class RecordService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        notificationManager.cancel(NOTIFICATION);
         running = false;
     }
 
@@ -53,7 +54,6 @@ public class RecordService extends Service {
         Log.d(TAG, "Received start id " + startId + ": " + intent);
         return START_NOT_STICKY;
     }
-
 
     static public boolean isRunning() {
         return running;
