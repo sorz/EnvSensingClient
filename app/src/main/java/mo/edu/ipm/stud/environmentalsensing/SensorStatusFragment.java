@@ -83,8 +83,12 @@ public class SensorStatusFragment extends Fragment
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (preferences.getString("pref_bluetooth_mac", null) == null)
-                    return;  // TODO: Show sensor selection fragment.
+                if (preferences.getString("pref_bluetooth_mac", null) == null) {
+                    Toast.makeText(getActivity(),
+                            R.string.need_to_select_sensor, Toast.LENGTH_SHORT).show();
+                    // TODO: Show sensor selection fragment directly.
+                    return;
+                }
 
                 BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                 if (bluetoothAdapter == null) {

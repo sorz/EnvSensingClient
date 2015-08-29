@@ -35,4 +35,5 @@
     <string name="battery_voltage_and_charging_status">%1$.2fV (%2$s)</string>
     <string name="battery_in_charging">in charging</string>
     <string name="battery_not_in_charging">not changing</string>
+    <string name="need_to_select_sensor">Please go settings to select Sendordone first.</string>
 </resources>

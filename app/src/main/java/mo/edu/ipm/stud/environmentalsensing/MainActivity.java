@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener {
 
+    private SharedPreferences preferences;
     private Drawer drawer;
 
     @Override
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity
         if (actionBar != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().addOnBackStackChangedListener(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Set up the drawer.
         // Reference:
@@ -53,8 +55,11 @@ public class MainActivity extends AppCompatActivity
                 .withOnDrawerItemClickListener(this)
                 .withOnDrawerNavigationListener(this)
                 .build();
-        drawer.setSelectionAtPosition(0);
 
+        if (preferences.getString("pref_bluetooth_mac", null) == null)
+            drawer.setSelectionAtPosition(1);
+        else
+            drawer.setSelectionAtPosition(0);
     }
 
     @Override
