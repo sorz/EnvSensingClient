@@ -8,7 +8,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 /**
- * Created by xierch on 2015/8/29.
+ * A PreferenceFragment which list all settings.
  */
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener  {

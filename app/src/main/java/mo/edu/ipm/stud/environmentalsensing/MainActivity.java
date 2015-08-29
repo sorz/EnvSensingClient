@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
@@ -49,8 +48,7 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_status).withIdentifier(1),
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_settings).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.title_section3).withIdentifier(1)
+                                .withName(R.string.title_section_settings).withIdentifier(1)
                 )
                 .withOnDrawerItemClickListener(this)
                 .withOnDrawerNavigationListener(this)
@@ -60,21 +58,6 @@ public class MainActivity extends AppCompatActivity
             drawer.setSelectionAtPosition(1);
         else
             drawer.setSelectionAtPosition(0);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -119,6 +102,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationClickListener(View view) {
+        // Handle back button click, return last fragment or default operation (exit).
         FragmentManager fragmentManager = getFragmentManager();
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
