@@ -61,7 +61,7 @@ public class SensorSelectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_connect_sensor, container, false);
+        View view = inflater.inflate(R.layout.fragment_sensor_selection, container, false);
 
         Button buttonEnableBt = (Button) view.findViewById(R.id.button_enable_bluetooth);
         buttonEnableBt.setOnClickListener(new View.OnClickListener() {

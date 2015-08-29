@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Environmental Sensing</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
+    <string name="title_section_settings">Settings</string>
+    <string name="title_section_status">Status</string>
     <string name="title_section3">Section 3</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -23,6 +23,10 @@
     <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordron device. Select it anyway?</string>
     <string name="dialog_select_device_confirm_title">Selection confirm</string>
     <string name="pref_bluetooth_mac">Sensordrone Bluetooth address</string>
-    <string name="title_section_settings">Settings</string>
     <string name="press_to_select">Press to select</string>
+    <string name="connect_fail">Connect fail.</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connect">Connect</string>
+    <string name="connected">Connected</string>
+    <string name="disconnect">Disconnect</string>
 </resources>

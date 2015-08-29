@@ -45,8 +45,9 @@ public class MainActivity extends AppCompatActivity
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         new PrimaryDrawerItem()
+                                .withName(R.string.title_section_status).withIdentifier(1),
+                        new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.title_section2).withIdentifier(1),
                         new PrimaryDrawerItem().withName(R.string.title_section3).withIdentifier(1)
                 )
                 .withOnDrawerItemClickListener(this)
@@ -76,6 +77,9 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment;
         switch (position) {
             case 0:
+                fragment = new SensorStatusFragment();
+                break;
+            case 1:
                 fragment = new SettingsFragment();
                 break;
             default:
