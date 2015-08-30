@@ -8,17 +8,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.sensorcon.sensordrone.DroneEventHandler;
+import com.sensorcon.sensordrone.DroneEventObject;
+import com.sensorcon.sensordrone.android.Drone;
+
 /**
  * Do measure periodically and stick a notification.
  */
-public class RecordService extends Service {
+public class RecordService extends Service implements DroneEventHandler {
     static private final String TAG = "RecordService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
+    static private final int MEASURE_TIMEOUT = 60;
     static public final String ACTION_NEW = RecordService.class.getName() + ".ACTION_NEW";
     static public final String ACTION_MEASURE = RecordService.class.getName() + ".ACTION_MEASURE";
     static public final String ACTION_STOP = RecordService.class.getName() + ".ACTION_STOP";
@@ -31,12 +37,18 @@ public class RecordService extends Service {
     private final IBinder binder = new LocalBinder();
     private SharedPreferences preferences;
     private AlarmManager alarmManager;
+    private Drone drone;
+
     private long recording_start;
     private long recording_stop;
     private PendingIntent pendingIntent;
     private boolean exactInterval;
     private long interval;
     private long nextMeasureTime;
+    private PowerManager.WakeLock wakeLock;
+
+    private boolean waitForTemperature;
+
 
     public class LocalBinder extends Binder {
         RecordService getService() {
@@ -55,6 +67,10 @@ public class RecordService extends Service {
         running = true;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        drone = SensorDrone.getInstance();
+        drone.registerDroneListener(this);
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(MainActivity.ACTION_SHOW_RECORD_STATUS);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -74,6 +90,10 @@ public class RecordService extends Service {
         super.onDestroy();
         running = false;
         stopForeground(true);
+        drone.unregisterDroneListener(this);
+        if (drone.isConnected)
+            // TODO: Use a connection counter to avoid disturbing who is using it?
+            drone.disconnect();
     }
 
     @Override
@@ -125,6 +145,60 @@ public class RecordService extends Service {
 
     private void doMeasure() {
         Log.d(TAG, "Measuring...");
+        wakeLock.acquire(MEASURE_TIMEOUT);
+        // TODO: Active check connection status?
+        if (drone.isConnected) {
+            sendMeasureRequest();
+        } else {
+            Log.d(TAG, "Connecting to sensor.");
+            new SensorConnectAsyncTask() {
+                @Override
+                public void onPostExecute(Boolean result) {
+                    if (result) {
+                        sendMeasureRequest();
+                    } else {
+                        Log.w(TAG, "Measure failed: cannot connect to sensor.");
+                        wakeLock.release();
+                    }
+                }
+            }.execute(preferences.getString("pref_bluetooth_mac", ""));
+        }
+    }
+
+    private void sendMeasureRequest() {
+        Log.d(TAG, "Sending measure requests.");
+        waitForTemperature = drone.measureTemperature();
+        if (!waitForTemperature)
+            Log.i(TAG, "Fail to send measureTemperature().");
+
+        // TODO: Enable sensors.
+        // TODO: Add more measures.
+
+        if (!waitForTemperature) {
+            // All actions failed.
+            wakeLock.release();
+        }
+    }
+
+    @Override
+    public void parseEvent(DroneEventObject event) {
+        // Wakelock must be held if we are waiting for measuring result.
+        if (!wakeLock.isHeld())
+            return;
+
+        Log.d(TAG, "Event: " + event);
+
+        if (waitForTemperature &&
+                event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED)) {
+            Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
+            // TODO: Store value.
+            waitForTemperature = false;
+        }
+
+        if (!waitForTemperature) {
+            // All measures done.
+            wakeLock.release();
+        }
     }
 
     private int finishTask() {
