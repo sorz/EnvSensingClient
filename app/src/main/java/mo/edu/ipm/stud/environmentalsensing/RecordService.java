@@ -8,12 +8,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
- * Created by xierch on 2015/8/29.
+ * Do measure periodically and stick a notification.
  */
 public class RecordService extends Service {
     static private final String TAG = "RecordService";
@@ -33,6 +34,9 @@ public class RecordService extends Service {
     private long recording_start;
     private long recording_stop;
     private PendingIntent pendingIntent;
+    private boolean exactInterval;
+    private long interval;
+    private long nextMeasureTime;
 
     public class LocalBinder extends Binder {
         RecordService getService() {
@@ -79,33 +83,48 @@ public class RecordService extends Service {
             // TODO: Check existed task.
             recording_start = intent.getLongExtra(EXTRA_RECORDING_START, 0);
             recording_stop = intent.getLongExtra(EXTRA_RECORDING_END, 0);
-            if (System.currentTimeMillis() > recording_stop)
+            if (SystemClock.elapsedRealtime() > recording_stop)
                 return finishTask();
 
             Intent measureIntent = new Intent(this, RecordService.class);
             measureIntent.setAction(ACTION_MEASURE);
             pendingIntent = PendingIntent.getService(this, 0, measureIntent, 0);
-            int intervalSeconds = Integer.parseInt(
-                    preferences.getString("pref_recording_interval", "300"));
+            interval = Integer.parseInt(
+                    preferences.getString("pref_recording_interval", "300")) * 1000;
             alarmManager.cancel(pendingIntent);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0,
-                    intervalSeconds * 1000, pendingIntent);
+
+            exactInterval = preferences.getBoolean("pref_recording_exact_interval", false);
+            if (exactInterval) {
+                nextMeasureTime = recording_start;
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        nextMeasureTime, pendingIntent);
+            } else {
+                alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        recording_start, interval, pendingIntent);
+            }
             return START_REDELIVER_INTENT;
 
         } else if (ACTION_MEASURE.equals(intent.getAction())) {
-            if (System.currentTimeMillis() > recording_stop)
+            if (SystemClock.elapsedRealtime() > recording_stop)
                 return finishTask();
-            if (System.currentTimeMillis() < recording_start)
+            if (SystemClock.elapsedRealtime() < recording_start)
                 return START_NOT_STICKY;
-
-            Log.d(TAG, "Measuring...");
-
+            if (exactInterval) {
+                nextMeasureTime += interval;
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        nextMeasureTime, pendingIntent);
+            }
+            doMeasure();
             return START_NOT_STICKY;
         } else if (ACTION_STOP.equals(intent.getAction())) {
             return finishTask();
         } else {
             return START_NOT_STICKY;
         }
+    }
+
+    private void doMeasure() {
+        Log.d(TAG, "Measuring...");
     }
 
     private int finishTask() {

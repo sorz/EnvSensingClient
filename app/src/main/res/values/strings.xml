@@ -33,7 +33,9 @@
     <string name="title_record_config">Start a recording task</string>
     <string name="title_record_status">Recording</string>
     <string name="stop">Stop</string>
-    <string name="pref_recording_interval_title">Measure interval</string>
+    <string name="pref_recording_interval">Measure interval</string>
     <string name="pref_recording_interval_dialog_title">Select a interval</string>
+    <string name="pref_recording_exact_interval_summary">More accurate as well as more battery usage.</string>
+    <string name="pref_recording_exact_interval">Precise interval</string>
 
 </resources>

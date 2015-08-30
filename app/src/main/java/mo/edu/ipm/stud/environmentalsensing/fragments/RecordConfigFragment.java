@@ -5,6 +5,7 @@ import android.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,9 +56,9 @@ public class RecordConfigFragment extends Fragment {
         if (!RecordService.isRunning()) {
             Intent intent = new Intent(getActivity(), RecordService.class);
             intent.setAction(RecordService.ACTION_NEW);
-            intent.putExtra(RecordService.EXTRA_RECORDING_START, System.currentTimeMillis());
+            intent.putExtra(RecordService.EXTRA_RECORDING_START, SystemClock.elapsedRealtime());
             intent.putExtra(RecordService.EXTRA_RECORDING_END,
-                    System.currentTimeMillis() + 60 * 1000);
+                    SystemClock.elapsedRealtime() + 60 * 1000);
             getActivity().startService(intent);
         }
         callback.onRecordingStarted();
