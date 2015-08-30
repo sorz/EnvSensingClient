@@ -179,9 +179,11 @@ public class SensorStatusFragment extends Fragment
         }
         // The number of measure requests sent.
         // Make parseEvent() know when to setRefreshing(false).
-        leftStatusEventCount = 2;
-        drone.checkIfCharging();
-        drone.measureBatteryVoltage();
+        leftStatusEventCount = 0;
+        if (drone.checkIfCharging())
+            leftStatusEventCount++;
+        if (drone.measureBatteryVoltage())
+            leftStatusEventCount++;
     }
 
     /**
