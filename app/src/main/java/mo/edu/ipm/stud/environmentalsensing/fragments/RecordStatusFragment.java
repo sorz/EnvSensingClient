@@ -51,8 +51,11 @@ public class RecordStatusFragment extends Fragment {
     }
 
     private void stopService() {
-        if (RecordService.isRunning())
-            getActivity().stopService(new Intent(getActivity(), RecordService.class));
+        if (RecordService.isRunning()) {
+            Intent intent = new Intent(getActivity(), RecordService.class);
+            intent.setAction(RecordService.ACTION_STOP);
+            getActivity().startService(intent);
+        }
         callback.onRecordingStopped();
     }
 }

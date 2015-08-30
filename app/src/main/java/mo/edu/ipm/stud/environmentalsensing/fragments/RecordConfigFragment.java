@@ -54,6 +54,10 @@ public class RecordConfigFragment extends Fragment {
     private void startService() {
         if (!RecordService.isRunning()) {
             Intent intent = new Intent(getActivity(), RecordService.class);
+            intent.setAction(RecordService.ACTION_NEW);
+            intent.putExtra(RecordService.EXTRA_RECORDING_START, System.currentTimeMillis());
+            intent.putExtra(RecordService.EXTRA_RECORDING_END,
+                    System.currentTimeMillis() + 60 * 1000);
             getActivity().startService(intent);
         }
         callback.onRecordingStarted();

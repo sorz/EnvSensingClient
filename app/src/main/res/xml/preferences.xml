@@ -5,4 +5,12 @@
         android:key="pref_bluetooth_mac"
         android:title="@string/pref_bluetooth_mac" />
 
+    <ListPreference
+        android:key="pref_recording_interval"
+        android:title="@string/pref_recording_interval_title"
+        android:dialogTitle="@string/pref_recording_interval_dialog_title"
+        android:entries="@array/pref_recording_interval_entries"
+        android:entryValues="@array/pref_recording_interval_values"
+        android:defaultValue="300" />
+
 </PreferenceScreen>

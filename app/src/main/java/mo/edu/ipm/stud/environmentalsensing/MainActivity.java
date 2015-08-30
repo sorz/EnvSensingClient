@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity
         SettingsFragment.OnDisplayDialogListener,
         RecordConfigFragment.OnRecordingStartedListener,
         RecordStatusFragment.OnRecordingStoppedListener {
-    public static final String ACTION_SHOW_RECORD_STATUS = "action-show-record-status";
+    public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
+            ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
