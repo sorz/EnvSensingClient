@@ -55,17 +55,13 @@ public class SensorMeasureAsyncTask
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
         drone.registerDroneListener(this);
 
-        if (drone.temperatureStatus)
-            measured[SENSOR_TEMPERATURE] = drone.measureTemperature();
-        else
-            failed[SENSOR_TEMPERATURE] = !drone.enableTemperature();
-
-        if (drone.humidityStatus)
-            measured[SENSOR_HUMIDITY] = drone.measureHumidity();
-        else
-            failed[SENSOR_HUMIDITY] = !drone.enableHumidity();
+        failed[SENSOR_TEMPERATURE] =
+                drone.temperatureStatus ? drone.measureTemperature() : !drone.enableTemperature();
+        failed[SENSOR_HUMIDITY] =
+                drone.humidityStatus ? drone.measureHumidity() : !drone.enableHumidity();
 
         // TODO: Add more sensors here.
+        // TODO: Handle all failed before timeout.
 
         return null;
     }
