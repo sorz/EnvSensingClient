@@ -16,6 +16,9 @@ import android.util.Log;
 
 import com.sensorcon.sensordrone.android.Drone;
 
+import mo.edu.ipm.stud.environmentalsensing.tasks.SensorConnectAsyncTask;
+import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
+
 /**
  * Do measure periodically and stick a notification.
  */

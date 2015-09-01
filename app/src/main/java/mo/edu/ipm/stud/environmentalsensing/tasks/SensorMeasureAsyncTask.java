@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.tasks;
 
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -7,6 +7,8 @@ import android.util.Log;
 import com.sensorcon.sensordrone.DroneEventHandler;
 import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
+
+import mo.edu.ipm.stud.environmentalsensing.SensorDrone;
 
 
 /**

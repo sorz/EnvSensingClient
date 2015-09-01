@@ -1,8 +1,10 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.tasks;
 
 import android.os.AsyncTask;
 
 import com.sensorcon.sensordrone.android.Drone;
+
+import mo.edu.ipm.stud.environmentalsensing.SensorDrone;
 
 /**
  * Connect to specify Sensordrone device via Bluetooth.

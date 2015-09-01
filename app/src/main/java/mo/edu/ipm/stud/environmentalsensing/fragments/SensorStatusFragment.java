@@ -22,7 +22,7 @@ import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
-import mo.edu.ipm.stud.environmentalsensing.SensorConnectAsyncTask;
+import mo.edu.ipm.stud.environmentalsensing.tasks.SensorConnectAsyncTask;
 import mo.edu.ipm.stud.environmentalsensing.SensorDrone;
 
 
