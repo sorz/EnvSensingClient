@@ -14,17 +14,15 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.sensorcon.sensordrone.DroneEventHandler;
-import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
 /**
  * Do measure periodically and stick a notification.
  */
-public class RecordService extends Service implements DroneEventHandler {
+public class RecordService extends Service {
     static private final String TAG = "RecordService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
-    static private final int MEASURE_TIMEOUT = 60;
+    static private final int MEASURE_TIMEOUT = 60 * 1000; // 60 seconds
     static public final String ACTION_NEW = RecordService.class.getName() + ".ACTION_NEW";
     static public final String ACTION_MEASURE = RecordService.class.getName() + ".ACTION_MEASURE";
     static public final String ACTION_STOP = RecordService.class.getName() + ".ACTION_STOP";
@@ -47,8 +45,6 @@ public class RecordService extends Service implements DroneEventHandler {
     private long nextMeasureTime;
     private PowerManager.WakeLock wakeLock;
 
-    private boolean waitForTemperature;
-
 
     public class LocalBinder extends Binder {
         RecordService getService() {
@@ -70,7 +66,6 @@ public class RecordService extends Service implements DroneEventHandler {
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         drone = SensorDrone.getInstance();
-        drone.registerDroneListener(this);
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(MainActivity.ACTION_SHOW_RECORD_STATUS);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -90,7 +85,6 @@ public class RecordService extends Service implements DroneEventHandler {
         super.onDestroy();
         running = false;
         stopForeground(true);
-        drone.unregisterDroneListener(this);
         if (drone.isConnected)
             // TODO: Use a connection counter to avoid disturbing who is using it?
             drone.disconnect();
@@ -158,7 +152,8 @@ public class RecordService extends Service implements DroneEventHandler {
                         sendMeasureRequest();
                     } else {
                         Log.w(TAG, "Measure failed: cannot connect to sensor.");
-                        wakeLock.release();
+                        if (wakeLock.isHeld())
+                            wakeLock.release();
                     }
                 }
             }.execute(preferences.getString("pref_bluetooth_mac", ""));
@@ -167,38 +162,19 @@ public class RecordService extends Service implements DroneEventHandler {
 
     private void sendMeasureRequest() {
         Log.d(TAG, "Sending measure requests.");
-        waitForTemperature = drone.measureTemperature();
-        if (!waitForTemperature)
-            Log.i(TAG, "Fail to send measureTemperature().");
 
-        // TODO: Enable sensors.
-        // TODO: Add more measures.
-
-        if (!waitForTemperature) {
-            // All actions failed.
-            wakeLock.release();
-        }
-    }
-
-    @Override
-    public void parseEvent(DroneEventObject event) {
-        // Wakelock must be held if we are waiting for measuring result.
-        if (!wakeLock.isHeld())
-            return;
-
-        Log.d(TAG, "Event: " + event);
-
-        if (waitForTemperature &&
-                event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED)) {
-            Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
-            // TODO: Store value.
-            waitForTemperature = false;
-        }
-
-        if (!waitForTemperature) {
-            // All measures done.
-            wakeLock.release();
-        }
+        new SensorMeasureAsyncTask().execute(new SensorMeasureAsyncTask.OnMeasureDone() {
+            @Override
+            public void onMeasureDone(boolean[] measured) {
+                Log.d(TAG, "Measured.");
+                if (measured[SensorMeasureAsyncTask.SENSOR_TEMPERATURE])
+                    Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
+                if (measured[SensorMeasureAsyncTask.SENSOR_HUMIDITY])
+                    Log.d(TAG, "Humidity: " + drone.humidity_Percent);
+                if (wakeLock.isHeld())
+                    wakeLock.release();
+            }
+        });
     }
 
     private int finishTask() {
