@@ -19,6 +19,7 @@ import com.sensorcon.sensordrone.android.Drone;
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
+import mo.edu.ipm.stud.environmentalsensing.entities.Pressure;
 import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorConnectAsyncTask;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
@@ -193,7 +194,11 @@ public class RecordService extends Service {
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_MONOXIDE]) {
             Log.d(TAG, "Monoxide: " + drone.precisionGas_ppmCarbonMonoxide);
-            new Monoxide(measurement, drone.precisionGas_ppmCarbonMonoxide);
+            new Monoxide(measurement, drone.precisionGas_ppmCarbonMonoxide).save();
+        }
+        if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
+            Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
+            new Pressure(measurement, drone.pressure_Pascals).save();
         }
 
         if (wakeLock.isHeld())
