@@ -16,6 +16,9 @@ import android.util.Log;
 
 import com.sensorcon.sensordrone.android.Drone;
 
+import mo.edu.ipm.stud.environmentalsensing.entites.Humidity;
+import mo.edu.ipm.stud.environmentalsensing.entites.Measurement;
+import mo.edu.ipm.stud.environmentalsensing.entites.Temperature;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorConnectAsyncTask;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
 
@@ -170,14 +173,31 @@ public class RecordService extends Service {
             @Override
             public void onMeasureDone(boolean[] measured) {
                 Log.d(TAG, "Measured.");
-                if (measured[SensorMeasureAsyncTask.SENSOR_TEMPERATURE])
-                    Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
-                if (measured[SensorMeasureAsyncTask.SENSOR_HUMIDITY])
-                    Log.d(TAG, "Humidity: " + drone.humidity_Percent);
-                if (wakeLock.isHeld())
-                    wakeLock.release();
+                storeMeasureResult(measured);
             }
         });
+    }
+
+    private void storeMeasureResult(boolean[] sensors) {
+        Measurement measurement = new Measurement();
+        measurement.save();
+
+        if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE]) {
+            Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
+            Temperature temperature = new Temperature(measurement);
+            temperature.setValue(drone.temperature_Kelvin);
+            temperature.save();
+        }
+
+        if (sensors[SensorMeasureAsyncTask.SENSOR_HUMIDITY]) {
+            Log.d(TAG, "Humidity: " + drone.humidity_Percent);
+            Humidity humidity = new Humidity(measurement);
+            humidity.setValue(drone.humidity_Percent);
+            humidity.save();
+        }
+
+        if (wakeLock.isHeld())
+            wakeLock.release();
     }
 
     private int finishTask() {
