@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing.entites;
+package mo.edu.ipm.stud.environmentalsensing.entities;
 
 import com.orm.SugarRecord;
 
