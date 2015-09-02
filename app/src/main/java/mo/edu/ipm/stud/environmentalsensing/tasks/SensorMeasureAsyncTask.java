@@ -22,9 +22,10 @@ public class SensorMeasureAsyncTask
     private static final String TAG = "SensorMeasureAsyncTask";
     private static final long TIMEOUT = 10 * 1000; // 10 seconds
 
-    public static final int TOTAL_SENSOR = 2;
+    public static final int TOTAL_SENSOR = 3;
     public static final int SENSOR_TEMPERATURE = 0;
     public static final int SENSOR_HUMIDITY = 1;
+    public static final int SENSOR_MONOXIDE = 2;
 
     private Drone drone = SensorDrone.getInstance();
     private boolean[] measured = new boolean[TOTAL_SENSOR];
@@ -55,10 +56,12 @@ public class SensorMeasureAsyncTask
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
         drone.registerDroneListener(this);
 
-        failed[SENSOR_TEMPERATURE] =
-                drone.temperatureStatus ? drone.measureTemperature() : !drone.enableTemperature();
-        failed[SENSOR_HUMIDITY] =
-                drone.humidityStatus ? drone.measureHumidity() : !drone.enableHumidity();
+        failed[SENSOR_TEMPERATURE] = drone.temperatureStatus ?
+                !drone.measureTemperature() : !drone.enableTemperature();
+        failed[SENSOR_HUMIDITY] = drone.humidityStatus ?
+                !drone.measureHumidity() : !drone.enableHumidity();
+        failed[SENSOR_MONOXIDE] = drone.precisionGasStatus ?
+                !drone.measurePrecisionGas() : !drone.enablePrecisionGas();
 
         // TODO: Add more sensors here.
         // TODO: Handle all failed before timeout.
@@ -76,6 +79,9 @@ public class SensorMeasureAsyncTask
         else if (event.matches(DroneEventObject.droneEventType.HUMIDITY_ENABLED)
                 & !measured[SENSOR_HUMIDITY])
             drone.measureHumidity();
+        else if (event.matches(DroneEventObject.droneEventType.PRECISION_GAS_ENABLED)
+                & !measured[SENSOR_MONOXIDE])
+            drone.measurePrecisionGas();
 
         // TODO: Add more sensors here.
 
@@ -84,6 +90,8 @@ public class SensorMeasureAsyncTask
             measured[SENSOR_TEMPERATURE] = true;
         else if (event.matches(DroneEventObject.droneEventType.HUMIDITY_MEASURED))
             measured[SENSOR_HUMIDITY] = true;
+        else if (event.matches(DroneEventObject.droneEventType.PRECISION_GAS_MEASURED))
+            measured[SENSOR_MONOXIDE] = true;
 
         // TODO: Add more sensors here.
 
