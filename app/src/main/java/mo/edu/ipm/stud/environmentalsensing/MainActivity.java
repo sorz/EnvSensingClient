@@ -69,11 +69,11 @@ public class MainActivity extends AppCompatActivity
                 .withToolbar(toolbar)
                 .addDrawerItems(
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_sensor_status)
-                                .withIdentifier(SECTION_SENSOR_STATUS),
-                        new PrimaryDrawerItem()
                                 .withName(R.string.title_section_recording)
                                 .withIdentifier(SECTION_RECORDING),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_sensor_status)
+                                .withIdentifier(SECTION_SENSOR_STATUS),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings)
                                 .withIdentifier(SECTION_SETTINGS)

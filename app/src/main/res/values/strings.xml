@@ -30,12 +30,17 @@
     <string name="record_service_running">Recording environmental indicators cyclically.</string>
     <string name="start">Start</string>
     <string name="title_section_recording">Recording</string>
-    <string name="title_record_config">Start a recording task</string>
+    <string name="title_record_config">Start new recording task</string>
     <string name="title_record_status">Recording</string>
     <string name="stop">Stop</string>
     <string name="pref_recording_interval">Measure interval</string>
     <string name="pref_recording_interval_dialog_title">Select a interval</string>
     <string name="pref_recording_exact_interval_summary">More accurate as well as more battery usage.</string>
     <string name="pref_recording_exact_interval">Precise interval</string>
+    <string name="recording_duration">Duration</string>
+    <string name="auto_stop_in">auto stop recording in</string>
+    <string name="unit_hours">hours</string>
+    <string name="unit_minutes">minutes</string>
+    <string name="illegal_duration">Please set a duration first.</string>
 
 </resources>
