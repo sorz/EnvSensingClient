@@ -23,6 +23,7 @@ import android.util.Log;
 import com.sensorcon.sensordrone.android.Drone;
 
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
+import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
 import mo.edu.ipm.stud.environmentalsensing.entities.Pressure;
@@ -59,6 +60,7 @@ public class RecordService extends Service implements LocationListener {
     private long interval;
     private long nextMeasureTime;
     private PowerManager.WakeLock wakeLock;
+    private Measurement measurement;
 
 
     public class LocalBinder extends Binder {
@@ -156,6 +158,8 @@ public class RecordService extends Service implements LocationListener {
     private void doMeasure() {
         Log.d(TAG, "Measuring...");
         wakeLock.acquire(MEASURE_TIMEOUT);
+        measurement = new Measurement();
+        measurement.save();
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -198,9 +202,6 @@ public class RecordService extends Service implements LocationListener {
     }
 
     private void storeMeasureResult(boolean[] sensors) {
-        Measurement measurement = new Measurement();
-        measurement.save();
-
         if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE]) {
             Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
             new Temperature(measurement, drone.temperature_Kelvin).save();
@@ -218,6 +219,7 @@ public class RecordService extends Service implements LocationListener {
             new Pressure(measurement, drone.pressure_Pascals).save();
         }
 
+        // TODO: Check and ensure release lock after location fixed.
         if (wakeLock.isHeld())
             wakeLock.release();
     }
@@ -242,6 +244,7 @@ public class RecordService extends Service implements LocationListener {
         Log.d(TAG, "Elapsed time: " +
                 (SystemClock.elapsedRealtimeNanos()
                         - location.getElapsedRealtimeNanos()) / 1000000000);
+        new LocationInfo(measurement, location).save();
     }
 
     @Override
