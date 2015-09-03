@@ -6,7 +6,13 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -27,7 +33,7 @@ import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
 /**
  * Do measure periodically and stick a notification.
  */
-public class RecordService extends Service {
+public class RecordService extends Service implements LocationListener {
     static private final String TAG = "RecordService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
     static private final int MEASURE_TIMEOUT = 60 * 1000; // 60 seconds
@@ -43,6 +49,7 @@ public class RecordService extends Service {
     private final IBinder binder = new LocalBinder();
     private SharedPreferences preferences;
     private AlarmManager alarmManager;
+    private LocationManager locationManager;
     private Drone drone;
 
     private long recording_start;
@@ -71,6 +78,7 @@ public class RecordService extends Service {
         running = true;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         drone = SensorDrone.getInstance();
@@ -148,6 +156,15 @@ public class RecordService extends Service {
     private void doMeasure() {
         Log.d(TAG, "Measuring...");
         wakeLock.acquire(MEASURE_TIMEOUT);
+
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setBearingRequired(false);
+        criteria.setAltitudeRequired(false);
+        criteria.setSpeedRequired(false);
+        // TODO: check permission?
+        locationManager.requestSingleUpdate(criteria, this, getMainLooper());
+
         // TODO: Active check connection status?
         if (drone.isConnected) {
             sendMeasureRequest();
@@ -214,6 +231,42 @@ public class RecordService extends Service {
 
     static public boolean isRunning() {
         return running;
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "Location changed: " + location);
+        Log.d(TAG, "Provider: " + location.getProvider());
+        Log.d(TAG, "Accuracy: " + location.getAccuracy() + "m");
+        Log.d(TAG, "Elapsed time: " +
+                (SystemClock.elapsedRealtimeNanos()
+                        - location.getElapsedRealtimeNanos()) / 1000000000);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        switch (status) {
+            case LocationProvider.OUT_OF_SERVICE:
+                Log.d(TAG, provider + " out of service");
+                break;
+            case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                Log.d(TAG, provider + " temporarily unavailable");
+                break;
+            case LocationProvider.AVAILABLE:
+                Log.d(TAG, provider + " available");
+                break;
+        }
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d(TAG, "Provider enabled: " + provider);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d(TAG, "Provider disabled: " + provider);
     }
 
 }
