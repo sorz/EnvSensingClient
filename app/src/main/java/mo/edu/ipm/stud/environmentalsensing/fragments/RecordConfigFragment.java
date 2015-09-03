@@ -3,7 +3,9 @@ package mo.edu.ipm.stud.environmentalsensing.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -20,7 +22,10 @@ import mo.edu.ipm.stud.environmentalsensing.RecordService;
  * A {@link Fragment} used to configure and start a new recording task.
  */
 public class RecordConfigFragment extends Fragment {
+    static private final int REQUEST_ENABLE_BT = 0;
+
     private OnRecordingStartedListener callback;
+
     private NumberPicker pickerHours;
     private NumberPicker pickerMinutes;
 
@@ -55,20 +60,49 @@ public class RecordConfigFragment extends Fragment {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startService();
+                checkThenStartService();
             }
         });
 
         return view;
     }
 
+    private void checkThenStartService() {
+        if (pickerHours.getValue() + pickerMinutes.getValue() == 0) {
+            Toast.makeText(getActivity(), R.string.illegal_duration, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            Toast.makeText(getActivity(),
+                    R.string.bluetooth_not_found, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (bluetoothAdapter.isEnabled()) {
+            startService();
+        } else {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            // startService() will be called in onActivityResult().
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                if (resultCode == Activity.RESULT_OK)
+                    // This request only be sent when user request to start service.
+                    // So we start it immediately after this request be accepted.
+                    startService();
+        }
+    }
+
     private void startService() {
         if (!RecordService.isRunning()) {
             long durationSeconds = pickerHours.getValue() + pickerMinutes.getValue() * 60;
-            if (durationSeconds <= 0) {
-                Toast.makeText(getActivity(), R.string.illegal_duration, Toast.LENGTH_SHORT).show();
+            if (durationSeconds <= 0)
                 return;
-            }
             Intent intent = new Intent(getActivity(), RecordService.class);
             intent.setAction(RecordService.ACTION_NEW);
             intent.putExtra(RecordService.EXTRA_RECORDING_START, SystemClock.elapsedRealtime());
