@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class RecordConfigFragment extends Fragment {
     static private final int REQUEST_ENABLE_BT = 0;
 
     private OnRecordingStartedListener callback;
+    private SharedPreferences preferences;
 
     private NumberPicker pickerHours;
     private NumberPicker pickerMinutes;
@@ -49,6 +51,7 @@ public class RecordConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record_config, container, false);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Button buttonStart = (Button) view.findViewById(R.id.button_start);
         pickerHours = (NumberPicker) view.findViewById(R.id.pickerHours);
         pickerMinutes = (NumberPicker) view.findViewById(R.id.pickerMinutes);
@@ -56,6 +59,10 @@ public class RecordConfigFragment extends Fragment {
         pickerHours.setMinValue(0);
         pickerMinutes.setMaxValue(59);
         pickerMinutes.setMinValue(0);
+        pickerHours.setValue(preferences.getInt(
+                getString(R.string.pref_recording_duration_hours), 0));
+        pickerMinutes.setValue(preferences.getInt(
+                getString(R.string.pref_recording_duration_minutes), 30));
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +116,13 @@ public class RecordConfigFragment extends Fragment {
             intent.putExtra(RecordService.EXTRA_RECORDING_END,
                     SystemClock.elapsedRealtime() + durationSeconds * 1000);
             getActivity().startService(intent);
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt(getString(R.string.pref_recording_duration_hours),
+                    pickerHours.getValue());
+            editor.putInt(getString(R.string.pref_recording_duration_minutes),
+                    pickerMinutes.getValue());
+            editor.apply();
         }
         callback.onRecordingStarted();
     }

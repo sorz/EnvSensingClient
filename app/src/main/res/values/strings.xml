@@ -2,6 +2,8 @@
     <string name="pref_bluetooth_mac" translatable="false">pref_bluetooth_mac</string>
     <string name="pref_recording_interval" translatable="false">pref_recording_interval</string>
     <string name="pref_recording_exact_interval" translatable="false">pref_recording_exact_interval</string>
+    <string name="pref_recording_duration_hours" translatable="false">pref_recording_duration_hours</string>
+    <string name="pref_recording_duration_minutes" translatable="false">pref_recording_duration_minutes</string>
 
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
