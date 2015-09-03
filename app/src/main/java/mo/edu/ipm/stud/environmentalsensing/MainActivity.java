@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity
                 .withOnDrawerNavigationListener(this)
                 .build();
 
-        if (preferences.getString("pref_bluetooth_mac", null) == null)
+        if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null)
             drawer.setSelectionAtPosition(1);
         else
             drawer.setSelectionAtPosition(0);
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity
     public void onSensorSelected(String mac) {
         SharedPreferences.Editor editor =
                 PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putString("pref_bluetooth_mac", mac);
+        editor.putString(getString(R.string.pref_bluetooth_mac), mac);
         editor.apply();
 
         getFragmentManager().popBackStack();

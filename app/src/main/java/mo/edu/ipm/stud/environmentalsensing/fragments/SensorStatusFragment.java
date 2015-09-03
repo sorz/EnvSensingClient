@@ -89,7 +89,7 @@ public class SensorStatusFragment extends Fragment
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (preferences.getString("pref_bluetooth_mac", null) == null) {
+                if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null) {
                     Toast.makeText(getActivity(),
                             R.string.need_to_select_sensor, Toast.LENGTH_SHORT).show();
                     // TODO: Show sensor selection fragment directly.
@@ -152,7 +152,7 @@ public class SensorStatusFragment extends Fragment
      * Connect sensor without check preconditions.
      */
     private void connectSensor() {
-        String mac = preferences.getString("pref_bluetooth_mac", "");
+        String mac = preferences.getString(getString(R.string.pref_bluetooth_mac), "");
         new SensorConnectAsyncTask() {
             @Override
             protected void onPostExecute(Boolean result) {

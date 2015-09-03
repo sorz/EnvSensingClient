@@ -122,10 +122,12 @@ public class RecordService extends Service implements LocationListener {
             measureIntent.setAction(ACTION_MEASURE);
             pendingIntent = PendingIntent.getService(this, 0, measureIntent, 0);
             interval = Integer.parseInt(
-                    preferences.getString("pref_recording_interval", "300")) * 1000;
+                    preferences.getString(
+                            getString(R.string.pref_recording_interval), "300")) * 1000;
             alarmManager.cancel(pendingIntent);
 
-            exactInterval = preferences.getBoolean("pref_recording_exact_interval", false);
+            exactInterval = preferences.getBoolean(
+                    getString(R.string.pref_recording_exact_interval), false);
             if (exactInterval) {
                 nextMeasureTime = recording_start;
                 alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -185,7 +187,7 @@ public class RecordService extends Service implements LocationListener {
                             wakeLock.release();
                     }
                 }
-            }.execute(preferences.getString("pref_bluetooth_mac", ""));
+            }.execute(preferences.getString(getString(R.string.pref_bluetooth_mac), ""));
         }
     }
 

@@ -1,4 +1,8 @@
 <resources>
+    <string name="pref_bluetooth_mac" translatable="false">pref_bluetooth_mac</string>
+    <string name="pref_recording_interval" translatable="false">pref_recording_interval</string>
+    <string name="pref_recording_exact_interval" translatable="false">pref_recording_exact_interval</string>
+
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
     <string name="title_section_sensor_status">Sensor status</string>
@@ -11,7 +15,7 @@
     <string name="scan">Scan</string>
     <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordrone device. Select it anyway?</string>
     <string name="dialog_select_device_confirm_title">Selection confirm</string>
-    <string name="pref_bluetooth_mac">Sensordrone address</string>
+    <string name="pref_bluetooth_mac_title">Sensordrone address</string>
     <string name="press_to_select">Press to select</string>
     <string name="connect_fail">Connect fail.</string>
     <string name="sensor_not_connect">Sensordrone is not connected.</string>
@@ -33,10 +37,10 @@
     <string name="title_record_config">Start new recording task</string>
     <string name="title_record_status">Recording</string>
     <string name="stop">Stop</string>
-    <string name="pref_recording_interval">Measure interval</string>
+    <string name="pref_recording_interval_title">Measure interval</string>
     <string name="pref_recording_interval_dialog_title">Select a interval</string>
     <string name="pref_recording_exact_interval_summary">More accurate as well as more battery usage.</string>
-    <string name="pref_recording_exact_interval">Precise interval</string>
+    <string name="pref_recording_exact_interval_title">Precise interval</string>
     <string name="recording_duration">Duration</string>
     <string name="auto_stop_in">auto stop recording in</string>
     <string name="unit_hours">hours</string>

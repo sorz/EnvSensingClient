@@ -48,8 +48,8 @@ public class SettingsFragment extends PreferenceFragment
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.registerOnSharedPreferenceChangeListener(this);
 
-        bluetoothMac = findPreference("pref_bluetooth_mac");
-        bluetoothMac.setSummary(preferences.getString("pref_bluetooth_mac",
+        bluetoothMac = findPreference(getString(R.string.pref_bluetooth_mac));
+        bluetoothMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
         bluetoothMac.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
