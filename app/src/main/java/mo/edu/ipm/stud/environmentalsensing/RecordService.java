@@ -26,7 +26,9 @@ import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
+import mo.edu.ipm.stud.environmentalsensing.entities.OxidzingGas;
 import mo.edu.ipm.stud.environmentalsensing.entities.Pressure;
+import mo.edu.ipm.stud.environmentalsensing.entities.ReducingGas;
 import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorConnectAsyncTask;
 import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
@@ -219,6 +221,14 @@ public class RecordService extends Service implements LocationListener {
         if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
             Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
             new Pressure(measurement, drone.pressure_Pascals).save();
+        }
+        if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
+            Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
+            new OxidzingGas(measurement, drone.oxidizingGas_Ohm).save();
+        }
+        if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING]) {
+            Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
+            new ReducingGas(measurement, drone.reducingGas_Ohm).save();
         }
 
         // TODO: Check and ensure release lock after location fixed.

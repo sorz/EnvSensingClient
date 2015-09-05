@@ -22,11 +22,13 @@ public class SensorMeasureAsyncTask
     private static final String TAG = "SensorMeasureAsyncTask";
     private static final long TIMEOUT = 10 * 1000; // 10 seconds
 
-    public static final int TOTAL_SENSOR = 4;
+    public static final int TOTAL_SENSOR = 6;
     public static final int SENSOR_TEMPERATURE = 0;
     public static final int SENSOR_HUMIDITY = 1;
     public static final int SENSOR_MONOXIDE = 2;
     public static final int SENSOR_PRESSURE = 3;
+    public static final int SENSOR_OXIDIZING = 4;
+    public static final int SENSOR_REDUCING = 5;
 
     private Drone drone = SensorDrone.getInstance();
     private boolean[] measured = new boolean[TOTAL_SENSOR];
@@ -65,9 +67,13 @@ public class SensorMeasureAsyncTask
                 !drone.measurePrecisionGas() : !drone.enablePrecisionGas();
         failed[SENSOR_PRESSURE] = drone.pressureStatus ?
                 !drone.measurePressure() : !drone.enablePressure();
+        failed[SENSOR_OXIDIZING] = drone.oxidizingGasStatus ?
+                !drone.measureOxidizingGas() : !drone.enableOxidizingGas();
+        failed[SENSOR_REDUCING] = drone.reducingGasStatus ?
+                !drone.measureReducingGas() : !drone.enableReducingGas();
 
-        // TODO: Add more sensors here.
-        // TODO: Handle all failed before timeout.
+        // TODO: Add more sensors here?
+        // TODO: Handle all failed case before timeout.
 
         return null;
     }
@@ -88,9 +94,14 @@ public class SensorMeasureAsyncTask
         else if (event.matches(DroneEventObject.droneEventType.PRESSURE_ENABLED)
                 & !measured[SENSOR_PRESSURE])
             drone.measurePressure();
+        else if (event.matches(DroneEventObject.droneEventType.OXIDIZING_GAS_ENABLED)
+                & !measured[SENSOR_OXIDIZING])
+            drone.measureOxidizingGas();
+        else if (event.matches(DroneEventObject.droneEventType.REDUCING_GAS_ENABLED)
+                & !measured[SENSOR_REDUCING])
+            drone.measureReducingGas();
 
-        // TODO: Add more sensors here.
-
+        // TODO: Add more sensors here?
 
         else if (event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED))
             measured[SENSOR_TEMPERATURE] = true;
@@ -100,8 +111,12 @@ public class SensorMeasureAsyncTask
             measured[SENSOR_MONOXIDE] = true;
         else if (event.matches(DroneEventObject.droneEventType.PRESSURE_MEASURED))
             measured[SENSOR_PRESSURE] = true;
+        else if (event.matches(DroneEventObject.droneEventType.OXIDIZING_GAS_MEASURED))
+            measured[SENSOR_OXIDIZING] = true;
+        else if (event.matches(DroneEventObject.droneEventType.REDUCING_GAS_MEASURED))
+            measured[SENSOR_REDUCING] = true;
 
-        // TODO: Add more sensors here.
+        // TODO: Add more sensors here?
 
         if (hasFinished()) {
             Log.d(TAG, "Measure finish, callback.");
