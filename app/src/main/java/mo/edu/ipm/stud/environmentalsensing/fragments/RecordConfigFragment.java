@@ -107,7 +107,7 @@ public class RecordConfigFragment extends Fragment {
 
     private void startService() {
         if (!RecordService.isRunning()) {
-            long durationSeconds = pickerHours.getValue() + pickerMinutes.getValue() * 60;
+            long durationSeconds = pickerHours.getValue() * 3600 + pickerMinutes.getValue() * 60;
             if (durationSeconds <= 0)
                 return;
             Intent intent = new Intent(getActivity(), RecordService.class);
