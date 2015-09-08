@@ -61,9 +61,11 @@ public class RecordService extends Service implements LocationListener {
     private boolean exactInterval;
     private long interval;
     private long nextMeasureTime;
+
     private PowerManager.WakeLock wakeLock;
     private Measurement measurement;
-
+    private boolean measureDone;
+    private boolean locationDone;
 
     public class LocalBinder extends Binder {
         RecordService getService() {
@@ -162,6 +164,7 @@ public class RecordService extends Service implements LocationListener {
     private void doMeasure() {
         Log.d(TAG, "Measuring...");
         wakeLock.acquire(MEASURE_TIMEOUT);
+        measureDone = locationDone = false;
         measurement = new Measurement();
         measurement.save();
 
@@ -230,9 +233,9 @@ public class RecordService extends Service implements LocationListener {
             Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
             new ReducingGas(measurement, drone.reducingGas_Ohm).save();
         }
+        measureDone = true;
 
-        // TODO: Check and ensure release lock after location fixed.
-        if (wakeLock.isHeld())
+        if (locationDone && wakeLock.isHeld())
             wakeLock.release();
     }
 
@@ -257,6 +260,11 @@ public class RecordService extends Service implements LocationListener {
                 (SystemClock.elapsedRealtimeNanos()
                         - location.getElapsedRealtimeNanos()) / 1000000000);
         new LocationInfo(measurement, location).save();
+        locationDone = true;
+
+        // TODO: Handle getting location timeout?
+        if (measureDone && wakeLock.isHeld())
+            wakeLock.release();
     }
 
     @Override
