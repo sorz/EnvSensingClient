@@ -74,6 +74,18 @@ public class RecordConfigFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(getString(R.string.pref_recording_duration_hours),
+                pickerHours.getValue());
+        editor.putInt(getString(R.string.pref_recording_duration_minutes),
+                pickerMinutes.getValue());
+        editor.apply();
+    }
+
     private void checkThenStartService() {
         if (pickerHours.getValue() + pickerMinutes.getValue() == 0) {
             Toast.makeText(getActivity(), R.string.illegal_duration, Toast.LENGTH_SHORT).show();
@@ -116,13 +128,6 @@ public class RecordConfigFragment extends Fragment {
             intent.putExtra(RecordService.EXTRA_RECORDING_END,
                     SystemClock.elapsedRealtime() + durationSeconds * 1000);
             getActivity().startService(intent);
-
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt(getString(R.string.pref_recording_duration_hours),
-                    pickerHours.getValue());
-            editor.putInt(getString(R.string.pref_recording_duration_minutes),
-                    pickerMinutes.getValue());
-            editor.apply();
         }
         callback.onRecordingStarted();
     }
