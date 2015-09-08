@@ -68,7 +68,7 @@ public class RecordService extends Service implements LocationListener {
     private boolean locationDone;
 
     public class LocalBinder extends Binder {
-        RecordService getService() {
+        public RecordService getService() {
             return RecordService.this;
         }
     }
