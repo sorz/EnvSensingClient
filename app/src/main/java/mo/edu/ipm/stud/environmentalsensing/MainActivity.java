@@ -12,9 +12,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
@@ -64,9 +67,14 @@ public class MainActivity extends AppCompatActivity
         // Set up the drawer.
         // Reference:
         // https://github.com/mikepenz/MaterialDrawer
+        AccountHeader header = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .build();
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .withAccountHeader(header)
                 .addDrawerItems(
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_recording)
