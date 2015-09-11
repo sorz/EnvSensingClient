@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -41,7 +42,7 @@ import mo.edu.ipm.stud.environmentalsensing.tasks.SensorMeasureAsyncTask;
 public class RecordService extends Service implements LocationListener {
     static private final String TAG = "RecordService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
-    static private final int MEASURE_TIMEOUT = 60 * 1000; // 60 seconds
+    static private final int MEASURE_TIMEOUT = 30 * 1000; // 30 seconds
     static public final String ACTION_NEW = RecordService.class.getName() + ".ACTION_NEW";
     static public final String ACTION_MEASURE = RecordService.class.getName() + ".ACTION_MEASURE";
     static public final String ACTION_STOP = RecordService.class.getName() + ".ACTION_STOP";
@@ -63,11 +64,16 @@ public class RecordService extends Service implements LocationListener {
     private boolean exactInterval;
     private long interval;
     private long nextMeasureTime;
+    private int measureSuccessCounter;
+    private int measureFailCounter;
 
     private PowerManager.WakeLock wakeLock;
-    private Measurement measurement;
-    private boolean measureDone;
-    private boolean locationDone;
+    private Handler timeoutHandler;
+    private Runnable timeoutRunnable;
+    private Measurement thisMeasurement;
+    private boolean thisMeasureSuccess;
+    private boolean thisMeasureFail;
+    private boolean thisLocationDone;
 
     public class LocalBinder extends Binder {
         public RecordService getService() {
@@ -102,6 +108,13 @@ public class RecordService extends Service implements LocationListener {
                 .setContentText(getText(R.string.record_service_running))
                 .build();
         startForeground(ONGOING_NOTIFICATION_ID, notification);
+        timeoutHandler = new Handler();
+        timeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                finishThisMeasure();
+            }
+        };
     }
 
     @Override
@@ -165,10 +178,15 @@ public class RecordService extends Service implements LocationListener {
 
     private void doMeasure() {
         Log.d(TAG, "Measuring...");
-        wakeLock.acquire(MEASURE_TIMEOUT);
-        measureDone = locationDone = false;
-        measurement = new Measurement();
-        measurement.save();
+        wakeLock.acquire(MEASURE_TIMEOUT + 3000);
+        // Timeout of the handler must less than WakeLock's and large than the sum of
+        // SensorConnectAsyncTask's + SensorMeasureAsyncTask's.
+        // Then only goal of this handler is calling finishThisMeasure().
+        timeoutHandler.postDelayed(timeoutRunnable, MEASURE_TIMEOUT);
+
+        thisMeasureSuccess = thisMeasureFail = thisLocationDone = false;
+        thisMeasurement = new Measurement();
+        thisMeasurement.save();
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -190,8 +208,7 @@ public class RecordService extends Service implements LocationListener {
                         sendMeasureRequest();
                     } else {
                         Log.w(TAG, "Measure failed: cannot connect to sensor.");
-                        if (wakeLock.isHeld())
-                            wakeLock.release();
+                        setMeasureDone(false);
                     }
                 }
             }.execute(preferences.getString(getString(R.string.pref_bluetooth_mac), ""));
@@ -213,34 +230,73 @@ public class RecordService extends Service implements LocationListener {
     private void storeMeasureResult(boolean[] sensors) {
         if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE]) {
             Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
-            new Temperature(measurement, drone.temperature_Kelvin).save();
+            new Temperature(thisMeasurement, drone.temperature_Kelvin).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_HUMIDITY]) {
             Log.d(TAG, "Humidity: " + drone.humidity_Percent);
-            new Humidity(measurement, drone.humidity_Percent).save();
+            new Humidity(thisMeasurement, drone.humidity_Percent).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_MONOXIDE]) {
             Log.d(TAG, "Monoxide: " + drone.precisionGas_ppmCarbonMonoxide);
-            new Monoxide(measurement, drone.precisionGas_ppmCarbonMonoxide).save();
+            new Monoxide(thisMeasurement, drone.precisionGas_ppmCarbonMonoxide).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
             Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
-            new Pressure(measurement, drone.pressure_Pascals).save();
+            new Pressure(thisMeasurement, drone.pressure_Pascals).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
             Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
-            new OxidzingGas(measurement, drone.oxidizingGas_Ohm).save();
+            new OxidzingGas(thisMeasurement, drone.oxidizingGas_Ohm).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING]) {
             Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
-            new ReducingGas(measurement, drone.reducingGas_Ohm).save();
+            new ReducingGas(thisMeasurement, drone.reducingGas_Ohm).save();
         }
-        measureDone = true;
+        // Only fail this measure if every sensors all are failed.
+        boolean success = false;
+        for (boolean ok : sensors) {
+            if (ok) {
+                success = true;
+                break;
+            }
+        }
+        setMeasureDone(success);
+    }
 
-        if (locationDone && wakeLock.isHeld())
+    private void setMeasureDone(boolean success) {
+        thisMeasureFail = ! (thisMeasureSuccess = success);
+        if (thisLocationDone)
+            finishThisMeasure();
+    }
+
+    private void setLocationDone() {
+        thisLocationDone = true;
+        if (thisMeasureSuccess || thisMeasureFail)
+            finishThisMeasure();
+    }
+
+    /**
+     * Called when
+     *   1. This measure has been success & location has been got.
+     *      (thisMeasureSuccess == true && thisMeasureFail == false && locationDone == true)
+     *   2. This measure has failed & location has been got.
+     *      (thisMeasureSuccess == false && thisMeasureFail == true && locationDone == true)
+     *   3. timeoutHandler call timeoutRunnable when above 2 case not occur after a certain time.
+     */
+    private void finishThisMeasure() {
+        timeoutHandler.removeCallbacks(timeoutRunnable);
+        if (thisMeasureSuccess && thisLocationDone)
+            measureSuccessCounter ++;
+        else
+            measureFailCounter ++;
+        if (wakeLock.isHeld())
             wakeLock.release();
     }
 
+    /**
+     * Stop this service while cancel the alarm if necessary.
+     * @return START_NOT_STICKY, for convenience.
+     */
     private int finishTask() {
         if (pendingIntent != null)
             alarmManager.cancel(pendingIntent);
@@ -252,7 +308,6 @@ public class RecordService extends Service implements LocationListener {
         return running;
     }
 
-
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location changed: " + location);
@@ -261,16 +316,13 @@ public class RecordService extends Service implements LocationListener {
         Log.d(TAG, "Elapsed time: " +
                 (SystemClock.elapsedRealtimeNanos()
                         - location.getElapsedRealtimeNanos()) / 1000000000);
-        new LocationInfo(measurement, location).save();
-        locationDone = true;
-
-        // TODO: Handle getting location timeout?
-        if (measureDone && wakeLock.isHeld())
-            wakeLock.release();
+        new LocationInfo(thisMeasurement, location).save();
+        setLocationDone();
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+        // Location related, seems never be invoked.
         switch (status) {
             case LocationProvider.OUT_OF_SERVICE:
                 Log.d(TAG, provider + " out of service");
@@ -286,11 +338,13 @@ public class RecordService extends Service implements LocationListener {
 
     @Override
     public void onProviderEnabled(String provider) {
+        // Location related, seems never be invoked.
         Log.d(TAG, "Provider enabled: " + provider);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
+        // Location related, seems never be invoked.
         Log.d(TAG, "Provider disabled: " + provider);
     }
 
@@ -306,6 +360,14 @@ public class RecordService extends Service implements LocationListener {
 
     public long getInterval() {
         return interval;
+    }
+
+    public int getMeasureSuccessCount() {
+        return measureSuccessCounter;
+    }
+
+    public int getMeasureFailCount() {
+        return measureFailCounter;
     }
 
 }
