@@ -13,6 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
 import mo.edu.ipm.stud.environmentalsensing.RecordService;
@@ -31,6 +35,7 @@ public class RecordStatusFragment extends Fragment {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             service = ((RecordService.LocalBinder) binder).getService();
             Log.d(TAG, "Service connected.");
+            refreshTaskInfo();
         }
 
         @Override
@@ -39,6 +44,9 @@ public class RecordStatusFragment extends Fragment {
             Log.d(TAG, "Service disconnected.");
         }
     };
+    private TextView textStartTime;
+    private TextView textStopTime;
+    private TextView textMeasureInterval;
 
     public interface OnRecordingStoppedListener {
         public void onRecordingStopped();
@@ -79,6 +87,10 @@ public class RecordStatusFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_record_status, container, false);
+
+        textStartTime = (TextView) view.findViewById(R.id.text_start_time);
+        textStopTime = (TextView) view.findViewById(R.id.text_stop_time);
+        textMeasureInterval = (TextView) view.findViewById(R.id.text_measure_interval);
         Button buttonStop = (Button) view.findViewById(R.id.button_stop);
 
         buttonStop.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +101,30 @@ public class RecordStatusFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void refreshTaskInfo() {
+        if (textStopTime == null)
+            return;
+        if (service == null) {
+            textStartTime.setText("");
+            textStopTime.setText("");
+            textMeasureInterval.setText("");
+            return;
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        textStartTime.setText(dateFormat.format(service.getStartTime()));
+        textStopTime.setText(dateFormat.format(service.getStopTime()));
+        textMeasureInterval.setText(getString(R.string.certain_seconds,
+                (int) service.getInterval() / 1000));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        textStartTime = null;
+        textStopTime = null;
+        textMeasureInterval = null;
     }
 
     private void stopService() {

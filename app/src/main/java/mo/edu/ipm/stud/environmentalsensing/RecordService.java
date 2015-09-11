@@ -22,6 +22,8 @@ import android.util.Log;
 
 import com.sensorcon.sensordrone.android.Drone;
 
+import java.util.Date;
+
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
@@ -290,6 +292,20 @@ public class RecordService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
         Log.d(TAG, "Provider disabled: " + provider);
+    }
+
+    public Date getStartTime() {
+        return new Date(System.currentTimeMillis() - SystemClock.elapsedRealtime()
+                + recording_start);
+    }
+
+    public Date getStopTime() {
+        return new Date(System.currentTimeMillis() - SystemClock.elapsedRealtime()
+                + recording_stop);
+    }
+
+    public long getInterval() {
+        return interval;
     }
 
 }
