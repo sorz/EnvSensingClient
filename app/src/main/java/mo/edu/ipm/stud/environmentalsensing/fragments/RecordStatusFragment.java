@@ -85,7 +85,8 @@ public class RecordStatusFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().unbindService(serviceConnection);
+        if (service != null)
+            getActivity().unbindService(serviceConnection);
     }
 
     @Override
