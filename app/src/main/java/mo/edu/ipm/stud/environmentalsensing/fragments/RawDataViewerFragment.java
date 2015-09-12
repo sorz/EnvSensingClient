@@ -51,8 +51,13 @@ public class RawDataViewerFragment extends Fragment {
 
         List<Measurement> measurements = Select.from(Measurement.class)
                 .orderBy("-timestamp").limit("" + MAX_LISTED_ITEMS).list();
-        adapter = new RawDataAdapter(getActivity(), measurements);
-        recyclerView.setAdapter(adapter);
+        if (measurements.size() == 0) {
+            recyclerView.setVisibility(View.GONE);
+            view.findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+        } else {
+            adapter = new RawDataAdapter(getActivity(), measurements);
+            recyclerView.setAdapter(adapter);
+        }
 
         return view;
     }

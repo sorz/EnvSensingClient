@@ -173,7 +173,7 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
     }
 
     @Override
-    public int getItemViewType (int position) {
+    public int getItemViewType(int position) {
         return extended.get(position) ? TYPE_EXTENDED : TYPE_SINGLE_LINE;
     }
 
