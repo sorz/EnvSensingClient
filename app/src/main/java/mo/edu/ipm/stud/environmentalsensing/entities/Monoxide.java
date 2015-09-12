@@ -13,6 +13,7 @@ public class Monoxide extends SugarRecord<Monoxide> {
     }
 
     public Monoxide(Measurement measurement, float ppm) {
+        measureId = measurement.getId();
         value = ppm;
     }
 
