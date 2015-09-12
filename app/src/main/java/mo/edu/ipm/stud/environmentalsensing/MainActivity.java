@@ -94,10 +94,12 @@ public class MainActivity extends AppCompatActivity
                 .withOnDrawerNavigationListener(this)
                 .build();
 
-        if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null)
-            drawer.setSelection(SECTION_SENSOR_STATUS);
-        else
+        if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null) {
+            drawer.setSelection(SECTION_SETTINGS);
+            showSensorSelectionDialog();
+        } else {
             drawer.setSelection(SECTION_RECORDING);
+        }
     }
 
     @Override
@@ -188,12 +190,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onDisplaySensorSelectionDialog() {
+    private void showSensorSelectionDialog() {
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, new SensorSelectionFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onDisplaySensorSelectionDialog() {
+        showSensorSelectionDialog();
     }
 
     @Override
