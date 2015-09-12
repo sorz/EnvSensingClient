@@ -31,10 +31,17 @@ public class Measurement extends SugarRecord<Measurement> {
 
     @Nullable
     public <T extends SugarRecord<?>> T getData(Class<T> type) {
+        MeasurementDataCache cache = MeasurementDataCache.getInstance();
+        T data = cache.getData(getId(), type);
+        if (data != null)
+            return data;
+
         List<T> result = Temperature.find(type, "MEASURE_ID = ?", "" + getId());
-        if (result.size() > 0)
-            return result.get(0);
-        else
+        if (result.size() == 0)
             return null;
+
+        data = result.get(0);
+        cache.putData(getId(), data);
+        return data;
     }
 }
