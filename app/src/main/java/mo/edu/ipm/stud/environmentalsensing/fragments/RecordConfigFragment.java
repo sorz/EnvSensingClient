@@ -87,6 +87,11 @@ public class RecordConfigFragment extends Fragment {
     }
 
     private void checkThenStartService() {
+        if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null) {
+            Toast.makeText(getActivity(),
+                    R.string.need_to_select_sensor, Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (pickerHours.getValue() + pickerMinutes.getValue() == 0) {
             Toast.makeText(getActivity(), R.string.illegal_duration, Toast.LENGTH_SHORT).show();
             return;
