@@ -56,7 +56,7 @@
     <string name="certain_celsius">%1$02.1f°C</string>
     <string name="certain_percentage">%1$02.1f%%</string>
     <string name="certain_hpa">%1$04.2fhPa</string>
-    <string name="certain_ppm">%1$fppm</string>
+    <string name="certain_ppm">%1$02.1fppm</string>
     <string name="certain_ohm">%1$04.0fΩ</string>
     <string name="certain_degree">%1$f°</string>
     <string name="measure_success_count">No. of success measuring</string>

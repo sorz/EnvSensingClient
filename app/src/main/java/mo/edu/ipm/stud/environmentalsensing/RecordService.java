@@ -26,6 +26,7 @@ import com.sensorcon.sensordrone.android.Drone;
 import java.util.Date;
 
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
+import mo.edu.ipm.stud.environmentalsensing.entities.InvalidValueException;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
@@ -228,29 +229,33 @@ public class RecordService extends Service implements LocationListener {
     }
 
     private void storeMeasureResult(boolean[] sensors) {
-        if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE]) {
-            Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
-            new Temperature(thisMeasurement, drone.temperature_Kelvin).save();
-        }
-        if (sensors[SensorMeasureAsyncTask.SENSOR_HUMIDITY]) {
-            Log.d(TAG, "Humidity: " + drone.humidity_Percent);
-            new Humidity(thisMeasurement, drone.humidity_Percent).save();
-        }
-        if (sensors[SensorMeasureAsyncTask.SENSOR_MONOXIDE]) {
-            Log.d(TAG, "Monoxide: " + drone.precisionGas_ppmCarbonMonoxide);
-            new Monoxide(thisMeasurement, drone.precisionGas_ppmCarbonMonoxide).save();
-        }
-        if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
-            Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
-            new Pressure(thisMeasurement, drone.pressure_Pascals).save();
-        }
-        if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
-            Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
-            new OxidizingGas(thisMeasurement, drone.oxidizingGas_Ohm).save();
-        }
-        if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING]) {
-            Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
-            new ReducingGas(thisMeasurement, drone.reducingGas_Ohm).save();
+        try {
+            if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE]) {
+                Log.d(TAG, "Temperature: " + drone.temperature_Celsius);
+                new Temperature(thisMeasurement, drone.temperature_Kelvin).save();
+            }
+            if (sensors[SensorMeasureAsyncTask.SENSOR_HUMIDITY]) {
+                Log.d(TAG, "Humidity: " + drone.humidity_Percent);
+                new Humidity(thisMeasurement, drone.humidity_Percent).save();
+            }
+            if (sensors[SensorMeasureAsyncTask.SENSOR_MONOXIDE]) {
+                Log.d(TAG, "Monoxide: " + drone.precisionGas_ppmCarbonMonoxide);
+                new Monoxide(thisMeasurement, drone.precisionGas_ppmCarbonMonoxide).save();
+            }
+            if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
+                Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
+                new Pressure(thisMeasurement, drone.pressure_Pascals).save();
+            }
+            if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
+                Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
+                new OxidizingGas(thisMeasurement, drone.oxidizingGas_Ohm).save();
+            }
+            if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING]) {
+                Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
+                new ReducingGas(thisMeasurement, drone.reducingGas_Ohm).save();
+            }
+        } catch (InvalidValueException e) {
+            Log.w(TAG, e.getMessage());
         }
         // Only fail this measure if every sensors all are failed.
         boolean success = false;

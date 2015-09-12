@@ -12,8 +12,10 @@ public class Pressure extends SugarRecord<Pressure> {
     public Pressure() {
     }
 
-    public Pressure(Measurement measurement, float pascal) {
+    public Pressure(Measurement measurement, float pascal) throws InvalidValueException {
         measureId = measurement.getId();
+        if (pascal <= 0)
+            throw new InvalidValueException("Value " + pascal + " is less than or equal to 0.");
         value = pascal;
     }
 
