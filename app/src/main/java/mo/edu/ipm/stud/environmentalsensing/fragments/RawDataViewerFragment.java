@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.orm.query.Select;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 public class RawDataViewerFragment extends Fragment {
     private static final int MAX_LISTED_ITEMS = 1000;
 
+    private FloatingActionButton floatingButton;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RawDataAdapter adapter;
@@ -44,6 +46,7 @@ public class RawDataViewerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_raw_data_viewer, container, false);
+        floatingButton = (FloatingActionButton) view.findViewById(R.id.floating_button);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
         layoutManager = new LinearLayoutManager(getActivity());
@@ -53,10 +56,12 @@ public class RawDataViewerFragment extends Fragment {
                 .orderBy("-timestamp").limit("" + MAX_LISTED_ITEMS).list();
         if (measurements.size() == 0) {
             recyclerView.setVisibility(View.GONE);
+            floatingButton.setVisibility(View.GONE);
             view.findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
         } else {
             adapter = new RawDataAdapter(getActivity(), measurements);
             recyclerView.setAdapter(adapter);
+            floatingButton.attachToRecyclerView(recyclerView);
         }
 
         return view;

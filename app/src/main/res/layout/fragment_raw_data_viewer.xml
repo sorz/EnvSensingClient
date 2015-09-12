@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context="mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment">
 
     <android.support.v7.widget.RecyclerView
@@ -11,6 +12,17 @@
         android:id="@+id/recycler_view">
 
     </android.support.v7.widget.RecyclerView>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/floating_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_save_white_24dp"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/md_blue_900"
+        fab:fab_colorRipple="@color/colorPrimaryDark" />
 
     <TextView
         android:layout_width="wrap_content"
