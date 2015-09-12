@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,13 +28,21 @@ import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
  * Used by the RecyclerView on RawDataViewFragment.
  */
 public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHolder> {
+    private static final int TYPE_SINGLE_LINE = 0;
+    private static final int TYPE_EXTENDED = 1;
+
     private Context context;
     private SimpleDateFormat dateFormat;
 
     // TODO: Change to Iterator to avoid load full list.
     private List<Measurement> measurements;
+    private List<Boolean> extended;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private OnViewHolderClick onViewHolderClick;
+
+        public int position;
+        public View container;
         public TextView textDate;
         public TextView textTemperature;
         public TextView textHumidity;
@@ -43,8 +54,10 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
         public TextView textLongitude;
 
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, OnViewHolderClick onClickListener) {
             super(view);
+            onViewHolderClick = onClickListener;
+            container = view.findViewById(R.id.container);
             textDate = (TextView) view.findViewById(R.id.text_date);
             textTemperature = (TextView) view.findViewById(R.id.text_temperature);
             textHumidity = (TextView) view.findViewById(R.id.text_humidity);
@@ -54,27 +67,64 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
             textReducing = (TextView) view.findViewById(R.id.text_reducing);
             textLatitude = (TextView) view.findViewById(R.id.text_latitude);
             textLongitude = (TextView) view.findViewById(R.id.text_longitude);
+
+            container.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            onViewHolderClick.onContainerClick(position);
+        }
+    }
+
+    private interface OnViewHolderClick {
+        // Reference:
+        // https://stackoverflow.com/questions/24885223/why-doesnt-recyclerview-have-
+        // onitemclicklistener-and-how-recyclerview-is-dif
+        void onContainerClick(int position);
     }
 
     public RawDataAdapter(Context context, List<Measurement> measurements) {
         this.context = context;
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
         this.measurements = measurements;
+
+        // Reference:
+        // https://stackoverflow.com/questions/20615448/set-all-values-of-
+        // arraylistboolean-to-false-on-instatiation
+        extended = new ArrayList<>(Arrays.asList(new Boolean[measurements.size()]));
+        Collections.fill(extended, Boolean.FALSE);
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_raw_data, parent, false);
-        ViewHolder holder = new ViewHolder(view);
+        View view = null;
+        switch (viewType) {
+            case TYPE_SINGLE_LINE:
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item_raw_data_singleline, parent, false);
+                break;
+            case TYPE_EXTENDED:
+                view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item_raw_data_extended, parent, false);
+                break;
+        }
+        ViewHolder holder = new ViewHolder(view, new OnViewHolderClick() {
+            @Override
+            public void onContainerClick(int position) {
+                extended.set(position, !extended.get(position));
+                notifyItemChanged(position);
+            }
+        });
 
         return holder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.position = position;
+
         Measurement measurement = measurements.get(position);
         Temperature temperature = measurement.getData(Temperature.class);
         Humidity humidity = measurement.getData(Humidity.class);
@@ -120,6 +170,11 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
                     context.getString(R.string.certain_degree, location.getLongitude()));
         }
 
+    }
+
+    @Override
+    public int getItemViewType (int position) {
+        return extended.get(position) ? TYPE_EXTENDED : TYPE_SINGLE_LINE;
     }
 
     @Override

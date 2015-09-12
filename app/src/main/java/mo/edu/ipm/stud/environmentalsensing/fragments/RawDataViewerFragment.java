@@ -29,6 +29,12 @@ public class RawDataViewerFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.title_section_raw_data);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -40,7 +46,6 @@ public class RawDataViewerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_raw_data_viewer, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
-        recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 

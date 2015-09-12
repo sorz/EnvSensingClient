@@ -62,5 +62,13 @@
     <string name="measure_success_count">No. of success measuring</string>
     <string name="measure_fail_count">No. of failed measuring</string>
     <string name="title_section_raw_data">Raw data</string>
+    <string name="temperature">Temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
+    <string name="monoxide">Carbon dioxide</string>
+    <string name="oxidizing">Oxidizing gas</string>
+    <string name="reducing">Reducing gas</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
 
 </resources>
