@@ -46,7 +46,7 @@ public class RawDataViewerFragment extends Fragment {
 
         List<Measurement> measurements = Select.from(Measurement.class)
                 .orderBy("-timestamp").limit("" + MAX_LISTED_ITEMS).list();
-        adapter = new RawDataAdapter(measurements);
+        adapter = new RawDataAdapter(getActivity(), measurements);
         recyclerView.setAdapter(adapter);
 
         return view;

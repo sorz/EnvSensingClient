@@ -1,5 +1,6 @@
 package mo.edu.ipm.stud.environmentalsensing.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,26 +13,31 @@ import java.util.Locale;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
+import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
 
 /**
  * Used by the RecyclerView on RawDataViewFragment.
  */
 public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHolder> {
+    private Context context;
     private SimpleDateFormat dateFormat;
 
     // TODO: Change to Iterator to avoid load full list.
     private List<Measurement> measurements;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+        public TextView textDate;
+        public TextView textTemperature;
 
         public ViewHolder(View view) {
             super(view);
-            textView = (TextView) view.findViewById(R.id.textView);
+            textDate = (TextView) view.findViewById(R.id.text_date);
+            textTemperature = (TextView) view.findViewById(R.id.text_temperature);
         }
     }
 
-    public RawDataAdapter(List<Measurement> measurements) {
+    public RawDataAdapter(Context context, List<Measurement> measurements) {
+        this.context = context;
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
         this.measurements = measurements;
     }
@@ -48,7 +54,14 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.textView.setText(dateFormat.format(measurements.get(position).getDate()));
+        Measurement measurement = measurements.get(position);
+        Temperature temperature = measurement.getData(Temperature.class);
+        holder.textDate.setText(dateFormat.format(measurements.get(position).getDate()));
+
+        holder.textTemperature.setVisibility(temperature == null ? View.GONE : View.VISIBLE);
+        if (temperature != null)
+            holder.textTemperature.setText(
+                    context.getString(R.string.certain_celsius, temperature.getCelsius()));
     }
 
     @Override
