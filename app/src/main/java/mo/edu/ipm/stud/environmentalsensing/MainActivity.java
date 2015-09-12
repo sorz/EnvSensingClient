@@ -82,15 +82,19 @@ public class MainActivity extends AppCompatActivity
                 .addDrawerItems(
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_recording)
+                                .withIcon(R.drawable.ic_hearing_black_24dp)
                                 .withIdentifier(SECTION_RECORDING),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_raw_data)
+                                .withIcon(R.drawable.ic_sd_card_black_24dp)
                                 .withIdentifier(SECTION_RAWDATA_VIEWER),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_sensor_status)
+                                .withIcon(R.drawable.ic_swap_vert_black_24dp)
                                 .withIdentifier(SECTION_SENSOR_STATUS),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings)
+                                .withIcon(R.drawable.ic_settings_black_24dp)
                                 .withIdentifier(SECTION_SETTINGS)
                 )
                 .withOnDrawerItemClickListener(this)
