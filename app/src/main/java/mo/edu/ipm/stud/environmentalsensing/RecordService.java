@@ -244,7 +244,8 @@ public class RecordService extends Service implements LocationListener {
             }
             if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE]) {
                 Log.d(TAG, "Pressure: " + drone.pressure_Pascals);
-                new Pressure(thisMeasurement, drone.pressure_Pascals).save();
+                if (drone.pressure_Pascals > 0)
+                    new Pressure(thisMeasurement, drone.pressure_Pascals).save();
             }
             if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
                 Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
