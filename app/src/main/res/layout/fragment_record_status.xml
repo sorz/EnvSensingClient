@@ -38,6 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textColor="@color/md_light_primary_text"
                     android:id="@+id/text_start_time" />
             </RelativeLayout>
 
@@ -55,6 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textColor="@color/md_light_primary_text"
                     android:id="@+id/text_stop_time" />
             </RelativeLayout>
 
@@ -72,6 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textColor="@color/md_light_primary_text"
                     android:id="@+id/text_measure_interval" />
             </RelativeLayout>
 
@@ -90,6 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textColor="@color/md_light_primary_text"
                     android:id="@+id/text_measure_success_count" />
             </RelativeLayout>
 
@@ -107,6 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
+                    android:textColor="@color/md_light_primary_text"
                     android:id="@+id/text_measure_fail_count" />
             </RelativeLayout>
 

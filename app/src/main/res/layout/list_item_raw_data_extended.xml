@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
+        android:textColor="@color/md_light_primary_text"
         android:id="@+id/text_date" />
 
     <LinearLayout
@@ -22,6 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_temperature" />
     </LinearLayout>
 
@@ -36,6 +38,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_humidity" />
     </LinearLayout>
 
@@ -50,6 +53,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_pressure" />
     </LinearLayout>
 
@@ -64,6 +68,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_monoxide" />
     </LinearLayout>
 
@@ -78,6 +83,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_oxidizing" />
     </LinearLayout>
 
@@ -92,6 +98,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_reducing" />
     </LinearLayout>
 
@@ -106,8 +113,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_latitude" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -121,6 +128,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_longitude" />
     </LinearLayout>
 
