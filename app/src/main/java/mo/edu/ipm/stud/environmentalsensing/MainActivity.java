@@ -17,7 +17,6 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
@@ -91,9 +90,9 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
         if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null)
-            drawer.setSelectionAtPosition(1);
+            drawer.setSelection(SECTION_SENSOR_STATUS);
         else
-            drawer.setSelectionAtPosition(0);
+            drawer.setSelection(SECTION_RECORDING);
     }
 
     @Override
