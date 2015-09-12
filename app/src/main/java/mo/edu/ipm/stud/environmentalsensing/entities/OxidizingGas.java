@@ -5,16 +5,16 @@ import com.orm.SugarRecord;
 /**
  * Storing oxidizing gas.
  */
-public class OxidzingGas extends SugarRecord<OxidzingGas> {
+public class OxidizingGas extends SugarRecord<OxidizingGas> {
     private long measureId;
     private float value;
 
-    public OxidzingGas() {
+    public OxidizingGas() {
     }
 
-    public OxidzingGas(Measurement measurement, float value) {
+    public OxidizingGas(Measurement measurement, float ohm) {
         measureId = measurement.getId();
-        this.value = value;
+        value = ohm;
     }
 
     public long getMeasureId() {

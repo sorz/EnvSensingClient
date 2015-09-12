@@ -12,7 +12,13 @@ import java.util.List;
 import java.util.Locale;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
+import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
+import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
+import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
+import mo.edu.ipm.stud.environmentalsensing.entities.OxidizingGas;
+import mo.edu.ipm.stud.environmentalsensing.entities.Pressure;
+import mo.edu.ipm.stud.environmentalsensing.entities.ReducingGas;
 import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
 
 /**
@@ -28,11 +34,26 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textDate;
         public TextView textTemperature;
+        public TextView textHumidity;
+        public TextView textPressure;
+        public TextView textMonoxide;
+        public TextView textOxidizing;
+        public TextView textReducing;
+        public TextView textLatitude;
+        public TextView textLongitude;
+
 
         public ViewHolder(View view) {
             super(view);
             textDate = (TextView) view.findViewById(R.id.text_date);
             textTemperature = (TextView) view.findViewById(R.id.text_temperature);
+            textHumidity = (TextView) view.findViewById(R.id.text_humidity);
+            textPressure = (TextView) view.findViewById(R.id.text_pressure);
+            textMonoxide = (TextView) view.findViewById(R.id.text_monoxide);
+            textOxidizing = (TextView) view.findViewById(R.id.text_oxidizing);
+            textReducing = (TextView) view.findViewById(R.id.text_reducing);
+            textLatitude = (TextView) view.findViewById(R.id.text_latitude);
+            textLongitude = (TextView) view.findViewById(R.id.text_longitude);
         }
     }
 
@@ -56,12 +77,49 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         Measurement measurement = measurements.get(position);
         Temperature temperature = measurement.getData(Temperature.class);
-        holder.textDate.setText(dateFormat.format(measurements.get(position).getDate()));
+        Humidity humidity = measurement.getData(Humidity.class);
+        Pressure pressure = measurement.getData(Pressure.class);
+        Monoxide monoxide = measurement.getData(Monoxide.class);
+        OxidizingGas oxidizingGas= measurement.getData(OxidizingGas.class);
+        ReducingGas reducingGas = measurement.getData(ReducingGas.class);
+        LocationInfo location = measurement.getData(LocationInfo.class);
 
         holder.textTemperature.setVisibility(temperature == null ? View.GONE : View.VISIBLE);
+        holder.textHumidity.setVisibility(humidity == null ? View.GONE : View.VISIBLE);
+        holder.textPressure.setVisibility(pressure == null ? View.GONE : View.VISIBLE);
+        holder.textMonoxide.setVisibility(monoxide == null ? View.GONE : View.VISIBLE);
+        holder.textOxidizing.setVisibility(oxidizingGas == null ? View.GONE : View.VISIBLE);
+        holder.textReducing.setVisibility(reducingGas == null ? View.GONE : View.VISIBLE);
+        holder.textLatitude.setVisibility(location == null ? View.GONE : View.VISIBLE);
+        holder.textLongitude.setVisibility(location == null ? View.GONE : View.VISIBLE);
+
+        holder.textDate.setText(dateFormat.format(measurements.get(position).getDate()));
+
         if (temperature != null)
             holder.textTemperature.setText(
                     context.getString(R.string.certain_celsius, temperature.getCelsius()));
+        if (humidity != null)
+            holder.textHumidity.setText(
+                    context.getString(R.string.certain_percentage, humidity.getValue()));
+        if (pressure != null)
+            holder.textPressure.setText(
+                    context.getString(R.string.certain_hpa, pressure.getValue() / 100.0));
+        if (monoxide != null)
+            holder.textMonoxide.setText(
+                    context.getString(R.string.certain_ppm, monoxide.getValue()));
+        if (oxidizingGas != null)
+            holder.textOxidizing.setText(
+                    context.getString(R.string.certain_ohm, oxidizingGas.getValue()));
+        if (reducingGas != null)
+            holder.textReducing.setText(
+                    context.getString(R.string.certain_ohm, reducingGas.getValue()));
+        if (location != null) {
+            holder.textLatitude.setText(
+                    context.getString(R.string.certain_degree, location.getLatitude()));
+            holder.textLongitude.setText(
+                    context.getString(R.string.certain_degree, location.getLongitude()));
+        }
+
     }
 
     @Override

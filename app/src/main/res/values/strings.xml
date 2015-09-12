@@ -53,7 +53,12 @@
     <string name="stop_time">Stop time</string>
     <string name="measure_interval">Measure interval</string>
     <string name="certain_seconds">%1$d seconds</string>
-    <string name="certain_celsius">%1$.1f °C</string>
+    <string name="certain_celsius">%1$02.1f°C</string>
+    <string name="certain_percentage">%1$02.1f%%</string>
+    <string name="certain_hpa">%1$04.2fhPa</string>
+    <string name="certain_ppm">%1$fppm</string>
+    <string name="certain_ohm">%1$04.0fΩ</string>
+    <string name="certain_degree">%1$f°</string>
     <string name="measure_success_count">No. of success measuring</string>
     <string name="measure_fail_count">No. of failed measuring</string>
     <string name="title_section_raw_data">Raw data</string>

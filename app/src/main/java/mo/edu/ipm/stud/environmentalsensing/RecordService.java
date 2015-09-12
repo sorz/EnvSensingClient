@@ -29,7 +29,7 @@ import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
-import mo.edu.ipm.stud.environmentalsensing.entities.OxidzingGas;
+import mo.edu.ipm.stud.environmentalsensing.entities.OxidizingGas;
 import mo.edu.ipm.stud.environmentalsensing.entities.Pressure;
 import mo.edu.ipm.stud.environmentalsensing.entities.ReducingGas;
 import mo.edu.ipm.stud.environmentalsensing.entities.Temperature;
@@ -246,7 +246,7 @@ public class RecordService extends Service implements LocationListener {
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING]) {
             Log.d(TAG, "Oxidizing gas: " + drone.oxidizingGas_Ohm);
-            new OxidzingGas(thisMeasurement, drone.oxidizingGas_Ohm).save();
+            new OxidizingGas(thisMeasurement, drone.oxidizingGas_Ohm).save();
         }
         if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING]) {
             Log.d(TAG, "Reducing gas: " + drone.reducingGas_Ohm);
