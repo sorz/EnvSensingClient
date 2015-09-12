@@ -30,18 +30,18 @@ public class Measurement extends SugarRecord<Measurement> {
     }
 
     @Nullable
-    public <T extends SugarRecord<?>> T getData(Class<T> type) {
-        MeasurementDataCache cache = MeasurementDataCache.getInstance();
-        T data = cache.getData(getId(), type);
-        if (data != null)
-            return data;
+    public <T extends SugarRecord<?>> T getValue(Class<T> type) {
+        MeasurementValueCache cache = MeasurementValueCache.getInstance();
+        T value = cache.getValue(getId(), type);
+        if (value != null)
+            return value;
 
         List<T> result = Temperature.find(type, "MEASURE_ID = ?", "" + getId());
         if (result.size() == 0)
             return null;
 
-        data = result.get(0);
-        cache.putData(getId(), data);
-        return data;
+        value = result.get(0);
+        cache.putValue(getId(), value);
+        return value;
     }
 }

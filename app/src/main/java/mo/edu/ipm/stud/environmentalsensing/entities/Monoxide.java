@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing ppm of carbon monoxide by precision gas sensor.
  */
-public class Monoxide extends SugarRecord<Monoxide> {
+public class Monoxide extends SugarRecord<Monoxide> implements MeasureValue {
     private long measureId;
     private float value;
 
@@ -21,6 +21,7 @@ public class Monoxide extends SugarRecord<Monoxide> {
         return measureId;
     }
 
+    @Override
     public float getValue() {
         return value;
     }

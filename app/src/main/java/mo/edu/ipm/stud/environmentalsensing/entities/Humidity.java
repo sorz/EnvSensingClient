@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing relative humidity percentage.
  */
-public class Humidity extends SugarRecord<Humidity> {
+public class Humidity extends SugarRecord<Humidity> implements MeasureValue {
     private long measureId;
     private float value;
 
@@ -21,6 +21,7 @@ public class Humidity extends SugarRecord<Humidity> {
         return measureId;
     }
 
+    @Override
     public float getValue() {
         return value;
     }

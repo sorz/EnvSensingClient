@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing pressure.
  */
-public class Pressure extends SugarRecord<Pressure> {
+public class Pressure extends SugarRecord<Pressure> implements MeasureValue {
     private long measureId;
     private float value;
 
@@ -23,6 +23,7 @@ public class Pressure extends SugarRecord<Pressure> {
         return measureId;
     }
 
+    @Override
     public float getValue() {
         return value;
     }

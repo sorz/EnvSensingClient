@@ -8,29 +8,29 @@ import com.orm.SugarRecord;
 /**
  * A singleton LruCache to cache measured value from database.
  */
-public class MeasurementDataCache extends LruCache<Pair<Long, Class>, SugarRecord> {
+public class MeasurementValueCache extends LruCache<Pair<Long, Class>, SugarRecord> {
     private static final int MAX_SIZE = 1000;
-    private static MeasurementDataCache instance;
+    private static MeasurementValueCache instance;
 
-    private MeasurementDataCache() {
+    private MeasurementValueCache() {
         super(MAX_SIZE);
     }
 
-    static public MeasurementDataCache getInstance() {
+    static public MeasurementValueCache getInstance() {
         if (instance == null)
-            instance = new MeasurementDataCache();
+            instance = new MeasurementValueCache();
         return instance;
     }
 
-    public <T extends SugarRecord<?>> T getData(long measureId, Class<T> type) {
+    public <T extends SugarRecord<?>> T getValue(long measureId, Class<T> type) {
         return (T) get(new Pair<Long, Class>(measureId, type));
     }
 
-    public <T extends SugarRecord<?>> void putData(long measureId, T data) {
+    public <T extends SugarRecord<?>> void putValue(long measureId, T data) {
         put(new Pair<Long, Class>(measureId, data.getClass()), data);
     }
 
-    public <T extends SugarRecord<?>> void removeData(long measureId, Class<T> type) {
+    public <T extends SugarRecord<?>> void removeValue(long measureId, Class<T> type) {
         remove(new Pair<Long, Class>(measureId, type));
     }
 

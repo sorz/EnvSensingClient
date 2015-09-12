@@ -77,4 +77,7 @@
     <string name="cannot_export_io_exception">Sorry, we cannot export data due to a I/O problem.</string>
     <string name="file_format">File format</string>
     <string name="file_format_cvs">Comma-Separated Values (CSV)</string>
+    <string name="export">Export</string>
+    <string name="export_ok">Export succesfuly</string>
+    <string name="export_error">Sorry, we cannot export data due to a unexcpeted error.</string>
 </resources>

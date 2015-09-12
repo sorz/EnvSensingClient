@@ -126,13 +126,13 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
         holder.position = position;
 
         Measurement measurement = measurements.get(position);
-        Temperature temperature = measurement.getData(Temperature.class);
-        Humidity humidity = measurement.getData(Humidity.class);
-        Pressure pressure = measurement.getData(Pressure.class);
-        Monoxide monoxide = measurement.getData(Monoxide.class);
-        OxidizingGas oxidizingGas= measurement.getData(OxidizingGas.class);
-        ReducingGas reducingGas = measurement.getData(ReducingGas.class);
-        LocationInfo location = measurement.getData(LocationInfo.class);
+        Temperature temperature = measurement.getValue(Temperature.class);
+        Humidity humidity = measurement.getValue(Humidity.class);
+        Pressure pressure = measurement.getValue(Pressure.class);
+        Monoxide monoxide = measurement.getValue(Monoxide.class);
+        OxidizingGas oxidizingGas= measurement.getValue(OxidizingGas.class);
+        ReducingGas reducingGas = measurement.getValue(ReducingGas.class);
+        LocationInfo location = measurement.getValue(LocationInfo.class);
 
         holder.textTemperature.setVisibility(temperature == null ? View.GONE : View.VISIBLE);
         holder.textHumidity.setVisibility(humidity == null ? View.GONE : View.VISIBLE);
