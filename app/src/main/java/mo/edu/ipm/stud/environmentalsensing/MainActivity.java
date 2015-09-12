@@ -19,6 +19,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordStatusFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SensorSelectionFragment;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
+    private static final int SECTION_RAWDATA_VIEWER = 4;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -79,6 +81,9 @@ public class MainActivity extends AppCompatActivity
                                 .withName(R.string.title_section_recording)
                                 .withIdentifier(SECTION_RECORDING),
                         new PrimaryDrawerItem()
+                                .withName(R.string.title_section_raw_data)
+                                .withIdentifier(SECTION_RAWDATA_VIEWER),
+                        new PrimaryDrawerItem()
                                 .withName(R.string.title_section_sensor_status)
                                 .withIdentifier(SECTION_SENSOR_STATUS),
                         new PrimaryDrawerItem()
@@ -119,6 +124,9 @@ public class MainActivity extends AppCompatActivity
                     fragment = new RecordStatusFragment();
                 else
                     fragment = new RecordConfigFragment();
+                break;
+            case SECTION_RAWDATA_VIEWER:
+                fragment = new RawDataViewerFragment();
                 break;
             default:
                 fragment = new Fragment();
