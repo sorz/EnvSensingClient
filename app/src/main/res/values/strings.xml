@@ -72,4 +72,9 @@
     <string name="longitude">Longitude</string>
     <string name="no_data_available">No data yet</string>
     <string name="title_export_data">Export data</string>
+    <string name="export_to">Export to</string>
+    <string name="change">Change</string>
+    <string name="cannot_export_io_exception">Sorry, we cannot export data due to a I/O problem.</string>
+    <string name="file_format">File format</string>
+    <string name="file_format_cvs">Comma-Separated Values (CSV)</string>
 </resources>
