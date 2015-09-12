@@ -71,4 +71,5 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="no_data_available">No data yet</string>
+    <string name="title_export_data">Export data</string>
 </resources>

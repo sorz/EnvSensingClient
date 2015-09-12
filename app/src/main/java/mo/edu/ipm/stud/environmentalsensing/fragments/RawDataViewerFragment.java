@@ -1,5 +1,6 @@
 package mo.edu.ipm.stud.environmentalsensing.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,8 @@ import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 
 public class RawDataViewerFragment extends Fragment {
     private static final int MAX_LISTED_ITEMS = 1000;
+
+    private OnExportDataListener callback;
 
     private FloatingActionButton floatingButton;
     private RecyclerView recyclerView;
@@ -62,6 +65,12 @@ public class RawDataViewerFragment extends Fragment {
             adapter = new RawDataAdapter(getActivity(), measurements);
             recyclerView.setAdapter(adapter);
             floatingButton.attachToRecyclerView(recyclerView);
+            floatingButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    callback.onExportData();
+                }
+            });
         }
 
         return view;
@@ -73,5 +82,20 @@ public class RawDataViewerFragment extends Fragment {
         recyclerView = null;
         layoutManager = null;
         adapter = null;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            callback = (OnExportDataListener) activity;
+        }catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnExportDataListener");
+        }
+    }
+
+    public interface OnExportDataListener {
+        public void onExportData();
     }
 }

@@ -19,6 +19,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import mo.edu.ipm.stud.environmentalsensing.fragments.ExportDataFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordStatusFragment;
@@ -33,7 +34,9 @@ public class MainActivity extends AppCompatActivity
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener,
         RecordConfigFragment.OnRecordingStartedListener,
-        RecordStatusFragment.OnRecordingStoppedListener {
+        RecordStatusFragment.OnRecordingStoppedListener,
+        RawDataViewerFragment.OnExportDataListener,
+        ExportDataFragment.OnDataExportedListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
@@ -229,4 +232,18 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.container, new RecordConfigFragment())
                     .commit();
     }
+
+    @Override
+    public void onExportData() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new ExportDataFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void onDataExported() {
+        getFragmentManager().popBackStack();
+    }
+
 }
