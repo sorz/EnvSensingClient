@@ -1,7 +1,9 @@
 package mo.edu.ipm.stud.environmentalsensing.adapters;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import java.util.Locale;
 import mo.edu.ipm.stud.environmentalsensing.R;
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;
+import mo.edu.ipm.stud.environmentalsensing.entities.MeasureValue;
 import mo.edu.ipm.stud.environmentalsensing.entities.Measurement;
 import mo.edu.ipm.stud.environmentalsensing.entities.Monoxide;
 import mo.edu.ipm.stud.environmentalsensing.entities.OxidizingGas;
@@ -124,52 +127,87 @@ public class RawDataAdapter extends RecyclerView.Adapter<RawDataAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.position = position;
-
-        Measurement measurement = measurements.get(position);
-        Temperature temperature = measurement.getValue(Temperature.class);
-        Humidity humidity = measurement.getValue(Humidity.class);
-        Pressure pressure = measurement.getValue(Pressure.class);
-        Monoxide monoxide = measurement.getValue(Monoxide.class);
-        OxidizingGas oxidizingGas= measurement.getValue(OxidizingGas.class);
-        ReducingGas reducingGas = measurement.getValue(ReducingGas.class);
-        LocationInfo location = measurement.getValue(LocationInfo.class);
-
-        holder.textTemperature.setVisibility(temperature == null ? View.GONE : View.VISIBLE);
-        holder.textHumidity.setVisibility(humidity == null ? View.GONE : View.VISIBLE);
-        holder.textPressure.setVisibility(pressure == null ? View.GONE : View.VISIBLE);
-        holder.textMonoxide.setVisibility(monoxide == null ? View.GONE : View.VISIBLE);
-        holder.textOxidizing.setVisibility(oxidizingGas == null ? View.GONE : View.VISIBLE);
-        holder.textReducing.setVisibility(reducingGas == null ? View.GONE : View.VISIBLE);
-        holder.textLatitude.setVisibility(location == null ? View.GONE : View.VISIBLE);
-        holder.textLongitude.setVisibility(location == null ? View.GONE : View.VISIBLE);
-
         holder.textDate.setText(dateFormat.format(measurements.get(position).getDate()));
 
-        if (temperature != null)
-            holder.textTemperature.setText(
-                    context.getString(R.string.certain_celsius, temperature.getCelsius()));
-        if (humidity != null)
-            holder.textHumidity.setText(
-                    context.getString(R.string.certain_percentage, humidity.getValue()));
-        if (pressure != null)
-            holder.textPressure.setText(
-                    context.getString(R.string.certain_hpa, pressure.getValue() / 100.0));
-        if (monoxide != null)
-            holder.textMonoxide.setText(
-                    context.getString(R.string.certain_ppm, monoxide.getValue()));
-        if (oxidizingGas != null)
-            holder.textOxidizing.setText(
-                    context.getString(R.string.certain_ohm, oxidizingGas.getValue()));
-        if (reducingGas != null)
-            holder.textReducing.setText(
-                    context.getString(R.string.certain_ohm, reducingGas.getValue()));
-        if (location != null) {
-            holder.textLatitude.setText(
-                    context.getString(R.string.certain_degree, location.getLatitude()));
-            holder.textLongitude.setText(
-                    context.getString(R.string.certain_degree, location.getLongitude()));
-        }
+        new AsyncTask<ViewHolder, Void, Pair<List<MeasureValue>, LocationInfo>>() {
+            private ViewHolder holder;
+            private int position;
+            private Measurement measurement;
 
+            @Override
+            protected Pair<List<MeasureValue>, LocationInfo> doInBackground(ViewHolder... viewHolders) {
+                holder = viewHolders[0];
+                position = holder.position;
+                measurement = measurements.get(position);
+
+                List<MeasureValue> values = new ArrayList<>(6);
+                values.add(measurement.getValue(Temperature.class));
+                values.add(measurement.getValue(Humidity.class));
+                values.add(measurement.getValue(Pressure.class));
+                values.add(measurement.getValue(Monoxide.class));
+                values.add(measurement.getValue(OxidizingGas.class));
+                values.add(measurement.getValue(ReducingGas.class));
+                LocationInfo location = measurement.getValue(LocationInfo.class);
+                return new Pair<>(values, location);
+            }
+
+            private int getVisibility(Object object) {
+                return object == null ? View.GONE : View.VISIBLE;
+            }
+
+            @SuppressWarnings("ResourceType")
+            @Override
+            protected void onPostExecute(Pair<List<MeasureValue>, LocationInfo> result) {
+                if (holder.position != position)
+                    return;
+                List<MeasureValue> values = result.first;
+                LocationInfo location = result.second;
+
+                int i = 0;
+                holder.textTemperature.setVisibility(getVisibility(values.get(i++)));
+                holder.textHumidity.setVisibility(getVisibility(values.get(i++)));
+                holder.textPressure.setVisibility(getVisibility(values.get(i++)));
+                holder.textMonoxide.setVisibility(getVisibility(values.get(i++)));
+                holder.textOxidizing.setVisibility(getVisibility(values.get(i++)));
+                holder.textReducing.setVisibility(getVisibility(values.get(i)));
+
+                holder.textLatitude.setVisibility(getVisibility(location));
+                holder.textLongitude.setVisibility(getVisibility(location));
+
+                i = 0;
+                if (values.get(i) != null)
+                    holder.textTemperature.setText(
+                            context.getString(R.string.certain_celsius,
+                                    ((Temperature) values.get(i++)).getCelsius()));
+                if (values.get(i) != null)
+                    holder.textHumidity.setText(
+                            context.getString(R.string.certain_percentage,
+                                    values.get(i++).getValue()));
+                if (values.get(i) != null)
+                    holder.textPressure.setText(
+                            context.getString(R.string.certain_hpa,
+                                    values.get(i++).getValue() / 100.0));
+                if (values.get(i) != null)
+                    holder.textMonoxide.setText(
+                            context.getString(R.string.certain_ppm,
+                                    values.get(i++).getValue()));
+                if (values.get(i) != null)
+                    holder.textOxidizing.setText(
+                            context.getString(R.string.certain_ohm,
+                                    values.get(i++).getValue()));
+                if (values.get(i) != null)
+                    holder.textReducing.setText(
+                            context.getString(R.string.certain_ohm,
+                                    values.get(i).getValue()));
+
+                if (location != null) {
+                    holder.textLatitude.setText(
+                            context.getString(R.string.certain_degree, location.getLatitude()));
+                    holder.textLongitude.setText(
+                            context.getString(R.string.certain_degree, location.getLongitude()));
+                }
+            }
+        }.execute(holder);
     }
 
     @Override
