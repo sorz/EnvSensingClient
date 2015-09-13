@@ -4,14 +4,18 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context="mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:id="@+id/recycler_view">
-
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_container">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:id="@+id/recycler_view">
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/floating_button"
