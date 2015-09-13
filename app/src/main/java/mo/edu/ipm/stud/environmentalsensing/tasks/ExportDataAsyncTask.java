@@ -40,7 +40,7 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
             writer.write(CSV_HEADER);
             writer.flush();
 
-            int totalRows = measurements.size();
+            double totalRows = measurements.size();
             int currentRow = 0;
             for (Measurement measurement : measurements) {
                 writer.write(measurement.getId() + ",");
@@ -68,7 +68,7 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
 
                 writer.flush();
                 currentRow ++;
-                publishProgress((int) ((double) currentRow) / totalRows * 100);
+                publishProgress((int) (currentRow / totalRows * 100));
             }
 
         } catch (FileNotFoundException e) {
