@@ -44,4 +44,14 @@ public class Measurement extends SugarRecord<Measurement> {
         cache.putValue(getId(), value);
         return value;
     }
+
+    @Nullable
+    public <T extends SugarRecord<?>> T getValueWithoutCache(Class<T> type) {
+        // TODO: Remove redundancy.
+        List<T> result = Temperature.find(type, "MEASURE_ID = ?", "" + getId());
+        if (result.size() == 0)
+            return null;
+        else
+            return result.get(0);
+    }
 }

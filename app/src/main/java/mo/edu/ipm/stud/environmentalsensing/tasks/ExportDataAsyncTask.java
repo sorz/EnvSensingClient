@@ -38,7 +38,6 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
             writer = new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream(files[0])));
             writer.write(CSV_HEADER);
-            writer.flush();
 
             double totalRows = measurements.size();
             int currentRow = 0;
@@ -47,12 +46,12 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
                 writer.write(measurement.getTimestamp() + ",");
 
                 MeasureValue[] values = new MeasureValue[6];
-                values[0] = measurement.getValue(Temperature.class);
-                values[1] = measurement.getValue(Humidity.class);
-                values[2] = measurement.getValue(Pressure.class);
-                values[3] = measurement.getValue(Monoxide.class);
-                values[4] = measurement.getValue(OxidizingGas.class);
-                values[5] = measurement.getValue(ReducingGas.class);
+                values[0] = measurement.getValueWithoutCache(Temperature.class);
+                values[1] = measurement.getValueWithoutCache(Humidity.class);
+                values[2] = measurement.getValueWithoutCache(Pressure.class);
+                values[3] = measurement.getValueWithoutCache(Monoxide.class);
+                values[4] = measurement.getValueWithoutCache(OxidizingGas.class);
+                values[5] = measurement.getValueWithoutCache(ReducingGas.class);
                 for (MeasureValue value : values) {
                     if (value != null)
                         writer.write(value.getValue() + "");
@@ -66,11 +65,10 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
                     writer.write(location.getLatitude() + "," + location.getLongitude() + ","
                             + location.getAccuracy() + "\r\n");
 
-                writer.flush();
                 currentRow ++;
                 publishProgress((int) (currentRow / totalRows * 100));
             }
-
+            writer.flush();
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Cannot create file.", e);
             return false;
