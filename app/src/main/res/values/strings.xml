@@ -4,6 +4,11 @@
     <string name="pref_recording_exact_interval" translatable="false">pref_recording_exact_interval</string>
     <string name="pref_recording_duration_hours" translatable="false">pref_recording_duration_hours</string>
     <string name="pref_recording_duration_minutes" translatable="false">pref_recording_duration_minutes</string>
+    <string name="pref_user_name" translatable="false">pref_user_name</string>
+    <string name="pref_user_email" translatable="false">pref_user_email</string>
+    <string name="pref_user_token" translatable="false">pref_user_token</string>
+
+    <string name="api_url" translatable="false">https://fyp.sorz.org/api</string>
 
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
@@ -78,6 +83,11 @@
     <string name="file_format">File format</string>
     <string name="file_format_cvs">Comma-Separated Values (CSV)</string>
     <string name="export">Export</string>
-    <string name="export_ok">Export succesfuly</string>
+    <string name="export_ok">Export successfully</string>
     <string name="export_error">Sorry, we cannot export data due to a unexcpeted error.</string>
+    <string name="title_user_login">Login</string>
+    <string name="username">User name</string>
+    <string name="password">Password</string>
+    <string name="login">Log in</string>
+    <string name="cannot_be_blank">Cannot be blank</string>
 </resources>
