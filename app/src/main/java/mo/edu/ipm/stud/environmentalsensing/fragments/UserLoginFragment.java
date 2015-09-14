@@ -109,8 +109,8 @@ public class UserLoginFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "User token got: " + response.substring(0, 8) + "...");
-                onLoggedIn(username, password, response);
-                buttonLogin.setEnabled(true);
+                onLoggedIn(username, "", response);
+                // TODO: get user's email.
             }
         }, new Response.ErrorListener() {
             @Override
@@ -134,11 +134,14 @@ public class UserLoginFragment extends Fragment {
 
     }
 
-    private void onLoggedIn(String username, String password, String token) {
-        // TODO: Save username, password and token.
-
+    private void onLoggedIn(String username, String email, String token) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(getString(R.string.pref_user_name), username);
+        editor.putString(getString(R.string.pref_user_email), email);
+        editor.putString(getString(R.string.pref_user_token), token);
+        editor.apply();
         if (callback != null)
-            callback.onUserLoggedIn(username, password);
+            callback.onUserLoggedIn(username, email);
     }
 
     public interface OnUserLoginListener {
