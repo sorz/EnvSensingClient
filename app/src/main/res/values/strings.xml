@@ -90,4 +90,6 @@
     <string name="password">Password</string>
     <string name="login">Log in</string>
     <string name="cannot_be_blank">Cannot be blank</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="title_section_account">Account</string>
 </resources>

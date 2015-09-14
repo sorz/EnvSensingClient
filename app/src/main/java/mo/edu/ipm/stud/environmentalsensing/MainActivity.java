@@ -12,11 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import mo.edu.ipm.stud.environmentalsensing.fragments.ExportDataFragment;
@@ -26,6 +26,7 @@ import mo.edu.ipm.stud.environmentalsensing.fragments.RecordStatusFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SensorSelectionFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SensorStatusFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SettingsFragment;
+import mo.edu.ipm.stud.environmentalsensing.fragments.UserLoginFragment;
 
 public class MainActivity extends AppCompatActivity
         implements FragmentManager.OnBackStackChangedListener,
@@ -36,13 +37,15 @@ public class MainActivity extends AppCompatActivity
         RecordConfigFragment.OnRecordingStartedListener,
         RecordStatusFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
-        ExportDataFragment.OnDataExportedListener {
+        ExportDataFragment.OnDataExportedListener,
+        UserLoginFragment.OnUserLoginListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
     private static final int SECTION_RAWDATA_VIEWER = 4;
+    private static final int SECTION_ACCOUNT = 5;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -71,14 +74,25 @@ public class MainActivity extends AppCompatActivity
         // Set up the drawer.
         // Reference:
         // https://github.com/mikepenz/MaterialDrawer
-        AccountHeader header = new AccountHeaderBuilder()
+        AccountHeaderBuilder headerBuilder = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.header)
-                .build();
+                .withHeaderBackground(R.drawable.header);
+
+        if (isUserLoggedIn()) {
+            String username = preferences.getString(getString(R.string.pref_user_name), "");
+            String email = preferences.getString(getString(R.string.pref_user_email), "");
+
+            ProfileDrawerItem profile = new ProfileDrawerItem()
+                    .withName(username)
+                    .withEmail(email);
+            // TODO: .withIcon(Gravatar)
+            headerBuilder.addProfiles(profile);
+        }
+
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withAccountHeader(header)
+                .withAccountHeader(headerBuilder.build())
                 .addDrawerItems(
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_recording)
@@ -92,6 +106,10 @@ public class MainActivity extends AppCompatActivity
                                 .withName(R.string.title_section_sensor_status)
                                 .withIcon(R.drawable.ic_swap_vert_black_24dp)
                                 .withIdentifier(SECTION_SENSOR_STATUS),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_account)
+                                .withIcon(R.drawable.ic_account_circle_black_24dp)
+                                .withIdentifier(SECTION_ACCOUNT),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings)
                                 .withIcon(R.drawable.ic_settings_black_24dp)
@@ -136,6 +154,12 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SECTION_RAWDATA_VIEWER:
                 fragment = new RawDataViewerFragment();
+                break;
+            case SECTION_ACCOUNT:
+                if (!isUserLoggedIn())
+                    fragment = new UserLoginFragment();
+                else
+                    fragment = new Fragment();  // TODO: account management.
                 break;
             default:
                 fragment = new Fragment();
@@ -204,6 +228,10 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
+    private boolean isUserLoggedIn() {
+        return preferences.getString(getString(R.string.pref_user_token), null) != null;
+    }
+
     @Override
     public void onDisplaySensorSelectionDialog() {
         showSensorSelectionDialog();
@@ -250,4 +278,9 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().popBackStack();
     }
 
+    @Override
+    public void onUserLoggedIn(String username, String email) {
+        getFragmentManager().popBackStack();
+        // TODO: update drawer header.
+    }
 }
