@@ -50,10 +50,8 @@ public class UserTokenRequest extends Request<String> {
 
     @Override
     protected Response<String> parseNetworkResponse(NetworkResponse response) {
-        System.out.println("fasdfwfwefas!!!!");
         try {
             if (response.statusCode == HttpURLConnection.HTTP_OK) {
-                Log.d(TAG, "Response ok.");
                 JSONObject json = new JSONObject(new String(response.data));
                 return Response.success(json.getString("token"),
                         HttpHeaderParser.parseCacheHeaders(response));
@@ -61,7 +59,6 @@ public class UserTokenRequest extends Request<String> {
                 Log.w(TAG, "Unexpected status code: " + response.statusCode);
                 return Response.error(new ServerError());
             }
-
         } catch (JSONException e) {
             Log.e(TAG, "Failed to parsing response.", e);
             return Response.error(new ParseError(e));

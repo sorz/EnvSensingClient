@@ -16,10 +16,12 @@ import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
 import mo.edu.ipm.stud.environmentalsensing.requests.MyRequestQueue;
+import mo.edu.ipm.stud.environmentalsensing.requests.RetryPolicy;
 import mo.edu.ipm.stud.environmentalsensing.requests.UserTokenRequest;
 
 /**
@@ -116,7 +118,7 @@ public class UserLoginFragment extends Fragment {
                 if (error instanceof AuthFailureError) {
                     Toast.makeText(getActivity(), R.string.auth_fail_message,
                             Toast.LENGTH_SHORT).show();
-                } else if (error instanceof NetworkError) {
+                } else if (error instanceof NetworkError || error instanceof TimeoutError) {
                     Toast.makeText(getActivity(), R.string.network_fail_message,
                             Toast.LENGTH_SHORT).show();
                 } else {
@@ -127,6 +129,7 @@ public class UserLoginFragment extends Fragment {
                 buttonLogin.setEnabled(true);
             }
         });
+        request.setRetryPolicy(new RetryPolicy());
         MyRequestQueue.getInstance(getActivity()).add(request);
 
     }
