@@ -8,8 +8,6 @@
     <string name="pref_user_email" translatable="false">pref_user_email</string>
     <string name="pref_user_token" translatable="false">pref_user_token</string>
 
-    <string name="api_url" translatable="false">https://fyp.sorz.org/api</string>
-
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
     <string name="title_section_sensor_status">Sensor status</string>
@@ -84,7 +82,7 @@
     <string name="file_format_cvs">Comma-Separated Values (CSV)</string>
     <string name="export">Export</string>
     <string name="export_ok">Export successfully</string>
-    <string name="export_error">Sorry, we cannot export data due to a unexcpeted error.</string>
+    <string name="export_error">Sorry, we cannot export data due to a unexpected error.</string>
     <string name="title_user_login">Login</string>
     <string name="username">User name</string>
     <string name="password">Password</string>
@@ -92,4 +90,7 @@
     <string name="cannot_be_blank">Cannot be blank</string>
     <string name="not_logged_in">Not logged in</string>
     <string name="title_section_account">Account</string>
+    <string name="auth_fail_message">Username or password incorrect. Please check and retry.</string>
+    <string name="network_fail_message">Network error, please try later.</string>
+    <string name="unknown_fail_message">Ouch, some bad things happened. Please retry it later.</string>
 </resources>

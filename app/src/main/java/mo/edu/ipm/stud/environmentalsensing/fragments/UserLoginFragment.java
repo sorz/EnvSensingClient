@@ -5,18 +5,29 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
+import mo.edu.ipm.stud.environmentalsensing.requests.MyRequestQueue;
+import mo.edu.ipm.stud.environmentalsensing.requests.UserTokenRequest;
 
 /**
  * A {@link Fragment} allow user type their username & password to login.
  */
 public class UserLoginFragment extends Fragment {
+    private static final String TAG = "UserLoginFragment";
+
     private OnUserLoginListener callback;
     private SharedPreferences preferences;
 
@@ -81,14 +92,50 @@ public class UserLoginFragment extends Fragment {
     }
 
     private void login() {
-        String username = textUsername.getText().toString();
-        String password = textPassword.getText().toString();
+        final String username = textUsername.getText().toString();
+        final String password = textPassword.getText().toString();
         if (username.isEmpty())
             textUsername.setError(getString(R.string.cannot_be_blank));
         if (password.isEmpty())
             textPassword.setError(getString(R.string.cannot_be_blank));
         if (username.isEmpty() || password.isEmpty())
             return;
+
+        buttonLogin.setEnabled(false);
+        UserTokenRequest request = new UserTokenRequest(username, password,
+                new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "User token got: " + response.substring(0, 8) + "...");
+                onLoggedIn(username, password, response);
+                buttonLogin.setEnabled(true);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof AuthFailureError) {
+                    Toast.makeText(getActivity(), R.string.auth_fail_message,
+                            Toast.LENGTH_SHORT).show();
+                } else if (error instanceof NetworkError) {
+                    Toast.makeText(getActivity(), R.string.network_fail_message,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.unknown_fail_message,
+                            Toast.LENGTH_SHORT).show();
+                    Log.w(TAG, "Unknown Volley error", error);
+                }
+                buttonLogin.setEnabled(true);
+            }
+        });
+        MyRequestQueue.getInstance(getActivity()).add(request);
+
+    }
+
+    private void onLoggedIn(String username, String password, String token) {
+        // TODO: Save username, password and token.
+
+        if (callback != null)
+            callback.onUserLoggedIn(username, password);
     }
 
     public interface OnUserLoginListener {
