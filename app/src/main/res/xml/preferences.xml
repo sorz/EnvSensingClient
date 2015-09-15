@@ -16,7 +16,7 @@
             android:dialogTitle="@string/pref_recording_interval_dialog_title"
             android:entries="@array/pref_recording_interval_entries"
             android:entryValues="@array/pref_recording_interval_values"
-            android:defaultValue="300" />
+            android:defaultValue="60" />
         <CheckBoxPreference
             android:key="@string/pref_recording_exact_interval"
             android:title="@string/pref_recording_exact_interval_title"
