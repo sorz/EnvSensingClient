@@ -77,18 +77,6 @@ public class MainActivity extends AppCompatActivity
         AccountHeaderBuilder headerBuilder = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.header);
-
-        if (isUserLoggedIn()) {
-            String username = preferences.getString(getString(R.string.pref_user_name), "");
-            String email = preferences.getString(getString(R.string.pref_user_email), "");
-
-            ProfileDrawerItem profile = new ProfileDrawerItem()
-                    .withName(username)
-                    .withEmail(email);
-            // TODO: .withIcon(Gravatar)
-            headerBuilder.addProfiles(profile);
-        }
-
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
@@ -279,8 +267,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onUserLoggedIn(String username, String email) {
+    public void onUserLoggedIn() {
         getFragmentManager().popBackStack();
-        // TODO: update drawer header.
     }
 }
