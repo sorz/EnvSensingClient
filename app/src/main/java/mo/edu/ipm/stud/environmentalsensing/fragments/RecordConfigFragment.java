@@ -17,7 +17,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
-import mo.edu.ipm.stud.environmentalsensing.RecordService;
+import mo.edu.ipm.stud.environmentalsensing.services.RecordService;
 
 /**
  * A {@link Fragment} used to configure and start a new recording task.

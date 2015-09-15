@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import mo.edu.ipm.stud.environmentalsensing.R;
-import mo.edu.ipm.stud.environmentalsensing.RecordService;
+import mo.edu.ipm.stud.environmentalsensing.services.RecordService;
 
 /**
  * A {@link Fragment} used to display status and stop the running recording task.

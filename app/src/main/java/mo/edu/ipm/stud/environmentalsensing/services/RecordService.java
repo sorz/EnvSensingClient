@@ -1,4 +1,4 @@
-package mo.edu.ipm.stud.environmentalsensing;
+package mo.edu.ipm.stud.environmentalsensing.services;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -25,6 +25,9 @@ import com.sensorcon.sensordrone.android.Drone;
 
 import java.util.Date;
 
+import mo.edu.ipm.stud.environmentalsensing.MainActivity;
+import mo.edu.ipm.stud.environmentalsensing.R;
+import mo.edu.ipm.stud.environmentalsensing.SensorDrone;
 import mo.edu.ipm.stud.environmentalsensing.entities.Humidity;
 import mo.edu.ipm.stud.environmentalsensing.entities.InvalidValueException;
 import mo.edu.ipm.stud.environmentalsensing.entities.LocationInfo;

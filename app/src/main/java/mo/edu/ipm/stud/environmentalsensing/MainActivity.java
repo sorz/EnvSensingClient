@@ -26,6 +26,7 @@ import mo.edu.ipm.stud.environmentalsensing.fragments.SensorSelectionFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SensorStatusFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.SettingsFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.UserLoginFragment;
+import mo.edu.ipm.stud.environmentalsensing.services.RecordService;
 
 public class MainActivity extends AppCompatActivity
         implements FragmentManager.OnBackStackChangedListener,
