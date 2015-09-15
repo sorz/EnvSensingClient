@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp" android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin" android:orientation="vertical"
     tools:context="mo.edu.ipm.stud.environmentalsensing.fragments.AccountFragment">
 
     <!-- TODO: Update blank fragment layout -->
