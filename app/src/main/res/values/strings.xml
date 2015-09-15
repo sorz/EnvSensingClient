@@ -89,12 +89,9 @@
     <string name="login">Log in</string>
     <string name="cannot_be_blank">Cannot be blank</string>
     <string name="not_logged_in">Not logged in</string>
-    <string name="title_section_account">Account</string>
     <string name="auth_fail_message">Username or password incorrect. Please check and retry.</string>
     <string name="network_fail_message">Network error, please try later.</string>
     <string name="unknown_fail_message">Ouch, some bad things happened. Please retry it later.</string>
-    <string name="title_account">My account</string>
-    <string name="welcome">Welcome,</string>
     <string name="logout">Log out</string>
     <string name="pref_device_title">Device</string>
     <string name="pref_recording_title">Recording</string>

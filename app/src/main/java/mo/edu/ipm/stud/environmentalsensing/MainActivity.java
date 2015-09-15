@@ -18,7 +18,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import mo.edu.ipm.stud.environmentalsensing.fragments.AccountFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.ExportDataFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
@@ -38,15 +37,13 @@ public class MainActivity extends AppCompatActivity
         RecordStatusFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
-        UserLoginFragment.OnUserLoginListener,
-        AccountFragment.OnUserLogoutListener {
+        UserLoginFragment.OnUserLoginListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
     private static final int SECTION_RAWDATA_VIEWER = 4;
-    private static final int SECTION_ACCOUNT = 5;
 
     private SharedPreferences preferences;
     private Drawer drawer;
@@ -96,10 +93,6 @@ public class MainActivity extends AppCompatActivity
                                 .withIcon(R.drawable.ic_swap_vert_black_24dp)
                                 .withIdentifier(SECTION_SENSOR_STATUS),
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_account)
-                                .withIcon(R.drawable.ic_account_circle_black_24dp)
-                                .withIdentifier(SECTION_ACCOUNT),
-                        new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings)
                                 .withIcon(R.drawable.ic_settings_black_24dp)
                                 .withIdentifier(SECTION_SETTINGS)
@@ -143,12 +136,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SECTION_RAWDATA_VIEWER:
                 fragment = new RawDataViewerFragment();
-                break;
-            case SECTION_ACCOUNT:
-                if (!isUserLoggedIn())
-                    fragment = new UserLoginFragment();
-                else
-                    fragment = new AccountFragment();
                 break;
             default:
                 fragment = new Fragment();
@@ -217,10 +204,6 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
-    private boolean isUserLoggedIn() {
-        return preferences.getString(getString(R.string.pref_user_token), null) != null;
-    }
-
     @Override
     public void onDisplaySensorSelectionDialog() {
         showSensorSelectionDialog();
@@ -280,10 +263,4 @@ public class MainActivity extends AppCompatActivity
        getFragmentManager().popBackStack();
     }
 
-    @Override
-    public void onUserLoggedOut() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new UserLoginFragment())
-                .commit();
-    }
 }
