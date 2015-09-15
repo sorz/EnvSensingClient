@@ -16,11 +16,9 @@ public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener  {
     private OnDisplayDialogListener callback;
     private SharedPreferences preferences;
-    private Preference bluetoothMac;
-
-    public interface OnDisplayDialogListener {
-        public void onDisplaySensorSelectionDialog();
-    }
+    private Preference prefBtMac;
+    private Preference prefUsername;
+    private Preference prefLogout;
 
     @Override
     public void onAttach(Activity activity) {
@@ -47,11 +45,13 @@ public class SettingsFragment extends PreferenceFragment
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         preferences.registerOnSharedPreferenceChangeListener(this);
+        prefBtMac = findPreference(getString(R.string.pref_bluetooth_mac));
+        prefUsername = findPreference(getString(R.string.pref_user_name));
+        prefLogout = findPreference(getString(R.string.pref_account_logout));
 
-        bluetoothMac = findPreference(getString(R.string.pref_bluetooth_mac));
-        bluetoothMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
+        prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
-        bluetoothMac.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        prefBtMac.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 callback.onDisplaySensorSelectionDialog();
@@ -59,14 +59,62 @@ public class SettingsFragment extends PreferenceFragment
             }
         });
 
+        prefUsername.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (!isUserLoggedIn()) {
+                    callback.onDisplayLoginDialog();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        prefLogout.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SharedPreferences.Editor editor = preference.getEditor();
+                editor.remove(getString(R.string.pref_user_token));
+                editor.apply();
+                return true;
+            }
+        });
+
+        updateAccountStatus();
+
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(bluetoothMac.getKey())) {
-            bluetoothMac.setSummary(
+        if (key.equals(prefBtMac.getKey())) {
+            prefBtMac.setSummary(
                     sharedPreferences.getString(key, getString(R.string.press_to_select)));
         }
+        if (key.equals(getString(R.string.pref_user_token))) {
+            updateAccountStatus();
+        }
+    }
+
+    private boolean isUserLoggedIn() {
+        return preferences.getString(getString(R.string.pref_user_token), null) != null;
+    }
+
+    private void updateAccountStatus() {
+        boolean loggedIn = isUserLoggedIn();
+        prefLogout.setEnabled(loggedIn);
+        if (loggedIn) {
+            prefUsername.setTitle(R.string.username);
+            prefUsername.setSummary(preferences.getString(getString(R.string.pref_user_name), ""));
+        } else {
+            prefUsername.setTitle(R.string.not_logged_in);
+            prefUsername.setSummary(R.string.click_to_login);
+        }
+    }
+
+
+    public interface OnDisplayDialogListener {
+        public void onDisplaySensorSelectionDialog();
+        public void onDisplayLoginDialog();
     }
 
 }

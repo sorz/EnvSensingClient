@@ -227,6 +227,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onDisplayLoginDialog() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new UserLoginFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
     public void onSensorSelected(String mac) {
         SharedPreferences.Editor editor =
                 PreferenceManager.getDefaultSharedPreferences(this).edit();
@@ -269,13 +277,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onUserLoggedIn() {
-        FragmentManager fragmentManager = getFragmentManager();
-        if (fragmentManager.getBackStackEntryCount()> 0)
-           getFragmentManager().popBackStack();
-        else
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, new AccountFragment())
-                    .commit();
+       getFragmentManager().popBackStack();
     }
 
     @Override

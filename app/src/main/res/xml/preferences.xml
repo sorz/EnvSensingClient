@@ -24,4 +24,13 @@
             android:defaultValue="false" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_account_title">
+        <Preference
+            android:key="@string/pref_user_name" />
+        <Preference
+            android:key="@string/pref_account_logout"
+            android:title="@string/logout" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
