@@ -93,4 +93,7 @@
     <string name="auth_fail_message">Username or password incorrect. Please check and retry.</string>
     <string name="network_fail_message">Network error, please try later.</string>
     <string name="unknown_fail_message">Ouch, some bad things happened. Please retry it later.</string>
+    <string name="title_account">My account</string>
+    <string name="welcome">Welcome,</string>
+    <string name="logout">Log out</string>
 </resources>

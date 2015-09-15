@@ -16,9 +16,9 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import mo.edu.ipm.stud.environmentalsensing.fragments.AccountFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.ExportDataFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment;
 import mo.edu.ipm.stud.environmentalsensing.fragments.RecordConfigFragment;
@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity
         RecordStatusFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
-        UserLoginFragment.OnUserLoginListener {
+        UserLoginFragment.OnUserLoginListener,
+        AccountFragment.OnUserLogoutListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity
                 if (!isUserLoggedIn())
                     fragment = new UserLoginFragment();
                 else
-                    fragment = new Fragment();  // TODO: account management.
+                    fragment = new AccountFragment();
                 break;
             default:
                 fragment = new Fragment();
@@ -268,6 +269,19 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onUserLoggedIn() {
-        getFragmentManager().popBackStack();
+        FragmentManager fragmentManager = getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount()> 0)
+           getFragmentManager().popBackStack();
+        else
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, new AccountFragment())
+                    .commit();
+    }
+
+    @Override
+    public void onUserLoggedOut() {
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container, new UserLoginFragment())
+                .commit();
     }
 }
