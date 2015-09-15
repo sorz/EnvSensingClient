@@ -20,7 +20,7 @@
     <string name="scan">Scan</string>
     <string name="dialog_select_device_confirm_message">%1$s (%2$s) seems not a Sensordrone device. Select it anyway?</string>
     <string name="dialog_select_device_confirm_title">Selection confirm</string>
-    <string name="pref_bluetooth_mac_title">Sensordrone address</string>
+    <string name="pref_bluetooth_mac_title">Bluetooth address</string>
     <string name="press_to_select">Press to select</string>
     <string name="connect_fail">Connect fail.</string>
     <string name="sensor_not_connect">Sensordrone is not connected.</string>
@@ -96,4 +96,6 @@
     <string name="title_account">My account</string>
     <string name="welcome">Welcome,</string>
     <string name="logout">Log out</string>
+    <string name="pref_device_title">Device</string>
+    <string name="pref_recording_title">Recording</string>
 </resources>
