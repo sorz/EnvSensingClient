@@ -1,10 +1,7 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -32,7 +29,6 @@ import mo.edu.ipm.stud.envsensing.requests.UserTokenRequest;
  */
 public class UserLoginFragment extends Fragment {
     private static final String TAG = "UserLoginFragment";
-    private static final String ACCOUNT_TYPE = "mo.edu.ipm.stud.envsensing";
 
     private OnUserLoginListener callback;
     private SharedPreferences preferences;
@@ -113,7 +109,7 @@ public class UserLoginFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "User token got: " + response.substring(0, 8) + "...");
-                onLoggedIn(username, password, response);
+                onLoggedIn(username, response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -137,15 +133,7 @@ public class UserLoginFragment extends Fragment {
 
     }
 
-    private void onLoggedIn(String username, String password, String token) {
-        AccountManager accountManager =
-                (AccountManager) getActivity().getSystemService(Context.ACCOUNT_SERVICE);
-
-        String oldUsername = preferences.getString(getString(R.string.pref_user_name), null);
-        if (oldUsername != null)
-            accountManager.removeAccount(new Account(oldUsername, ACCOUNT_TYPE), null, null);
-        accountManager.addAccountExplicitly(new Account(username, ACCOUNT_TYPE), password, null);
-
+    private void onLoggedIn(String username, String token) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(getString(R.string.pref_user_name), username);
         editor.putString(getString(R.string.pref_user_token), token);

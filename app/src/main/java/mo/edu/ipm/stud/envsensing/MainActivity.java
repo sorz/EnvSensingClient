@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity
         UserLoginFragment.OnUserLoginListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
-    private static final String TAG = "MainActivity";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
-    private static final int SECTION_RAW_DATA_VIEWER = 4;
+    private static final int SECTION_RAWDATA_VIEWER = 4;
 
+    private SharedPreferences preferences;
     private Drawer drawer;
 
     @Override
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         if (actionBar != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().addOnBackStackChangedListener(this);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Enable RecordService display recording section directly.
         // In this case, do not add the drawer.
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_raw_data)
                                 .withIcon(R.drawable.ic_sd_card_black_24dp)
-                                .withIdentifier(SECTION_RAW_DATA_VIEWER),
+                                .withIdentifier(SECTION_RAWDATA_VIEWER),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_sensor_status)
                                 .withIcon(R.drawable.ic_swap_vert_black_24dp)
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity
                 else
                     fragment = new RecordConfigFragment();
                 break;
-            case SECTION_RAW_DATA_VIEWER:
+            case SECTION_RAWDATA_VIEWER:
                 fragment = new RawDataViewerFragment();
                 break;
             default:
