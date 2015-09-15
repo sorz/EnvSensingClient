@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context="mo.edu.ipm.stud.environmentalsensing.fragments.RawDataViewerFragment">
+    tools:context="mo.edu.ipm.stud.envsensing.fragments.RawDataViewerFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"

@@ -5,7 +5,7 @@
     android:layout_marginTop="@dimen/activity_horizontal_margin"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
-    tools:context="mo.edu.ipm.stud.environmentalsensing.fragments.SensorSelectionFragment">
+    tools:context="mo.edu.ipm.stud.envsensing.fragments.SensorSelectionFragment">
 
     <LinearLayout
         android:id="@+id/bluetooth_disabled"
