@@ -12,13 +12,10 @@ import java.util.List;
  */
 public class Measurement extends SugarRecord<Measurement> {
     private long timestamp;
+    private boolean uploaded;
 
     public Measurement() {
         timestamp = System.currentTimeMillis();
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public long getTimestamp() {
@@ -27,6 +24,14 @@ public class Measurement extends SugarRecord<Measurement> {
 
     public Date getDate() {
         return new Date(getTimestamp());
+    }
+
+    public boolean isUploaded() {
+        return uploaded;
+    }
+
+    public void setUploaded(boolean uploaded) {
+        this.uploaded = uploaded;
     }
 
     @Nullable
