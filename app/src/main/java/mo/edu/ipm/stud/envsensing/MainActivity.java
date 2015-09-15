@@ -1,7 +1,10 @@
 package mo.edu.ipm.stud.envsensing;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -41,13 +45,16 @@ public class MainActivity extends AppCompatActivity
         UserLoginFragment.OnUserLoginListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
+    private static final String TAG = "MainActivity";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
-    private static final int SECTION_RAWDATA_VIEWER = 4;
+    private static final int SECTION_RAW_DATA_VIEWER = 4;
+    private static final String ACCOUNT_TYPE = "mo.edu.ipm.stud.envsensing";
+    private static final String ACCOUNT = "dummy-account";
 
-    private SharedPreferences preferences;
     private Drawer drawer;
+    private Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +67,7 @@ public class MainActivity extends AppCompatActivity
         if (actionBar != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().addOnBackStackChangedListener(this);
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Enable RecordService display recording section directly.
         // In this case, do not add the drawer.
@@ -88,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_raw_data)
                                 .withIcon(R.drawable.ic_sd_card_black_24dp)
-                                .withIdentifier(SECTION_RAWDATA_VIEWER),
+                                .withIdentifier(SECTION_RAW_DATA_VIEWER),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_sensor_status)
                                 .withIcon(R.drawable.ic_swap_vert_black_24dp)
@@ -108,6 +115,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             drawer.setSelection(SECTION_RECORDING);
         }
+
+        account = createSyncAccount(this);
     }
 
     @Override
@@ -135,7 +144,7 @@ public class MainActivity extends AppCompatActivity
                 else
                     fragment = new RecordConfigFragment();
                 break;
-            case SECTION_RAWDATA_VIEWER:
+            case SECTION_RAW_DATA_VIEWER:
                 fragment = new RawDataViewerFragment();
                 break;
             default:
@@ -264,4 +273,15 @@ public class MainActivity extends AppCompatActivity
        getFragmentManager().popBackStack();
     }
 
+
+    public static Account createSyncAccount(Context context) {
+        Account account = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if (accountManager.addAccountExplicitly(account, null, null)) {
+            Log.d(TAG, "Account added");
+        } else {
+            Log.d(TAG, "Add account failed.");
+        }
+        return account;
+    }
 }
