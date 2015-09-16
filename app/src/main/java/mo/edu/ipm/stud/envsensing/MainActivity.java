@@ -2,6 +2,7 @@ package mo.edu.ipm.stud.envsensing;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import mo.edu.ipm.stud.envsensing.fragments.SensorSelectionFragment;
 import mo.edu.ipm.stud.envsensing.fragments.SensorStatusFragment;
 import mo.edu.ipm.stud.envsensing.fragments.SettingsFragment;
 import mo.edu.ipm.stud.envsensing.fragments.UserLoginFragment;
+import mo.edu.ipm.stud.envsensing.fragments.UserRegisterFragment;
 import mo.edu.ipm.stud.envsensing.services.RecordService;
 
 public class MainActivity extends AppCompatActivity
@@ -38,7 +40,8 @@ public class MainActivity extends AppCompatActivity
         RecordStatusFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
-        UserLoginFragment.OnUserLoginListener {
+        UserLoginFragment.OnUserLoginListener,
+        UserRegisterFragment.OnUserRegisterListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
     private static final int SECTION_SENSOR_STATUS = 1;
@@ -147,6 +150,14 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
+    private void switchFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment);
+        if (addToBackStack)
+            transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
     @Override
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         switchSection(drawerItem.getIdentifier());
@@ -199,10 +210,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showSensorSelectionDialog() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new SensorSelectionFragment())
-                .addToBackStack(null)
-                .commit();
+        switchFragment(new SensorSelectionFragment(), true);
     }
 
     @Override
@@ -212,10 +220,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDisplayLoginDialog() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new UserLoginFragment())
-                .addToBackStack(null)
-                .commit();
+        switchFragment(new UserLoginFragment(), true);
     }
 
     @Override
@@ -230,9 +235,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRecordingStarted() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new RecordStatusFragment())
-                .commit();
+        switchFragment(new RecordStatusFragment(), false);
     }
 
     @Override
@@ -241,17 +244,12 @@ public class MainActivity extends AppCompatActivity
             // This activity start with ACTION_SHOW_RECORD_STATUS by RecordService.
             finish();
         else
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.container, new RecordConfigFragment())
-                    .commit();
+            switchFragment(new RecordConfigFragment(), false);
     }
 
     @Override
     public void onExportData() {
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container, new ExportDataFragment())
-                .addToBackStack(null)
-                .commit();
+        switchFragment(new ExportDataFragment(), true);
     }
 
     @Override
@@ -262,6 +260,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onUserLoggedIn() {
        getFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onUserRegister() {
+        switchFragment(new UserRegisterFragment(), true);
+    }
+
+    @Override
+    public void onUserRemasterFinish() {
+        getFragmentManager().popBackStack();
     }
 
 }

@@ -104,4 +104,7 @@
     <string name="email">E-mail address</string>
     <string name="username_too_short">3 characters or more.</string>
     <string name="password_no_match">Two password not match.</string>
+    <string name="already_have_a_account">I have a account</string>
+    <string name="create_new_account">Create new one</string>
+    <string name="need_a_account">Need a account?</string>
 </resources>

@@ -45,7 +45,7 @@ public class UserRegisterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_login, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_register, container, false);
         textUsername = (TextView) view.findViewById(R.id.text_username);
         textEmail = (TextView) view.findViewById(R.id.text_email);
         textPassword = (TextView) view.findViewById(R.id.text_password);
@@ -114,7 +114,7 @@ public class UserRegisterFragment extends Fragment {
     }
 
     public interface OnUserRegisterListener {
-        public void onUserReigstered();
+        public void onUserRemasterFinish();
     }
 
 }

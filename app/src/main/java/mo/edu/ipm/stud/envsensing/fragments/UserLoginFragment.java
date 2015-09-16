@@ -36,6 +36,7 @@ public class UserLoginFragment extends Fragment {
     private TextView textUsername;
     private TextView textPassword;
     private Button buttonLogin;
+    private Button buttonRegister;
 
     public UserLoginFragment() {
         // Required empty public constructor
@@ -61,12 +62,19 @@ public class UserLoginFragment extends Fragment {
         textUsername = (TextView) view.findViewById(R.id.text_username);
         textPassword = (TextView) view.findViewById(R.id.text_password);
         buttonLogin = (Button) view.findViewById(R.id.button_login);
+        buttonRegister = (Button) view.findViewById(R.id.button_register);
 
         textUsername.setText(preferences.getString(getString(R.string.pref_user_name), ""));
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 login();
+            }
+        });
+        buttonRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callback.onUserRegister();
             }
         });
 
@@ -79,6 +87,7 @@ public class UserLoginFragment extends Fragment {
         textUsername = null;
         textPassword = null;
         buttonLogin = null;
+        buttonRegister = null;
     }
 
     @Override
@@ -130,7 +139,6 @@ public class UserLoginFragment extends Fragment {
         });
         request.setRetryPolicy(new RetryPolicy());
         MyRequestQueue.getInstance(getActivity()).add(request);
-
     }
 
     private void onLoggedIn(String username, String token) {
@@ -144,6 +152,8 @@ public class UserLoginFragment extends Fragment {
 
     public interface OnUserLoginListener {
         public void onUserLoggedIn();
+
+        public void onUserRegister();
     }
 
 }
