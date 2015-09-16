@@ -98,4 +98,10 @@
     <string name="pref_account_title">Account</string>
     <string name="pref_account_logout">pref_account_logout</string>
     <string name="click_to_login">(click to login)</string>
+    <string name="title_user_register">Create new account</string>
+    <string name="password_repeat">Password (again)</string>
+    <string name="sign_up">Sign up</string>
+    <string name="email">E-mail address</string>
+    <string name="username_too_short">3 characters or more.</string>
+    <string name="password_no_match">Two password not match.</string>
 </resources>
