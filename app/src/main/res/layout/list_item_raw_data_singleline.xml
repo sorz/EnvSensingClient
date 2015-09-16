@@ -70,6 +70,10 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:id="@+id/text_longitude" />
-
     </LinearLayout>
+
+    <View
+        style="@style/divider"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>

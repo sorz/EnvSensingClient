@@ -3,8 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp" >
+    android:layout_marginTop="8dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -132,5 +131,9 @@
             android:textColor="@color/md_light_primary_text"
             android:id="@+id/text_longitude" />
     </LinearLayout>
+
+    <View
+        style="@style/divider"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>
