@@ -93,11 +93,11 @@ public class UserRegisterFragment extends Fragment {
         if (username.isEmpty())
             textUsername.setError(getString(R.string.cannot_be_blank));
         if (email.isEmpty())
-            textUsername.setError(getString(R.string.cannot_be_blank));
+            textEmail.setError(getString(R.string.cannot_be_blank));
         if (password.isEmpty())
-            textUsername.setError(getString(R.string.cannot_be_blank));
+            textPassword.setError(getString(R.string.cannot_be_blank));
         if (password2.isEmpty())
-            textUsername.setError(getString(R.string.cannot_be_blank));
+            textPassword2.setError(getString(R.string.cannot_be_blank));
         if (username.isEmpty() || email.isEmpty() || password.isEmpty() || password2.isEmpty())
             return;
 
@@ -107,6 +107,7 @@ public class UserRegisterFragment extends Fragment {
         }
         if (!password.equals(password2)) {
             textPassword2.setError(getString(R.string.password_no_match));
+            textPassword2.setText("");
             return;
         }
 
