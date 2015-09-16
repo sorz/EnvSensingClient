@@ -133,6 +133,15 @@ public class RecordConfigFragment extends Fragment {
                     SystemClock.elapsedRealtime() + durationSeconds * 1000);
             getActivity().startService(intent);
         }
-        callback.onRecordingStarted();
+
+        // Try to let service start first, after that, we switch to status fragment.
+        View view = getView();
+        if (view != null)
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onRecordingStarted();
+                }
+            });
     }
 }
