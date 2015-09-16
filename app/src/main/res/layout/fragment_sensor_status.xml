@@ -50,8 +50,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/sensor_connected"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_gravity="center_horizontal" />
 
                 <RelativeLayout
