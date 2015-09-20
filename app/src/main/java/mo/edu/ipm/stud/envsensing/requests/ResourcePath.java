@@ -6,5 +6,5 @@ package mo.edu.ipm.stud.envsensing.requests;
 class ResourcePath {
     private static final String SITE = "https://fyp.sorz.org/api";
 
-    static final String TOKEN = SITE + "/token";
+    static final String TOKEN = SITE + "/token/";
 }
