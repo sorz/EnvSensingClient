@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Bundle;
@@ -20,9 +21,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.sensorcon.sensordrone.android.Drone;
 
 import java.util.Date;
@@ -45,7 +43,7 @@ import mo.edu.ipm.stud.envsensing.tasks.SensorMeasureAsyncTask;
 /**
  * Do measure periodically and stick a notification.
  */
-public class RecordService extends Service implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class RecordService extends Service implements LocationListener {
     static private final String TAG = "RecordService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
     static private final int MEASURE_TIMEOUT = 30 * 1000; // 30 seconds
@@ -61,7 +59,7 @@ public class RecordService extends Service implements LocationListener, GoogleAp
     private final IBinder binder = new LocalBinder();
     private SharedPreferences preferences;
     private AlarmManager alarmManager;
-    private GoogleApiClient apiClient;
+    private LocationManager locationManager;
     private Drone drone;
 
     private long recording_start;
@@ -81,21 +79,6 @@ public class RecordService extends Service implements LocationListener, GoogleAp
     private boolean thisMeasureFail;
     private boolean thisLocationDone;
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "Google API connected.");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d(TAG, "Google API suspended.");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.w(TAG, "Google API connection failed.");
-    }
-
     public class LocalBinder extends Binder {
         public RecordService getService() {
             return RecordService.this;
@@ -113,14 +96,10 @@ public class RecordService extends Service implements LocationListener, GoogleAp
         running = true;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         drone = SensorDrone.getInstance();
-        apiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(MainActivity.ACTION_SHOW_RECORD_STATUS);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -144,13 +123,12 @@ public class RecordService extends Service implements LocationListener, GoogleAp
 
     @Override
     public void onDestroy() {
-        apiClient.disconnect();
+        super.onDestroy();
         running = false;
         stopForeground(true);
         if (drone.isConnected)
             // TODO: Use a connection counter to avoid disturbing who is using it?
             drone.disconnect();
-        super.onDestroy();
     }
 
     @Override
@@ -219,7 +197,8 @@ public class RecordService extends Service implements LocationListener, GoogleAp
         criteria.setBearingRequired(false);
         criteria.setAltitudeRequired(false);
         criteria.setSpeedRequired(false);
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
+        // TODO: check permission?
+        locationManager.requestSingleUpdate(criteria, this, getMainLooper());
 
         // TODO: Active check connection status?
         if (drone.isConnected) {
