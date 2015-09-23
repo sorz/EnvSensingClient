@@ -1,13 +1,21 @@
 package mo.edu.ipm.stud.envsensing.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.RequestFuture;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import mo.edu.ipm.stud.envsensing.entities.Humidity;
 import mo.edu.ipm.stud.envsensing.entities.LocationInfo;
@@ -17,6 +25,10 @@ import mo.edu.ipm.stud.envsensing.entities.Monoxide;
 import mo.edu.ipm.stud.envsensing.entities.OxidizingGas;
 import mo.edu.ipm.stud.envsensing.entities.ReducingGas;
 import mo.edu.ipm.stud.envsensing.entities.Temperature;
+import mo.edu.ipm.stud.envsensing.requests.JsonArrayAuthRequest;
+import mo.edu.ipm.stud.envsensing.requests.MyRequestQueue;
+import mo.edu.ipm.stud.envsensing.requests.ResourcePath;
+import mo.edu.ipm.stud.envsensing.requests.RetryPolicy;
 
 /**
  * Upload measured data to server.
@@ -25,6 +37,15 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
     private static final String TAG = "UploadAsyncTask";
     private static final int MAX_PER_REQUEST = 20;
 
+    private Context context;
+    private String deviceId;
+
+    public UploadAsyncTask(Context context) {
+        this.context = context;
+        deviceId = Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+    }
+
     @Override
     protected Void doInBackground(Void... voids) {
         long total = Measurement.count(Measurement.class, "uploaded = false", null);
@@ -32,27 +53,50 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
         Iterator<Measurement> measureIterator = Measurement.findAsIterator(
                 Measurement.class, "uploaded = false", null, null, "-timestamp", null);
 
-
+        long progress = 0;
         try {
             while (measureIterator.hasNext()) {
                 JSONArray measures = new JSONArray();
-
+                List<Measurement> needToSave = new ArrayList<>(MAX_PER_REQUEST);
                 while (measureIterator.hasNext() && measures.length() < MAX_PER_REQUEST) {
+                    ++progress;
                     Measurement measure = measureIterator.next();
                     JSONObject json = packUpMeasure(measure);
-                    if (json == null)
+                    if (json == null) {
                         Log.d(TAG, "Bypass invalid data.");
-                    else
+                    } else {
                         measures.put(json);
+                        measure.setUploaded(true);
+                        needToSave.add(measure);
+                    }
                 }
-
-                // TODO: upload measures and wait.
+                uploadMeasures(measures);
+                Measurement.saveInTx(needToSave);
+                publishProgress(((float) progress / total));
             }
         } catch (JSONException e) {
+            Log.w(TAG, "JSON exception.", e);
+        } catch (ExecutionException e) {
+            Log.d(TAG, "Execution exception");
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    private void uploadMeasures(JSONArray measures) throws ExecutionException {
+        RequestFuture<JSONArray> future = RequestFuture.newFuture();
+        JsonArrayAuthRequest request = new JsonArrayAuthRequest(context, Request.Method.POST,
+                String.format(ResourcePath.MEASURES, deviceId), measures, future, future);
+        request.setRetryPolicy(new RetryPolicy());
+        MyRequestQueue.getInstance(context).add(request);
+
+        try {
+            JSONArray response = future.get();
+        } catch (InterruptedException e) {
+            Log.d(TAG, "Upload request interrupted.");
+        }
+
     }
 
     private JSONObject packUpMeasure(Measurement measure) throws JSONException {

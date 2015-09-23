@@ -169,7 +169,7 @@ public class UserLoginFragment extends Fragment {
         JSONObject deviceInfo = new JSONObject(info);
 
         JsonObjectAuthRequest request = new JsonObjectAuthRequest(getActivity(),
-                Request.Method.PUT, ResourcePath.DEVICE + deviceId + "/", deviceInfo,
+                Request.Method.PUT, ResourcePath.DEVICES + deviceId + "/", deviceInfo,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
