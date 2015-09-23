@@ -71,7 +71,6 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
                         needToSave.add(measure);
                     }
                 }
-                Log.d(TAG, measures.toString(2));
                 uploadMeasures(measures);
                 Measurement.saveInTx(needToSave);
                 publishProgress(((float) progress / total));
@@ -123,7 +122,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
         if (location == null || values == null)
             return null;
         JSONObject json = new JSONObject();
-        json.put("timestamp", measure.getTimestamp());
+        json.put("timestamp", measure.getTimestamp() / 1000);
         json.put("longitude", location.getLongitude());
         json.put("latitude", location.getLatitude());
         json.put("accuracy", location.getAccuracy());
