@@ -52,7 +52,7 @@ public class ExportDataFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_export_data, container, false);
         textPath = (TextView) view.findViewById(R.id.text_export_path);
         buttonExport = (Button) view.findViewById(R.id.button_export);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 
         destFile = getDefaultExportFilePath();
 

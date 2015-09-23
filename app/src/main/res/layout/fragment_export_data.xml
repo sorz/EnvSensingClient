@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        android:id="@+id/progressBar" />
+        android:id="@+id/progress_bar" />
 
     <Button
         android:layout_width="wrap_content"
