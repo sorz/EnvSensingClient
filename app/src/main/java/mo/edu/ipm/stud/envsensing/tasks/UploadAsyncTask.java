@@ -6,6 +6,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 
 import org.json.JSONArray;
@@ -70,6 +71,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
                         needToSave.add(measure);
                     }
                 }
+                Log.d(TAG, measures.toString(2));
                 uploadMeasures(measures);
                 Measurement.saveInTx(needToSave);
                 publishProgress(((float) progress / total));
@@ -78,10 +80,26 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
             Log.w(TAG, "JSON exception.", e);
         } catch (ExecutionException e) {
             Log.d(TAG, "Execution exception");
-            e.printStackTrace();
+            if (e.getCause() instanceof VolleyError) {
+                VolleyError error = (VolleyError) e.getCause();
+                if (error.networkResponse != null && error.networkResponse.data != null) {
+                    String message = tryParseErrorMessageFromResponse(error.networkResponse.data);
+                    Log.w(TAG, String.format("Upload failed %s: %s",
+                            error.networkResponse.statusCode, message));
+                }
+            }
         }
 
         return null;
+    }
+
+    private String tryParseErrorMessageFromResponse(byte[] data) {
+        try {
+            JSONObject json = new JSONObject(new String(data));
+            return json.getString("message");
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     private void uploadMeasures(JSONArray measures) throws ExecutionException {
