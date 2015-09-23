@@ -48,10 +48,10 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        long total = Measurement.count(Measurement.class, "uploaded = false", null);
+        long total = Measurement.count(Measurement.class, "UPLOADED = 0", null);
         Log.d(TAG, "%s measurements need to upload.");
         Iterator<Measurement> measureIterator = Measurement.findAsIterator(
-                Measurement.class, "uploaded = false", null, null, "-timestamp", null);
+                Measurement.class, "UPLOADED = 0", null, null, "-timestamp", null);
 
         long progress = 0;
         try {
@@ -125,7 +125,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
 
         boolean notNull = false;
         for (MeasureValue value : values) {
-            if (value != null) {
+            if (value != null && value.isValid()) {
                 json.put(value.getClass().getSimpleName(), value.getValue());
                 notNull = true;
             }

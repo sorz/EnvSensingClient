@@ -26,4 +26,9 @@ public class Humidity extends SugarRecord<Humidity> implements MeasureValue {
         return value;
     }
 
+    @Override
+    public boolean isValid() {
+        return getValue() >= 0 && getValue() <= 100;
+    }
+
 }

@@ -26,4 +26,9 @@ public class OxidizingGas extends SugarRecord<OxidizingGas> implements MeasureVa
         return value;
     }
 
+    @Override
+    public boolean isValid() {
+        return !(Float.isInfinite(getValue()) || Float.isNaN(getValue()));
+    }
+
 }

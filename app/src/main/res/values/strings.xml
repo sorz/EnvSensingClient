@@ -107,4 +107,7 @@
     <string name="already_have_a_account">I have a account</string>
     <string name="create_new_account">Create new one</string>
     <string name="need_a_account">Need a account?</string>
+    <string name="uploading">Uploading</string>
+    <string name="upload">Upload</string>
+    <string name="pref_upload">pref_upload</string>
 </resources>

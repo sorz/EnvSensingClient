@@ -26,4 +26,9 @@ public class ReducingGas extends SugarRecord<ReducingGas> implements MeasureValu
         return value;
     }
 
+    @Override
+    public boolean isValid() {
+        return !(Float.isInfinite(getValue()) || Float.isNaN(getValue()));
+    }
+
 }

@@ -28,6 +28,11 @@ public class Pressure extends SugarRecord<Pressure> implements MeasureValue {
         return value;
     }
 
+    @Override
+    public boolean isValid() {
+        return getValue() > 0;
+    }
+
     public float getAtmospheres() {
         return (float) (value * 9.86923267e-6);
     }

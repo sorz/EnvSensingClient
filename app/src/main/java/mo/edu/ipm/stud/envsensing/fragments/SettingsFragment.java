@@ -1,6 +1,7 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -8,6 +9,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import mo.edu.ipm.stud.envsensing.R;
+import mo.edu.ipm.stud.envsensing.services.UploadService;
 
 /**
  * A PreferenceFragment which list all settings.
@@ -19,6 +21,7 @@ public class SettingsFragment extends PreferenceFragment
     private Preference prefBtMac;
     private Preference prefUsername;
     private Preference prefLogout;
+    private Preference prefUpload;
 
     @Override
     public void onAttach(Activity activity) {
@@ -48,6 +51,7 @@ public class SettingsFragment extends PreferenceFragment
         prefBtMac = findPreference(getString(R.string.pref_bluetooth_mac));
         prefUsername = findPreference(getString(R.string.pref_user_name));
         prefLogout = findPreference(getString(R.string.pref_account_logout));
+        prefUpload = findPreference(getString(R.string.pref_upload));
 
         prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
@@ -80,6 +84,17 @@ public class SettingsFragment extends PreferenceFragment
             }
         });
 
+        prefUpload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (UploadService.isRunning())
+                    return false;
+                Intent intent = new Intent(getActivity(), UploadService.class);
+                getActivity().startService(intent);
+                return true;
+            }
+        });
+
         updateAccountStatus();
 
     }
@@ -102,6 +117,7 @@ public class SettingsFragment extends PreferenceFragment
     private void updateAccountStatus() {
         boolean loggedIn = isUserLoggedIn();
         prefLogout.setEnabled(loggedIn);
+        prefUpload.setEnabled(loggedIn);
         if (loggedIn) {
             prefUsername.setTitle(R.string.username);
             prefUsername.setSummary(preferences.getString(getString(R.string.pref_user_name), ""));

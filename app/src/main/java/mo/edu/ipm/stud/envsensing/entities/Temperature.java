@@ -35,4 +35,9 @@ public class Temperature extends SugarRecord<Temperature> implements MeasureValu
         return value * 9f / 5f - 459.67f;
     }
 
+    @Override
+    public boolean isValid() {
+        return getValue() > 0 && !Float.isInfinite(getValue());
+    }
+
 }

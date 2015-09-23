@@ -37,6 +37,7 @@
         </activity>
 
         <service android:name=".services.RecordService" />
+        <service android:name=".services.UploadService" />
     </application>
 
 </manifest>

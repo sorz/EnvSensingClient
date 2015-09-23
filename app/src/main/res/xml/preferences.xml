@@ -31,6 +31,9 @@
         <Preference
             android:key="@string/pref_account_logout"
             android:title="@string/logout" />
+        <Preference
+            android:key="@string/pref_upload"
+            android:title="@string/upload" />
     </PreferenceCategory>
 
 </PreferenceScreen>

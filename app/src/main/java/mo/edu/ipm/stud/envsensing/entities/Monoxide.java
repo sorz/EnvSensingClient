@@ -25,4 +25,9 @@ public class Monoxide extends SugarRecord<Monoxide> implements MeasureValue {
     public float getValue() {
         return value;
     }
+
+    @Override
+    public boolean isValid() {
+        return !(Float.isInfinite(getValue()) || Float.isNaN(getValue()));
+    }
 }
