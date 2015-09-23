@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +16,20 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import mo.edu.ipm.stud.envsensing.R;
+import mo.edu.ipm.stud.envsensing.requests.JsonObjectAuthRequest;
 import mo.edu.ipm.stud.envsensing.requests.MyRequestQueue;
+import mo.edu.ipm.stud.envsensing.requests.ResourcePath;
 import mo.edu.ipm.stud.envsensing.requests.RetryPolicy;
 import mo.edu.ipm.stud.envsensing.requests.UserTokenRequest;
 
@@ -146,8 +155,34 @@ public class UserLoginFragment extends Fragment {
         editor.putString(getString(R.string.pref_user_name), username);
         editor.putString(getString(R.string.pref_user_token), token);
         editor.apply();
+        registerDevice();
         if (callback != null)
             callback.onUserLoggedIn();
+    }
+
+    private void registerDevice() {
+        String deviceId = Settings.Secure.getString(getActivity().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        Map<String, String> info = new HashMap<>();
+        info.put("name", android.os.Build.MODEL);
+        JSONObject deviceInfo = new JSONObject(info);
+
+        JsonObjectAuthRequest request = new JsonObjectAuthRequest(getActivity(),
+                Request.Method.PUT, ResourcePath.DEVICE + deviceId + "/", deviceInfo,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "Device register ok.");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.w(TAG, "Device register error.", error);
+            }
+        });
+        request.setRetryPolicy(new RetryPolicy());
+        MyRequestQueue.getInstance(getActivity()).add(request);
     }
 
     public interface OnUserLoginListener {
