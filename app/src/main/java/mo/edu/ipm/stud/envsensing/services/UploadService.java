@@ -55,6 +55,10 @@ public class UploadService extends Service {
         Log.d(TAG, "Received start id " + startId + ": " + intent);
 
         if (ACTION_START.equals(intent.getAction())) {
+            if (uploadAsyncTask != null) {
+                stopSelf();
+                return START_NOT_STICKY;
+            }
             updateNotification(0);
             startUploadTask();
             return START_REDELIVER_INTENT;
@@ -85,6 +89,7 @@ public class UploadService extends Service {
 
             @Override
             protected void onCancelled(Void result) {
+                uploadAsyncTask = null;
                 // TODO: add a cancel notification.
             }
 
