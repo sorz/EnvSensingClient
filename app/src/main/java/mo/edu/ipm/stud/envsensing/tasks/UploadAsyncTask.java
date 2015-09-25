@@ -50,7 +50,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         long total = Measurement.count(Measurement.class, "UPLOADED = 0", null);
-        Log.d(TAG, "%s measurements need to upload.");
+        Log.d(TAG, total + " measurements need to upload.");
         Iterator<Measurement> measureIterator = Measurement.findAsIterator(
                 Measurement.class, "UPLOADED = 0", null, null, "-timestamp", null);
 

@@ -90,6 +90,7 @@ public class SettingsFragment extends PreferenceFragment
                 if (UploadService.isRunning())
                     return false;
                 Intent intent = new Intent(getActivity(), UploadService.class);
+                intent.setAction(UploadService.ACTION_START);
                 getActivity().startService(intent);
                 return true;
             }
