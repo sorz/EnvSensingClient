@@ -59,7 +59,7 @@ public class UploadService extends Service {
                 stopSelf();
                 return START_NOT_STICKY;
             }
-            updateNotification(0);
+            updateNotification(-1);
             startUploadTask();
             return START_REDELIVER_INTENT;
         } else if (ACTION_STOP.equals(intent.getAction())) {
@@ -102,6 +102,7 @@ public class UploadService extends Service {
     }
 
     private void updateNotification(float progress) {
+        Log.d(TAG, "Upgrade progress: " + progress);
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(stopServiceIntent)
@@ -109,7 +110,7 @@ public class UploadService extends Service {
                 .setContentTitle(getText(R.string.app_name))
                 .setContentText(getText(R.string.uploading))
                 .setTicker(getText(R.string.uploading))
-                .setProgress(100, (int) progress * 100, false)
+                .setProgress(100, progress < 0 ? 0 : (int) (progress * 100), progress < 0)
                 .build();
         startForeground(NOTIFICATION_ID, notification);
     }
