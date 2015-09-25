@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.Pair;
 
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.tasks.UploadAsyncTask;
@@ -64,7 +65,7 @@ public class UploadService extends Service {
             return START_REDELIVER_INTENT;
         } else if (ACTION_STOP.equals(intent.getAction())) {
             if (uploadAsyncTask != null && !uploadAsyncTask.isCancelled())
-                uploadAsyncTask.cancel(false);
+                uploadAsyncTask.cancel(true);
             return START_NOT_STICKY;
         } else {
             stopSelf();
@@ -80,7 +81,7 @@ public class UploadService extends Service {
             }
 
             @Override
-            protected void onPostExecute(Void result) {
+            protected void onPostExecute(Pair<Boolean, Long> result) {
                 Log.d(TAG, "AsyncTask done.");
                 uploadAsyncTask = null;
                 // TODO: add a finish notification.
@@ -89,7 +90,7 @@ public class UploadService extends Service {
             }
 
             @Override
-            protected void onCancelled(Void result) {
+            protected void onCancelled(Pair<Boolean, Long> result) {
                 Log.d(TAG, "AsyncTask canceled.");
                 uploadAsyncTask = null;
                 // TODO: add a cancel notification.
@@ -102,14 +103,13 @@ public class UploadService extends Service {
     }
 
     private void updateNotification(float progress) {
-        Log.d(TAG, "Upgrade progress: " + progress);
         Notification notification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(stopServiceIntent)
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle(getText(R.string.app_name))
-                .setContentText(getText(R.string.uploading))
-                .setTicker(getText(R.string.uploading))
+                .setContentTitle(getText(R.string.uploading))
+                .setContentText(getText(R.string.touch_for_cancel_upload))
+                .setTicker(getText(R.string.touch_for_cancel_upload))
                 .setProgress(100, progress < 0 ? 0 : (int) (progress * 100), progress < 0)
                 .build();
         startForeground(NOTIFICATION_ID, notification);

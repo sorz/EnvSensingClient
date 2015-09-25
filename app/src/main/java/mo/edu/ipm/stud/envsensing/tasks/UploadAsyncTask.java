@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.Pair;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
@@ -33,8 +34,11 @@ import mo.edu.ipm.stud.envsensing.requests.RetryPolicy;
 
 /**
  * Upload measured data to server.
+ *
+ * Progress: float between 0 and 1.
+ * Result: Pair(IsSuccess, UploadedCount).
  */
-public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
+public class UploadAsyncTask extends AsyncTask<Void, Float, Pair<Boolean, Long>> {
     private static final String TAG = "UploadAsyncTask";
     private static final int MAX_PER_REQUEST = 20;
 
@@ -48,18 +52,20 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
+    protected Pair<Boolean, Long> doInBackground(Void... voids) {
         long total = Measurement.count(Measurement.class, "UPLOADED = 0", null);
         Log.d(TAG, total + " measurements need to upload.");
         Iterator<Measurement> measureIterator = Measurement.findAsIterator(
                 Measurement.class, "UPLOADED = 0", null, null, "-timestamp", null);
 
         long progress = 0;
+        long uploaded = 0;
         try {
-            while (measureIterator.hasNext()) {
+            while (!isCancelled() && measureIterator.hasNext()) {
                 JSONArray measures = new JSONArray();
                 List<Measurement> needToSave = new ArrayList<>(MAX_PER_REQUEST);
-                while (measureIterator.hasNext() && measures.length() < MAX_PER_REQUEST) {
+                while (!isCancelled() &&
+                        measureIterator.hasNext() && measures.length() < MAX_PER_REQUEST) {
                     ++progress;
                     Measurement measure = measureIterator.next();
                     JSONObject json = packUpMeasure(measure);
@@ -73,12 +79,14 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
                 }
                 uploadMeasures(measures);
                 Measurement.saveInTx(needToSave);
+                uploaded += measures.length();
                 publishProgress(((float) progress / total));
             }
+            return new Pair<>(true, uploaded);
         } catch (JSONException e) {
             Log.w(TAG, "JSON exception.", e);
         } catch (ExecutionException e) {
-            Log.d(TAG, "Execution exception");
+            Log.i(TAG, "Execution exception");
             if (e.getCause() instanceof VolleyError) {
                 VolleyError error = (VolleyError) e.getCause();
                 if (error.networkResponse != null && error.networkResponse.data != null) {
@@ -88,8 +96,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Void> {
                 }
             }
         }
-
-        return null;
+        return new Pair<>(false, uploaded);
     }
 
     private String tryParseErrorMessageFromResponse(byte[] data) {
