@@ -21,7 +21,8 @@ public class SettingsFragment extends PreferenceFragment
     private Preference prefBtMac;
     private Preference prefUsername;
     private Preference prefLogout;
-    private Preference prefUpload;
+    private Preference prefUploadCategory;
+    private Preference prefStartUpload;
 
     @Override
     public void onAttach(Activity activity) {
@@ -51,7 +52,8 @@ public class SettingsFragment extends PreferenceFragment
         prefBtMac = findPreference(getString(R.string.pref_bluetooth_mac));
         prefUsername = findPreference(getString(R.string.pref_user_name));
         prefLogout = findPreference(getString(R.string.pref_account_logout));
-        prefUpload = findPreference(getString(R.string.pref_upload));
+        prefUploadCategory = findPreference(getString(R.string.pref_upload_category));
+        prefStartUpload = findPreference(getString(R.string.pref_start_upload));
 
         prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
@@ -84,7 +86,7 @@ public class SettingsFragment extends PreferenceFragment
             }
         });
 
-        prefUpload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        prefStartUpload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (UploadService.isRunning())
@@ -118,7 +120,7 @@ public class SettingsFragment extends PreferenceFragment
     private void updateAccountStatus() {
         boolean loggedIn = isUserLoggedIn();
         prefLogout.setEnabled(loggedIn);
-        prefUpload.setEnabled(loggedIn);
+        prefUploadCategory.setEnabled(loggedIn);
         if (loggedIn) {
             prefUsername.setTitle(R.string.username);
             prefUsername.setSummary(preferences.getString(getString(R.string.pref_user_name), ""));

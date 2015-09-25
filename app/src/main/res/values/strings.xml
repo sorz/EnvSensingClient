@@ -108,6 +108,8 @@
     <string name="create_new_account">Create new one</string>
     <string name="need_a_account">Need a account?</string>
     <string name="uploading">Uploading</string>
-    <string name="upload">Upload</string>
-    <string name="pref_upload">pref_upload</string>
+    <string name="upload_now">Upload now</string>
+    <string name="pref_start_upload">pref_start_upload</string>
+    <string name="pref_upload_title">Upload</string>
+    <string name="pref_upload_category">pref_upload_category</string>
 </resources>
