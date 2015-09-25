@@ -3,12 +3,17 @@ package mo.edu.ipm.stud.envsensing.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
+
+import java.util.List;
 
 import mo.edu.ipm.stud.envsensing.R;
+import mo.edu.ipm.stud.envsensing.entities.Measurement;
 import mo.edu.ipm.stud.envsensing.services.UploadService;
 
 /**
@@ -23,6 +28,7 @@ public class SettingsFragment extends PreferenceFragment
     private Preference prefLogout;
     private Preference prefUploadCategory;
     private Preference prefStartUpload;
+    private Preference prefResetUploadMark;
 
     @Override
     public void onAttach(Activity activity) {
@@ -54,6 +60,7 @@ public class SettingsFragment extends PreferenceFragment
         prefLogout = findPreference(getString(R.string.pref_account_logout));
         prefUploadCategory = findPreference(getString(R.string.pref_upload_category));
         prefStartUpload = findPreference(getString(R.string.pref_start_upload));
+        prefResetUploadMark = findPreference(getString(R.string.pref_reset_upload_mark));
 
         prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
@@ -98,8 +105,30 @@ public class SettingsFragment extends PreferenceFragment
             }
         });
 
-        updateAccountStatus();
+        prefResetUploadMark.setOnPreferenceClickListener(
+                new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                List<Measurement> measures = Measurement.listAll(Measurement.class);
+                                for (Measurement measure : measures)
+                                    measure.setUploaded(false);
+                                Measurement.saveInTx(measures);
+                                return null;
+                            }
 
+                            @Override
+                            protected void onPostExecute(Void result) {
+                                Toast.makeText(getActivity(), "Done", Toast.LENGTH_SHORT).show();
+                            }
+                        }.execute();
+                        return true;
+                    }
+                });
+
+        updateAccountStatus();
     }
 
     @Override

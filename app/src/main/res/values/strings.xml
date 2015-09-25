@@ -112,4 +112,7 @@
     <string name="pref_start_upload">pref_start_upload</string>
     <string name="pref_upload_title">Upload</string>
     <string name="pref_upload_category">pref_upload_category</string>
+    <string name="pref_reset_upload_mark">pref_reset_upload_mark</string>
+    <string name="reset_upload_mark">Reset all upload mark</string>
+    <string name="for_debug">For debugging only</string>
 </resources>

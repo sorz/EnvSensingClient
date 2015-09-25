@@ -39,6 +39,10 @@
         <Preference
             android:key="@string/pref_start_upload"
             android:title="@string/upload_now" />
+        <Preference
+            android:key="@string/pref_reset_upload_mark"
+            android:title="@string/reset_upload_mark"
+            android:summary="@string/for_debug" />
     </PreferenceCategory>
 
 </PreferenceScreen>
