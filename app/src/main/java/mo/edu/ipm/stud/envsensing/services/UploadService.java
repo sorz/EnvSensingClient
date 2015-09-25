@@ -82,6 +82,7 @@ public class UploadService extends Service {
             @Override
             protected void onPostExecute(Void result) {
                 Log.d(TAG, "AsyncTask done.");
+                uploadAsyncTask = null;
                 // TODO: add a finish notification.
                 stopForeground(true);
                 stopSelf();
@@ -89,8 +90,11 @@ public class UploadService extends Service {
 
             @Override
             protected void onCancelled(Void result) {
+                Log.d(TAG, "AsyncTask canceled.");
                 uploadAsyncTask = null;
                 // TODO: add a cancel notification.
+                stopForeground(true);
+                stopSelf();
             }
 
         };
