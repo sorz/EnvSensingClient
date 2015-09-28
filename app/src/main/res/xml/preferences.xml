@@ -22,6 +22,11 @@
             android:title="@string/pref_recording_exact_interval_title"
             android:summary="@string/pref_recording_exact_interval_summary"
             android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="@string/pref_recording_experiment"
+            android:title="@string/pref_recording_experiment_title"
+            android:summary="@string/pref_recording_experiment_summary"
+            android:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory

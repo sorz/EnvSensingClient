@@ -50,8 +50,11 @@ public class RecordService extends Service implements LocationListener {
     static public final String ACTION_NEW = RecordService.class.getName() + ".ACTION_NEW";
     static public final String ACTION_MEASURE = RecordService.class.getName() + ".ACTION_MEASURE";
     static public final String ACTION_STOP = RecordService.class.getName() + ".ACTION_STOP";
+    static public final String ACTION_SINGLE_MEASURE = RecordService.class.getName()
+            + ".ACTION_SINGLE_MEASURE";
     static public final String EXTRA_RECORDING_START = "extra-recording-start";
     static public final String EXTRA_RECORDING_END = "extra-recording-end";
+    static public final String EXTRA_MEASURE_TAG = "extra-measure-tag";
 
     // Reference:
     // https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android
@@ -78,6 +81,7 @@ public class RecordService extends Service implements LocationListener {
     private boolean thisMeasureSuccess;
     private boolean thisMeasureFail;
     private boolean thisLocationDone;
+    private boolean shouldStopServiceAfterThisMeasure;
 
     public class LocalBinder extends Binder {
         public RecordService getService() {
@@ -171,16 +175,24 @@ public class RecordService extends Service implements LocationListener {
                 alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         nextMeasureTime, pendingIntent);
             }
-            doMeasure();
+            doMeasure(null);
             return START_NOT_STICKY;
+
+        } else if (ACTION_SINGLE_MEASURE.equals(intent.getAction())) {
+            String tag = intent.getStringExtra(EXTRA_MEASURE_TAG);
+            doMeasure(tag);
+            shouldStopServiceAfterThisMeasure = true;
+            return START_NOT_STICKY;
+
         } else if (ACTION_STOP.equals(intent.getAction())) {
             return finishTask();
+
         } else {
             return START_NOT_STICKY;
         }
     }
 
-    private void doMeasure() {
+    private void doMeasure(String tag) {
         Log.d(TAG, "Measuring...");
         wakeLock.acquire(MEASURE_TIMEOUT + 3000);
         // Timeout of the handler must less than WakeLock's and large than the sum of
@@ -190,6 +202,8 @@ public class RecordService extends Service implements LocationListener {
 
         thisMeasureSuccess = thisMeasureFail = thisLocationDone = false;
         thisMeasurement = new Measurement();
+        if (tag != null)
+            thisMeasurement.setTag(tag);
         thisMeasurement.save();
 
         Criteria criteria = new Criteria();
@@ -298,6 +312,8 @@ public class RecordService extends Service implements LocationListener {
             measureSuccessCounter ++;
         else
             measureFailCounter ++;
+        if (shouldStopServiceAfterThisMeasure)
+            finishTask();
         if (wakeLock.isHeld())
             wakeLock.release();
     }

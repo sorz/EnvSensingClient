@@ -116,4 +116,10 @@
     <string name="reset_upload_mark">Reset all upload mark</string>
     <string name="for_debug">For debugging only</string>
     <string name="touch_for_cancel_upload">Touch for cancel uploading</string>
+    <string name="pref_recording_experiment">pref_recording_experiment</string>
+    <string name="pref_recording_experiment_title">Enable experiment mode</string>
+    <string name="pref_recording_experiment_summary">Allow make single measurement with a tag.</string>
+    <string name="tag">Tag</string>
+    <string name="measure">Measure</string>
+    <string name="recording_experiment">Experiment</string>
 </resources>

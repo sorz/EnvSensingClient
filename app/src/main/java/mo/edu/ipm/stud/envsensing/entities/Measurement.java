@@ -13,6 +13,7 @@ import java.util.List;
 public class Measurement extends SugarRecord<Measurement> {
     private long timestamp;
     private boolean uploaded;
+    private String tag;
 
     public Measurement() {
         timestamp = System.currentTimeMillis();
@@ -32,6 +33,10 @@ public class Measurement extends SugarRecord<Measurement> {
 
     public void setUploaded(boolean uploaded) {
         this.uploaded = uploaded;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     @Nullable

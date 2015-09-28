@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import mo.edu.ipm.stud.envsensing.R;
@@ -29,6 +30,7 @@ public class RecordConfigFragment extends Fragment {
 
     private NumberPicker pickerHours;
     private NumberPicker pickerMinutes;
+    private TextView textTag;
 
     public interface OnRecordingStartedListener {
         public void onRecordingStarted();
@@ -52,6 +54,10 @@ public class RecordConfigFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_record_config, container, false);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Button buttonStart = (Button) view.findViewById(R.id.button_start);
+        View experiment = view.findViewById(R.id.experiment);
+        Button buttonMeasure = (Button) view.findViewById(R.id.button_measure);
+        textTag = (TextView) view.findViewById(R.id.text_tag);
+
         pickerHours = (NumberPicker) view.findViewById(R.id.pickerHours);
         pickerMinutes = (NumberPicker) view.findViewById(R.id.pickerMinutes);
         pickerHours.setMaxValue(72);
@@ -70,7 +76,27 @@ public class RecordConfigFragment extends Fragment {
             }
         });
 
+        if (preferences.getBoolean(getString(R.string.pref_recording_experiment), false)) {
+            experiment.setVisibility(View.VISIBLE);
+            buttonMeasure.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    makeSingleMeasure();
+                }
+            });
+        } else {
+            experiment.setVisibility(View.GONE);
+        }
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        pickerHours = null;
+        pickerMinutes = null;
+        textTag = null;
     }
 
     @Override
@@ -143,5 +169,14 @@ public class RecordConfigFragment extends Fragment {
                     callback.onRecordingStarted();
                 }
             });
+    }
+
+    private void makeSingleMeasure() {
+        if (RecordService.isRunning())
+            return;
+        Intent intent = new Intent(getActivity(), RecordService.class);
+        intent.setAction(RecordService.ACTION_SINGLE_MEASURE);
+        intent.putExtra(RecordService.EXTRA_MEASURE_TAG, textTag.getText().toString());
+        getActivity().startService(intent);
     }
 }
