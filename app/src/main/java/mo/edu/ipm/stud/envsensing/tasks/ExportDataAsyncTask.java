@@ -27,8 +27,8 @@ import mo.edu.ipm.stud.envsensing.entities.Temperature;
  */
 public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
     private static final String TAG = "ExportDataAsyncTask";
-    private static final String CSV_HEADER = "id,timestamp,temperature,humidity,pressure," +
-            "monoxide,oxidizing,reducing,latitude,longitude,accuracy\r\n";
+    private static final String CSV_HEADER = "id,timestamp,tag,temperature,humidity,pressure," +
+            "monoxide,oxidizing,reducing,latitude,longitude,accuracy,delay\r\n";
 
     @Override
     protected Boolean doInBackground(File... files) {
@@ -44,6 +44,7 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
             for (Measurement measurement : measurements) {
                 writer.write(measurement.getId() + ",");
                 writer.write(measurement.getTimestamp() + ",");
+                writer.write(measurement.getTag() + ",");
 
                 MeasureValue[] values = new MeasureValue[6];
                 values[0] = measurement.getValueWithoutCache(Temperature.class);
@@ -62,8 +63,10 @@ public class ExportDataAsyncTask extends AsyncTask<File, Integer, Boolean> {
                 if (location == null)
                     writer.write(",,\r\n");
                 else
-                    writer.write(location.getLatitude() + "," + location.getLongitude() + ","
-                            + location.getAccuracy() + "\r\n");
+                    writer.write(location.getLatitude() + "," +
+                            location.getLongitude() + "," +
+                            location.getAccuracy() + "," +
+                            (location.getTime() - measurement.getTimestamp()) + "\r\n");
 
                 currentRow ++;
                 publishProgress((int) (currentRow / totalRows * 100));

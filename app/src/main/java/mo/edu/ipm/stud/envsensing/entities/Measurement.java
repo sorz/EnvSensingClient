@@ -64,4 +64,8 @@ public class Measurement extends SugarRecord<Measurement> {
         else
             return result.get(0);
     }
+
+    public String getTag() {
+        return tag;
+    }
 }
