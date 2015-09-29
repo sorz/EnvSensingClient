@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/text_username"
             android:maxLength="30"
+            android:singleLine="true"
             android:hint="@string/username" />
     </android.support.design.widget.TextInputLayout>
 
