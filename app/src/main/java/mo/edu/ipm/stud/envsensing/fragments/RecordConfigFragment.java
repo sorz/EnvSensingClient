@@ -68,6 +68,7 @@ public class RecordConfigFragment extends Fragment {
                 getString(R.string.pref_recording_duration_hours), 0));
         pickerMinutes.setValue(preferences.getInt(
                 getString(R.string.pref_recording_duration_minutes), 30));
+        textTag.setText(preferences.getString(getString(R.string.pref_recording_tag), ""));
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +109,8 @@ public class RecordConfigFragment extends Fragment {
                 pickerHours.getValue());
         editor.putInt(getString(R.string.pref_recording_duration_minutes),
                 pickerMinutes.getValue());
+        editor.putString(getString(R.string.pref_recording_tag),
+                textTag.getText().toString());
         editor.apply();
     }
 
