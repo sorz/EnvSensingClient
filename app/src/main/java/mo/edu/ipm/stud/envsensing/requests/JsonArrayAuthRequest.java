@@ -23,34 +23,6 @@ import mo.edu.ipm.stud.envsensing.R;
 public class JsonArrayAuthRequest extends JsonArrayRequest {
     private String token;
 
-    public JsonArrayAuthRequest(Context context, String url, JSONArray jsonRequest,
-                                Response.Listener<JSONArray> listener,
-                                Response.ErrorListener errorListener) {
-        super(url, jsonRequest, listener, errorListener);
-        token = getUserToken(context);
-    }
-
-    public JsonArrayAuthRequest(Context context, int method, String url, String requestBody,
-                                Response.Listener<JSONArray> listener,
-                                Response.ErrorListener errorListener) {
-        super(method, url, requestBody, listener, errorListener);
-        token = getUserToken(context);
-    }
-
-    public JsonArrayAuthRequest(Context context, String url,
-                                Response.Listener<JSONArray> listener,
-                                Response.ErrorListener errorListener) {
-        super(url, listener, errorListener);
-        token = getUserToken(context);
-    }
-
-    public JsonArrayAuthRequest(Context context, int method, String url,
-                                Response.Listener<JSONArray> listener,
-                                Response.ErrorListener errorListener) {
-        super(method, url, listener, errorListener);
-        token = getUserToken(context);
-    }
-
     public JsonArrayAuthRequest(Context context, int method, String url, JSONArray jsonRequest,
                                 Response.Listener<JSONArray> listener,
                                 Response.ErrorListener errorListener) {

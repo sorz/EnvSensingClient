@@ -5,18 +5,35 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import mo.edu.ipm.stud.envsensing.R;
+import mo.edu.ipm.stud.envsensing.requests.MyErrorListener;
+import mo.edu.ipm.stud.envsensing.requests.MyJsonObjectRequest;
+import mo.edu.ipm.stud.envsensing.requests.MyRequestQueue;
+import mo.edu.ipm.stud.envsensing.requests.ResourcePath;
+import mo.edu.ipm.stud.envsensing.requests.RetryPolicy;
+import mo.edu.ipm.stud.envsensing.requests.UserTokenRequest;
 
 /**
  * A {@link Fragment} allow new user to create their account.
  */
 public class UserRegisterFragment extends Fragment {
+    static private final String TAG = "UserRegisterFragment";
     private OnUserRegisterListener callback;
     private SharedPreferences preferences;
 
@@ -56,7 +73,7 @@ public class UserRegisterFragment extends Fragment {
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                register();
+                checkThenRegister();
             }
         });
         return view;
@@ -84,7 +101,7 @@ public class UserRegisterFragment extends Fragment {
         callback = null;
     }
 
-    private void register() {
+    private void checkThenRegister() {
         String username = textUsername.getText().toString();
         String email = textEmail.getText().toString();
         String password = textPassword.getText().toString();
@@ -111,11 +128,67 @@ public class UserRegisterFragment extends Fragment {
             return;
         }
 
-        // TODO: register with server.
+        register(username, email, password);
+    }
+
+    private void register(final String username, final String email, final String password) {
+        buttonRegister.setEnabled(false);
+
+        Map<String, String> userInfo = new HashMap<>();
+        userInfo.put("username", username);
+        userInfo.put("email", email);
+        userInfo.put("password", password);
+
+        MyJsonObjectRequest request = new MyJsonObjectRequest(Request.Method.POST,
+            ResourcePath.USERS, new JSONObject(userInfo),
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    onUserRegistered(username, password);
+                }
+            }, new MyErrorListener(getActivity()) {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    super.onErrorResponse(error);
+                    buttonRegister.setEnabled(true);
+                }
+            });
+        request.setRetryPolicy(new RetryPolicy());
+        MyRequestQueue.getInstance(getActivity()).add(request);
+    }
+
+    private void onUserRegistered(String username, String password) {
+        Log.d(TAG, username + " registered successfully.");
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(getString(R.string.pref_user_name), username);
+        editor.apply();
+
+        UserTokenRequest request = new UserTokenRequest(username, password,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String token) {
+                    buttonRegister.setEnabled(true);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(getString(R.string.pref_user_token), token);
+                    editor.apply();
+                    if (callback != null)
+                        callback.onUserRegisterFinish(true);
+                }
+            }, new MyErrorListener(getActivity()) {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    super.onErrorResponse(error);
+                    buttonRegister.setEnabled(true);
+                    if (callback != null)
+                        callback.onUserRegisterFinish(false);
+                }
+            });
+        request.setRetryPolicy(new RetryPolicy());
+        MyRequestQueue.getInstance(getActivity()).add(request);
     }
 
     public interface OnUserRegisterListener {
-        public void onUserRemasterFinish();
+        public void onUserRegisterFinish(boolean loggedIn);
     }
 
 }

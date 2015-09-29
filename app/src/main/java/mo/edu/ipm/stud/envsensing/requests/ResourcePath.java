@@ -9,4 +9,5 @@ public class ResourcePath {
     static final String TOKEN = SITE + "/token/";
     static public final String DEVICES = SITE + "/devices/";
     static public final String MEASURES = SITE + "/devices/%s/measures/";
+    static public final String USERS = SITE + "/users/";
 }

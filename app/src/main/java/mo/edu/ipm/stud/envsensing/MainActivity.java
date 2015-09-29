@@ -267,8 +267,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onUserRemasterFinish() {
+    public void onUserRegisterFinish(boolean loggedIn) {
         getFragmentManager().popBackStack();
+        if (loggedIn)
+            getFragmentManager().popBackStack();
     }
-
 }
