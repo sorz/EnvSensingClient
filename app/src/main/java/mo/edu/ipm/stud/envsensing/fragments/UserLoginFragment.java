@@ -15,10 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
@@ -28,6 +26,7 @@ import java.util.Map;
 
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.requests.JsonObjectAuthRequest;
+import mo.edu.ipm.stud.envsensing.requests.MyErrorListener;
 import mo.edu.ipm.stud.envsensing.requests.MyRequestQueue;
 import mo.edu.ipm.stud.envsensing.requests.ResourcePath;
 import mo.edu.ipm.stud.envsensing.requests.RetryPolicy;
@@ -129,19 +128,14 @@ public class UserLoginFragment extends Fragment {
                 Log.d(TAG, "User token got: " + response.substring(0, 8) + "...");
                 onLoggedIn(username, response);
             }
-        }, new Response.ErrorListener() {
+        }, new MyErrorListener(getActivity()) {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error instanceof AuthFailureError) {
                     Toast.makeText(getActivity(), R.string.auth_fail_message,
                             Toast.LENGTH_SHORT).show();
-                } else if (error instanceof NetworkError || error instanceof TimeoutError) {
-                    Toast.makeText(getActivity(), R.string.network_fail_message,
-                            Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), R.string.unknown_fail_message,
-                            Toast.LENGTH_SHORT).show();
-                    Log.w(TAG, "Unknown Volley error", error);
+                    super.onErrorResponse(error);
                 }
                 buttonLogin.setEnabled(true);
             }
