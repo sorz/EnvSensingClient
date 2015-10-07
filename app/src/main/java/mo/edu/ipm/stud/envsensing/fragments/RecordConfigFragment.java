@@ -155,11 +155,14 @@ public class RecordConfigFragment extends Fragment {
             long durationSeconds = pickerHours.getValue() * 3600 + pickerMinutes.getValue() * 60;
             if (durationSeconds <= 0)
                 return;
+            String tag = textTag.getText().toString();
+
             Intent intent = new Intent(getActivity(), RecordService.class);
             intent.setAction(RecordService.ACTION_NEW);
             intent.putExtra(RecordService.EXTRA_RECORDING_START, SystemClock.elapsedRealtime());
             intent.putExtra(RecordService.EXTRA_RECORDING_END,
                     SystemClock.elapsedRealtime() + durationSeconds * 1000);
+            intent.putExtra(RecordService.EXTRA_MEASURE_TAG, tag);
             getActivity().startService(intent);
         }
 

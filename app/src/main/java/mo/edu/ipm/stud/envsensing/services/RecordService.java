@@ -69,6 +69,7 @@ public class RecordService extends Service implements LocationListener {
     private long recording_stop;
     private PendingIntent pendingIntent;
     private boolean exactInterval;
+    private String measureTag;
     private long interval;
     private long nextMeasureTime;
     private int measureSuccessCounter;
@@ -142,6 +143,7 @@ public class RecordService extends Service implements LocationListener {
             // TODO: Check existed task.
             recording_start = intent.getLongExtra(EXTRA_RECORDING_START, 0);
             recording_stop = intent.getLongExtra(EXTRA_RECORDING_END, 0);
+            measureTag = intent.getStringExtra(EXTRA_MEASURE_TAG);
             if (SystemClock.elapsedRealtime() > recording_stop)
                 return finishTask();
 
@@ -175,12 +177,12 @@ public class RecordService extends Service implements LocationListener {
                 alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                         nextMeasureTime, pendingIntent);
             }
-            doMeasure(null);
+            doMeasure();
             return START_NOT_STICKY;
 
         } else if (ACTION_SINGLE_MEASURE.equals(intent.getAction())) {
-            String tag = intent.getStringExtra(EXTRA_MEASURE_TAG);
-            doMeasure(tag);
+            measureTag = intent.getStringExtra(EXTRA_MEASURE_TAG);
+            doMeasure();
             shouldStopServiceAfterThisMeasure = true;
             return START_NOT_STICKY;
 
@@ -192,7 +194,7 @@ public class RecordService extends Service implements LocationListener {
         }
     }
 
-    private void doMeasure(String tag) {
+    private void doMeasure() {
         Log.d(TAG, "Measuring...");
         wakeLock.acquire(MEASURE_TIMEOUT + 3000);
         // Timeout of the handler must less than WakeLock's and large than the sum of
@@ -202,8 +204,8 @@ public class RecordService extends Service implements LocationListener {
 
         thisMeasureSuccess = thisMeasureFail = thisLocationDone = false;
         thisMeasurement = new Measurement();
-        if (tag != null)
-            thisMeasurement.setTag(tag);
+        if (measureTag != null)
+            thisMeasurement.setTag(measureTag);
         thisMeasurement.save();
 
         Criteria criteria = new Criteria();
