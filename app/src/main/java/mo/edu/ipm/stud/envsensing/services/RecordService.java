@@ -238,7 +238,7 @@ public class RecordService extends Service implements LocationListener {
     private void sendMeasureRequest() {
         Log.d(TAG, "Sending measure requests.");
 
-        new SensorMeasureAsyncTask().execute(new SensorMeasureAsyncTask.OnMeasureDone() {
+        new SensorMeasureAsyncTask(this).execute(new SensorMeasureAsyncTask.OnMeasureDone() {
             @Override
             public void onMeasureDone(boolean[] measured) {
                 Log.d(TAG, "Measured.");

@@ -1,13 +1,17 @@
 package mo.edu.ipm.stud.envsensing.tasks;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.sensorcon.sensordrone.DroneEventHandler;
 import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
+import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.SensorDrone;
 
 
@@ -31,6 +35,7 @@ public class SensorMeasureAsyncTask
     public static final int SENSOR_REDUCING = 5;
 
     private Drone drone = SensorDrone.getInstance();
+    private boolean autoDisable;
     private boolean[] measured = new boolean[TOTAL_SENSOR];
     private boolean[] failed = new boolean[TOTAL_SENSOR];
     private OnMeasureDone callback;
@@ -43,6 +48,12 @@ public class SensorMeasureAsyncTask
          * @param measured Indicate which sensors are measured successfully.
          */
         public void onMeasureDone(boolean[] measured);
+    }
+
+    public SensorMeasureAsyncTask(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        autoDisable = preferences.getBoolean(
+                context.getString(R.string.pref_recording_auto_disable), false);
     }
 
     @Override
@@ -123,7 +134,8 @@ public class SensorMeasureAsyncTask
             Log.d(TAG, "Measure finish, callback.");
             drone.unregisterDroneListener(this);
             timeoutHandler.removeCallbacks(timeoutRunnable);
-            disableHighPowerSensor();
+            if (autoDisable)
+                disableHighPowerSensor();
             callback.onMeasureDone(measured);
         }
     }
