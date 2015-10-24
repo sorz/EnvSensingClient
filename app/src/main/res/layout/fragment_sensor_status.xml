@@ -107,15 +107,24 @@
                         android:id="@+id/text_battery_status" />
                 </RelativeLayout>
 
+                <Button
+                    android:id="@+id/button_disconnect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/disconnect"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="end" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/enabled_sensor" />
+                        android:text="@string/enabled_sensors" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -124,13 +133,24 @@
                         android:id="@+id/text_enabled_sensor" />
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_disconnect"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/disconnect"
-                    android:layout_marginTop="20dp"
-                    android:layout_gravity="end" />
+                    android:orientation="horizontal"
+                    android:layout_gravity="end">
+                    <Button
+                        android:id="@+id/button_enable_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/enable_sensors" />
+                    <Button
+                        android:id="@+id/button_disable_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/disable_sensors" />
+                </LinearLayout>
+
 
             </LinearLayout>
         </FrameLayout>

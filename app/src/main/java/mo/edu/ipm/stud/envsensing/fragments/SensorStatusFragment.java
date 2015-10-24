@@ -42,6 +42,8 @@ public class SensorStatusFragment extends Fragment
     private View layoutConnected;
     private View layoutDisconnected;
     private Button buttonConnect;
+    private Button buttonDisableAll;
+    private Button buttonEnableAll;
     private TextView textMacAddress;
     private TextView textBatteryStatus;
     private TextView textVersion;
@@ -80,6 +82,8 @@ public class SensorStatusFragment extends Fragment
         textVersion = (TextView) view.findViewById(R.id.text_version);
         textEnabledSensors = (TextView) view.findViewById(R.id.text_enabled_sensor);
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
+        buttonDisableAll = (Button) view.findViewById(R.id.button_disable_all);
+        buttonEnableAll = (Button) view.findViewById(R.id.button_enable_all);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
         swipeLayout.setOnRefreshListener(this);
@@ -121,6 +125,20 @@ public class SensorStatusFragment extends Fragment
             }
         });
 
+        buttonDisableAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                disableAllSensors();
+            }
+        });
+
+        buttonEnableAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enableAllSensors();
+            }
+        });
+
         return view;
     }
 
@@ -138,6 +156,8 @@ public class SensorStatusFragment extends Fragment
         textBatteryStatus = null;
         textVersion = null;
         textEnabledSensors = null;
+        buttonDisableAll = null;
+        buttonEnableAll = null;
     }
 
     @Override
@@ -193,6 +213,20 @@ public class SensorStatusFragment extends Fragment
         drone.statusOfPrecisionGas();
         drone.statusOfOxidizingGas();
         drone.statusOfReducingGas();
+    }
+
+    private void enableAllSensors() {
+        drone.enableTemperature();
+        drone.enableHumidity();
+        drone.enablePressure();
+        drone.enablePrecisionGas();
+        drone.enableOxidizingGas();
+        drone.enableReducingGas();
+    }
+
+    private void disableAllSensors() {
+        for (int i=0; i<10; i++)
+            drone.quickDisable(i);
     }
 
     /**
