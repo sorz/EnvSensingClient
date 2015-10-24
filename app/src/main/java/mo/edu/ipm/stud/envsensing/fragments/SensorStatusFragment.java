@@ -45,6 +45,7 @@ public class SensorStatusFragment extends Fragment
     private TextView textMacAddress;
     private TextView textBatteryStatus;
     private TextView textVersion;
+    private TextView textEnabledSensors;
 
 
     @Override
@@ -77,6 +78,7 @@ public class SensorStatusFragment extends Fragment
         textMacAddress = (TextView) view.findViewById(R.id.text_mac_address);
         textBatteryStatus = (TextView) view.findViewById(R.id.text_battery_status);
         textVersion = (TextView) view.findViewById(R.id.text_version);
+        textEnabledSensors = (TextView) view.findViewById(R.id.text_enabled_sensor);
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
         Button buttonDisconnect = (Button) view.findViewById(R.id.button_disconnect);
 
@@ -135,6 +137,7 @@ public class SensorStatusFragment extends Fragment
         textMacAddress = null;
         textBatteryStatus = null;
         textVersion = null;
+        textEnabledSensors = null;
     }
 
     @Override
@@ -184,6 +187,12 @@ public class SensorStatusFragment extends Fragment
             leftStatusEventCount++;
         if (drone.measureBatteryVoltage())
             leftStatusEventCount++;
+        drone.statusOfTemperature();
+        drone.statusOfHumidity();
+        drone.statusOfPressure();
+        drone.statusOfPrecisionGas();
+        drone.statusOfOxidizingGas();
+        drone.statusOfReducingGas();
     }
 
     /**
@@ -240,6 +249,21 @@ public class SensorStatusFragment extends Fragment
                                      : getString(R.string.battery_not_in_charging)
             ));
         }
+
+        String sensors = "";
+        if (drone.temperatureStatus)
+            sensors += "temperature ";
+        if (drone.humidityStatus)
+            sensors += "humidity ";
+        if (drone.pressureStatus)
+            sensors += "pressure ";
+        if (drone.precisionGasStatus)
+            sensors += "monoxide ";
+        if (drone.oxidizingGasStatus)
+            sensors += "oxidizing ";
+        if (drone.reducingGasStatus)
+            sensors += "reducing ";
+        textEnabledSensors.setText(sensors);
 
         if (leftStatusEventCount <= 0)
             swipeLayout.setRefreshing(false);

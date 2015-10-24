@@ -107,6 +107,23 @@
                         android:id="@+id/text_battery_status" />
                 </RelativeLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enabled_sensor" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/md_light_primary_text"
+                        android:id="@+id/text_enabled_sensor" />
+                </LinearLayout>
+
                 <Button
                     android:id="@+id/button_disconnect"
                     android:layout_width="wrap_content"
