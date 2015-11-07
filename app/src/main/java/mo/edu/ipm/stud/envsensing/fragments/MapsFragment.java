@@ -1,7 +1,11 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
 
+import android.app.Fragment;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -12,7 +16,8 @@ import mo.edu.ipm.stud.envsensing.R;
 /**
  * Display Google Maps.
  */
-public class MapsFragment extends MapFragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback {
+    private MapFragment mapFragment;
     private GoogleMap map;
 
     public MapsFragment() {
@@ -22,7 +27,6 @@ public class MapsFragment extends MapFragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getMapAsync(this);
     }
 
     @Override
@@ -32,11 +36,20 @@ public class MapsFragment extends MapFragment implements OnMapReadyCallback {
     }
 
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_maps, container, false);
-//    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        mapFragment = MapFragment.newInstance();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.map, mapFragment)
+                .commit();
+
+        mapFragment.getMapAsync(this);
+        return view;
+    }
 
     @Override
     public void onDestroyView() {
