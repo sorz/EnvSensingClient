@@ -138,4 +138,5 @@
     <string name="software_licenses">Software Licenses</string>
     <string name="waiting">Waiting…</string>
     <string name="title_section_maps">Maps</string>
+    <string name="choose_date_range">Choose date range</string>
 </resources>

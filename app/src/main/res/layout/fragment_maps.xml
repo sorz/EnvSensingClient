@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/map" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/button_select_date"
+        android:layout_margin="20dp"
+        android:visibility="invisible"
+        android:src="@drawable/ic_insert_invitation_black_36dp"
+        app:backgroundTint="@color/md_white_1000"
+        app:rippleColor="@color/md_grey_400"
+        app:borderWidth="0dp"
+        app:elevation="4dp" />
 
 </RelativeLayout>
 
