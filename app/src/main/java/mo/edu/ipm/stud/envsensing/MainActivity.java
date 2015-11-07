@@ -1,5 +1,6 @@
 package mo.edu.ipm.stud.envsensing;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -20,6 +21,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import mo.edu.ipm.stud.envsensing.fragments.ExportDataFragment;
+import mo.edu.ipm.stud.envsensing.fragments.MapsFragment;
 import mo.edu.ipm.stud.envsensing.fragments.RawDataViewerFragment;
 import mo.edu.ipm.stud.envsensing.fragments.RecordConfigFragment;
 import mo.edu.ipm.stud.envsensing.fragments.RecordStatusFragment;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private static final int SECTION_SETTINGS = 2;
     private static final int SECTION_RECORDING = 3;
     private static final int SECTION_RAW_DATA_VIEWER = 4;
+    private static final int SECTION_MAPS = 5;
 
     private Drawer drawer;
 
@@ -87,6 +90,10 @@ public class MainActivity extends AppCompatActivity
                                 .withName(R.string.title_section_recording)
                                 .withIcon(R.drawable.ic_hearing_black_24dp)
                                 .withIdentifier(SECTION_RECORDING),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_maps)
+                                .withIcon(R.drawable.ic_map_black_24dp)
+                                .withIdentifier(SECTION_MAPS),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_raw_data)
                                 .withIcon(R.drawable.ic_sd_card_black_24dp)
@@ -140,6 +147,9 @@ public class MainActivity extends AppCompatActivity
             case SECTION_RAW_DATA_VIEWER:
                 fragment = new RawDataViewerFragment();
                 break;
+            case SECTION_MAPS:
+                fragment = new MapsFragment();
+                break;
             default:
                 fragment = new Fragment();
                 break;
@@ -150,6 +160,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void switchFragment(Fragment fragment, boolean addToBackStack) {
+        @SuppressLint("CommitTransaction")
         FragmentTransaction transaction = getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment);
         if (addToBackStack)

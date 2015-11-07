@@ -137,4 +137,5 @@
     <string name="pref_version_title">Version %1$s (%2$s)</string>
     <string name="software_licenses">Software Licenses</string>
     <string name="waiting">Waiting…</string>
+    <string name="title_section_maps">Maps</string>
 </resources>
