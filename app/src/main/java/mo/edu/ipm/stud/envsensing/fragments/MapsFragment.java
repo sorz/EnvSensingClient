@@ -8,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 
 import mo.edu.ipm.stud.envsensing.R;
 
@@ -42,7 +45,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        mapFragment = MapFragment.newInstance();
+        CameraPosition position = CameraPosition.fromLatLngZoom(new LatLng(22.18, 113.55), 12);
+        // Set initial position to Macao. TODO: use last position?
+        GoogleMapOptions options = new GoogleMapOptions()
+                .camera(position);
+        mapFragment = MapFragment.newInstance(options);
         getFragmentManager().beginTransaction()
                 .replace(R.id.map, mapFragment)
                 .commit();
@@ -65,6 +72,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.setMyLocationEnabled(true);
 
     }
 }
