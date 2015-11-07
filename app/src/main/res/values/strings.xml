@@ -124,7 +124,7 @@
     <string name="recording_experiment">Experiment</string>
     <string name="pref_recording_tag">pref_recording_tag</string>
     <string name="pref_recording_auto_disable">pref_recording_auto_disable</string>
-    <string name="pref_recording_auto_disable_title">Audo disable sensors</string>
+    <string name="pref_recording_auto_disable_title">Auto disable sensors</string>
     <string name="pref_recording_auto_disable_summary">Try to extend battary life of Sensordrone.</string>
     <string name="enabled_sensors">Enabled sensors</string>
     <string name="disable_sensors">Disable all</string>
@@ -133,6 +133,8 @@
     <string name="pref_version">pref_version</string>
     <string name="pref_source_code_title">Open GitHub repository</string>
     <string name="pref_source_code_summary">Access source code and submit issues.</string>
-    <string name="pref_version_summary">Press to display license info.</string>
+    <string name="pref_version_summary">Touch to display license info.</string>
     <string name="pref_version_title">Version %1$s (%2$s)</string>
+    <string name="software_licenses">Software Licenses</string>
+    <string name="waiting">Waiting…</string>
 </resources>

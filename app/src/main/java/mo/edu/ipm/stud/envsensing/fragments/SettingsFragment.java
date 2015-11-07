@@ -1,6 +1,7 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -9,6 +10,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.List;
 
@@ -130,6 +133,13 @@ public class SettingsFragment extends PreferenceFragment
 
         prefVersion.setTitle(String.format(getString(R.string.pref_version_title),
                 BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
+        prefVersion.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                displayLicenseDialog();
+                return true;
+            }
+        });
 
         updateAccountStatus();
     }
@@ -162,6 +172,24 @@ public class SettingsFragment extends PreferenceFragment
         }
     }
 
+    private void displayLicenseDialog() {
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.software_licenses))
+                .setMessage(getString(R.string.waiting))
+                .show();
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                return GoogleApiAvailability.getInstance()
+                        .getOpenSourceSoftwareLicenseInfo(getActivity());
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                dialog.setMessage(result);
+            }
+        }.execute();
+    }
 
     public interface OnDisplayDialogListener {
         public void onDisplaySensorSelectionDialog();
