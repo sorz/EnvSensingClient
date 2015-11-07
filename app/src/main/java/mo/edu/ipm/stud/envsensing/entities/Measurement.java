@@ -2,6 +2,8 @@ package mo.edu.ipm.stud.envsensing.entities;
 
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 import com.orm.SugarRecord;
 
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.util.List;
 /**
  * Logging the date time of a specific measurement.
  */
-public class Measurement extends SugarRecord<Measurement> {
+public class Measurement extends SugarRecord<Measurement> implements ClusterItem {
     private long timestamp;
     private boolean uploaded;
     private String tag;
@@ -67,5 +69,13 @@ public class Measurement extends SugarRecord<Measurement> {
 
     public String getTag() {
         return tag;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        LocationInfo location = getValue(LocationInfo.class);
+        if (location == null)
+            return null;
+        return new LatLng(location.getLatitude(), location.getLongitude());
     }
 }

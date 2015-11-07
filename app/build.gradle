@@ -31,4 +31,5 @@ dependencies {
     compile 'com.melnykov:floatingactionbutton:1.3.0'
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.squareup:android-times-square:1.6.4@aar'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
 }

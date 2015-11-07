@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,10 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import mo.edu.ipm.stud.envsensing.R;
@@ -27,10 +30,12 @@ import mo.edu.ipm.stud.envsensing.entities.Measurement;
  * Display Google Maps.
  */
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
+    private final static String TAG = "MapsFragment";
     private final static int REQUEST_SELECT_DATE = 0;
 
     private MapFragment mapFragment;
     private GoogleMap map;
+    private ClusterManager<Measurement> clusterManager;
 
     private FloatingActionButton buttonSelectDate;
 
@@ -94,6 +99,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         map = googleMap;
         map.setMyLocationEnabled(true);
 
+        clusterManager = new ClusterManager<>(getActivity(), map);
+        map.setOnCameraChangeListener(clusterManager);
+        map.setOnMarkerClickListener(clusterManager);
+
         buttonSelectDate.setVisibility(View.VISIBLE);
     }
 
@@ -124,15 +133,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         new AsyncTask<Void, Void, List<Measurement>>() {
             @Override
             protected List<Measurement> doInBackground(Void... voids) {
-                return Measurement.find(Measurement.class,
+                List<Measurement> list = Measurement.find(Measurement.class,
                         "TIMESTAMP BETWEEN ? AND ?", "" + dateFrom, "" + dateTo);
+                for (Iterator<Measurement> iterator = list.iterator(); iterator.hasNext();) {
+                    Measurement measurement = iterator.next();
+                    if (measurement.getPosition() == null) {
+                        iterator.remove();
+                    }
+                }
+                return list;
             }
 
             @Override
             protected void onPostExecute(List<Measurement> measurements) {
-                System.out.println(measurements.size());
-
-                // TODO: add markers.
+                Log.d(TAG, "Measurements loaded: " + measurements.size());
+                clusterManager.clearItems();
+                clusterManager.addItems(measurements);
             }
         }.execute();
     }
