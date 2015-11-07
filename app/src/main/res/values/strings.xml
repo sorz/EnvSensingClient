@@ -129,4 +129,10 @@
     <string name="enabled_sensors">Enabled sensors</string>
     <string name="disable_sensors">Disable all</string>
     <string name="enable_sensors">Enable all</string>
+    <string name="pref_about_title">About</string>
+    <string name="pref_version">pref_version</string>
+    <string name="pref_source_code_title">Open GitHub repository</string>
+    <string name="pref_source_code_summary">Access source code and submit issues.</string>
+    <string name="pref_version_summary">Press to display license info.</string>
+    <string name="pref_version_title">Version %1$s (%2$s)</string>
 </resources>

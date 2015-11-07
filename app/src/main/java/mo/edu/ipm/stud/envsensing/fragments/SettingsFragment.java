@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import mo.edu.ipm.stud.envsensing.BuildConfig;
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.entities.Measurement;
 import mo.edu.ipm.stud.envsensing.services.UploadService;
@@ -27,8 +28,6 @@ public class SettingsFragment extends PreferenceFragment
     private Preference prefUsername;
     private Preference prefLogout;
     private Preference prefUploadCategory;
-    private Preference prefStartUpload;
-    private Preference prefResetUploadMark;
 
     @Override
     public void onAttach(Activity activity) {
@@ -59,8 +58,9 @@ public class SettingsFragment extends PreferenceFragment
         prefUsername = findPreference(getString(R.string.pref_user_name));
         prefLogout = findPreference(getString(R.string.pref_account_logout));
         prefUploadCategory = findPreference(getString(R.string.pref_upload_category));
-        prefStartUpload = findPreference(getString(R.string.pref_start_upload));
-        prefResetUploadMark = findPreference(getString(R.string.pref_reset_upload_mark));
+        Preference prefStartUpload = findPreference(getString(R.string.pref_start_upload));
+        Preference prefResetUploadMark = findPreference(getString(R.string.pref_reset_upload_mark));
+        Preference prefVersion = findPreference(getString(R.string.pref_version));
 
         prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
@@ -127,6 +127,9 @@ public class SettingsFragment extends PreferenceFragment
                         return true;
                     }
                 });
+
+        prefVersion.setTitle(String.format(getString(R.string.pref_version_title),
+                BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
 
         updateAccountStatus();
     }

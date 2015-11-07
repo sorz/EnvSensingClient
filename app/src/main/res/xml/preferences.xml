@@ -55,4 +55,17 @@
             android:summary="@string/for_debug" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_about_title">
+        <Preference
+            android:key="@string/pref_version"
+            android:summary="@string/pref_version_summary"/>
+        <Preference
+            android:title="@string/pref_source_code_title"
+            android:summary="@string/pref_source_code_summary">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://github.com/sorz/EnvSensingClient" />
+        </Preference>
+    </PreferenceCategory>
+
 </PreferenceScreen>
