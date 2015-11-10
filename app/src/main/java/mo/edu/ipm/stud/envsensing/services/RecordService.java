@@ -312,8 +312,10 @@ public class RecordService extends Service implements LocationListener {
         timeoutHandler.removeCallbacks(timeoutRunnable);
         Log.d(TAG, String.format("Measure finished, measure success? %s, fail? %s; location " +
                         "done? %s.", thisMeasureSuccess, thisMeasureFail, thisLocationDone));
-        if (!thisMeasureSuccess && drone.isConnected)
+        if (!thisMeasureSuccess && drone.isConnected) {
+            Log.d(TAG, "Disconnect drone.");
             drone.disconnectNow();
+        }
         if (thisMeasureSuccess && thisLocationDone)
             measureSuccessCounter ++;
         else

@@ -64,7 +64,8 @@ public class SensorMeasureAsyncTask
             public void run() {
                 Log.d(TAG, "Measure timeout, callback.");
                 drone.unregisterDroneListener(SensorMeasureAsyncTask.this);
-                disableHighPowerSensor();
+                if (autoDisable)
+                    disableHighPowerSensor();
                 SensorMeasureAsyncTask.this.callback.onMeasureDone(measured);
             }
         };
@@ -141,6 +142,7 @@ public class SensorMeasureAsyncTask
     }
 
     private void disableHighPowerSensor() {
+        Log.d(TAG, "Disable high power sensors");
         if (drone.statusOfOxidizingGas())
             drone.disableOxidizingGas();
         if (drone.statusOfReducingGas())
