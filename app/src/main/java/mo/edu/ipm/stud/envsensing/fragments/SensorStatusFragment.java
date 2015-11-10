@@ -62,6 +62,7 @@ public class SensorStatusFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         drone.unregisterDroneListener(this);
+        SensorDrone.release();
     }
 
     @Override

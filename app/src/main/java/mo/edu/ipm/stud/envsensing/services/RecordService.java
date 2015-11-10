@@ -131,9 +131,7 @@ public class RecordService extends Service implements LocationListener {
         super.onDestroy();
         running = false;
         stopForeground(true);
-        if (drone.isConnected)
-            // TODO: Use a connection counter to avoid disturbing who is using it?
-            drone.disconnect();
+        SensorDrone.release();
     }
 
     @Override
@@ -313,7 +311,7 @@ public class RecordService extends Service implements LocationListener {
         Log.d(TAG, String.format("Measure finished, measure success? %s, fail? %s; location " +
                         "done? %s.", thisMeasureSuccess, thisMeasureFail, thisLocationDone));
         if (!thisMeasureSuccess && drone.isConnected) {
-            Log.d(TAG, "Disconnect drone.");
+            Log.d(TAG, "Connection seems broken, disconnect now.");
             drone.disconnectNow();
         }
         if (thisMeasureSuccess && thisLocationDone)

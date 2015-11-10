@@ -34,7 +34,7 @@ public class SensorMeasureAsyncTask
     public static final int SENSOR_OXIDIZING = 4;
     public static final int SENSOR_REDUCING = 5;
 
-    private Drone drone = SensorDrone.getInstance();
+    private Drone drone;
     private boolean autoDisable;
     private boolean[] measured = new boolean[TOTAL_SENSOR];
     private boolean[] failed = new boolean[TOTAL_SENSOR];
@@ -58,6 +58,7 @@ public class SensorMeasureAsyncTask
 
     @Override
     protected Void doInBackground(OnMeasureDone... callback) {
+        drone = SensorDrone.getInstance();
         this.callback = callback[0];
         timeoutRunnable = new Runnable() {
             @Override
@@ -67,6 +68,7 @@ public class SensorMeasureAsyncTask
                 if (autoDisable)
                     disableHighPowerSensor();
                 SensorMeasureAsyncTask.this.callback.onMeasureDone(measured);
+                SensorDrone.release();
             }
         };
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
@@ -138,6 +140,7 @@ public class SensorMeasureAsyncTask
             if (autoDisable)
                 disableHighPowerSensor();
             callback.onMeasureDone(measured);
+            SensorDrone.release();
         }
     }
 
