@@ -109,6 +109,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
         clusterManager.setOnClusterItemClickListener(this);
 
         buttonSelectDate.setVisibility(View.VISIBLE);
+        selectDate();
     }
 
     private void selectDate() {
