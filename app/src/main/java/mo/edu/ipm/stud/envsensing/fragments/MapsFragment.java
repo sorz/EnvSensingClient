@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -159,7 +160,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
 
     @Override
     public boolean onClusterClick(Cluster<Measurement> cluster) {
-        return false;
+        ArrayList<Measurement> measurements = new ArrayList<>(cluster.getItems());
+        DataListDialogFragment fragment = DataListDialogFragment.newInstance(measurements);
+        fragment.show(getFragmentManager(), "data-list");
+        return true;
     }
 
     @Override

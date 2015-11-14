@@ -1,5 +1,7 @@
 package mo.edu.ipm.stud.envsensing.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,7 +14,7 @@ import java.util.List;
 /**
  * Logging the date time of a specific measurement.
  */
-public class Measurement extends SugarRecord<Measurement> implements ClusterItem {
+public class Measurement extends SugarRecord<Measurement> implements ClusterItem, Parcelable {
     private long timestamp;
     private boolean uploaded;
     private String tag;
@@ -78,4 +80,36 @@ public class Measurement extends SugarRecord<Measurement> implements ClusterItem
             return null;
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(getId());
+        out.writeLong(timestamp);
+        out.writeInt(uploaded ? 1 : 0);
+        out.writeString(tag);
+    }
+
+    public static final Parcelable.Creator<Measurement> CREATOR
+            = new Parcelable.Creator<Measurement>() {
+        public Measurement createFromParcel(Parcel in) {
+            return new Measurement(in);
+        }
+
+        public Measurement[] newArray(int size) {
+            return new Measurement[size];
+        }
+    };
+
+    private Measurement(Parcel in) {
+        setId(in.readLong());
+        timestamp = in.readLong();
+        uploaded = in.readInt() == 1;
+        tag = in.readString();
+    }
+
 }
