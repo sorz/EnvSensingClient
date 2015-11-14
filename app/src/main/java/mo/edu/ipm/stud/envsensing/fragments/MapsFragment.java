@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
@@ -36,11 +37,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
     private final static String TAG = "MapsFragment";
     private final static int REQUEST_SELECT_DATE = 0;
 
-    private MapFragment mapFragment;
     private GoogleMap map;
     private ClusterManager<Measurement> clusterManager;
 
     private FloatingActionButton buttonSelectDate;
+    private ProgressBar progressBar;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -64,6 +65,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
 
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         buttonSelectDate = (FloatingActionButton) view.findViewById(R.id.button_select_date);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         buttonSelectDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +78,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
         // Set initial position to Macao. TODO: use last position?
         GoogleMapOptions options = new GoogleMapOptions()
                 .camera(position);
-        mapFragment = MapFragment.newInstance(options);
+        MapFragment mapFragment = MapFragment.newInstance(options);
         getFragmentManager().beginTransaction()
                 .replace(R.id.map, mapFragment)
                 .commit();
@@ -89,6 +91,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
     public void onDestroyView() {
         super.onDestroyView();
         buttonSelectDate = null;
+        progressBar = null;
+        clusterManager = null;
+        map = null;
     }
 
     /**
@@ -136,26 +141,39 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
     }
 
     private void refreshMarkers(final long dateFrom, final long dateTo) {
-        new AsyncTask<Void, Void, List<Measurement>>() {
+        new AsyncTask<Void, Void, Void>() {
+
             @Override
-            protected List<Measurement> doInBackground(Void... voids) {
-                List<Measurement> list = Measurement.find(Measurement.class,
+            protected void onPreExecute() {
+                buttonSelectDate.setEnabled(false);
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                List<Measurement> items = Measurement.find(Measurement.class,
                         "TIMESTAMP BETWEEN ? AND ?", "" + dateFrom, "" + dateTo);
-                for (Iterator<Measurement> iterator = list.iterator(); iterator.hasNext();) {
+                for (Iterator<Measurement> iterator = items.iterator(); iterator.hasNext();) {
                     Measurement measurement = iterator.next();
                     if (measurement.getPosition() == null) {
                         iterator.remove();
                     }
                 }
-                return list;
+                Log.d(TAG, "Measurements loaded: " + items.size());
+                if (clusterManager != null) {
+                    clusterManager.clearItems();
+                    clusterManager.addItems(items);
+                }
+                return null;
             }
 
             @Override
-            protected void onPostExecute(List<Measurement> measurements) {
-                Log.d(TAG, "Measurements loaded: " + measurements.size());
-                clusterManager.clearItems();
-                clusterManager.addItems(measurements);
+            protected void onPostExecute(Void result) {
                 clusterManager.cluster();
+                if (buttonSelectDate != null && progressBar != null) {
+                    buttonSelectDate.setEnabled(true);
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
             }
         }.execute();
     }

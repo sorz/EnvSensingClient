@@ -8,19 +8,33 @@
         android:layout_height="match_parent"
         android:id="@+id/map" />
 
-    <android.support.design.widget.FloatingActionButton
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/button_select_date"
-        android:layout_margin="20dp"
-        android:visibility="invisible"
-        android:src="@drawable/ic_insert_invitation_black_36dp"
-        app:backgroundTint="@color/md_white_1000"
-        app:rippleColor="@color/md_grey_400"
-        app:borderWidth="0dp"
-        app:elevation="4dp" />
+        android:layout_alignParentBottom="true">
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:id="@+id/button_select_date"
+            android:src="@drawable/ic_insert_invitation_black_36dp"
+            app:backgroundTint="@color/md_white_1000"
+            app:rippleColor="@color/md_grey_400"
+            android:visibility="invisible"
+            app:borderWidth="0dp"
+            app:elevation="4dp" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_gravity="center"
+            android:elevation="4dp"
+            android:id="@+id/progressBar" />
+
+    </FrameLayout>
+
 
 </RelativeLayout>
 
