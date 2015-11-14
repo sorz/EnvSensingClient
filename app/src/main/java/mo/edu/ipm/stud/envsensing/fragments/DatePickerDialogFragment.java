@@ -49,7 +49,7 @@ public class DatePickerDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_date_picker, container, false);
+        View view = inflater.inflate(R.layout.fragment_date_picker_dialog, container, false);
         calendarView = (CalendarPickerView) view.findViewById(R.id.calendarView);
         Button button = (Button) view.findViewById(R.id.button);
 

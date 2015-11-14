@@ -38,7 +38,7 @@ public class DataListDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_data_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_data_list_dialog, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         List<Measurement> measurements = getArguments().getParcelableArrayList(ARGS_ITEMS);
         if (measurements == null)

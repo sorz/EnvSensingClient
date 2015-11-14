@@ -1,6 +1,7 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
 
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -161,13 +162,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
     @Override
     public boolean onClusterClick(Cluster<Measurement> cluster) {
         ArrayList<Measurement> measurements = new ArrayList<>(cluster.getItems());
-        DataListDialogFragment fragment = DataListDialogFragment.newInstance(measurements);
+        DialogFragment fragment = DataListDialogFragment.newInstance(measurements);
         fragment.show(getFragmentManager(), "data-list");
         return true;
     }
 
     @Override
     public boolean onClusterItemClick(Measurement measurement) {
-        return false;
+        DialogFragment fragment = DataDialogFragment.newInstance(measurement);
+        fragment.show(getFragmentManager(), "data-dialog");
+        return true;
     }
 }
