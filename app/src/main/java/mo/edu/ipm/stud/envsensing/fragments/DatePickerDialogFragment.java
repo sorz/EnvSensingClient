@@ -42,7 +42,7 @@ public class DatePickerDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.setTitle(getString(R.string.choose_date_range));
+        dialog.setTitle(R.string.choose_date_range);
         return dialog;
     }
 

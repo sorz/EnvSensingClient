@@ -34,17 +34,20 @@ public class DataListDialogFragment extends DialogFragment {
         return fragment;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_data_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
-
         List<Measurement> measurements = getArguments().getParcelableArrayList(ARGS_ITEMS);
+        if (measurements == null)
+            measurements = new ArrayList<>();
+
+        getDialog().setTitle(getString(R.string.data_list_dialog_title, measurements.size()));
+
         adapter = new RawDataAdapter(getActivity(), measurements);
         recyclerView.setAdapter(adapter);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         return view;

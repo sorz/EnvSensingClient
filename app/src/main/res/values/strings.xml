@@ -139,4 +139,5 @@
     <string name="waiting">Waiting…</string>
     <string name="title_section_maps">Maps</string>
     <string name="choose_date_range">Choose date range</string>
+    <string name="data_list_dialog_title">%s records in this area</string>
 </resources>
