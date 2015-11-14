@@ -64,6 +64,13 @@ public class RecordStatusFragment extends Fragment implements SwipeRefreshLayout
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        swipeLayout.setRefreshing(false);
+        swipeLayout.destroyDrawingCache();
+        swipeLayout.clearAnimation();    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         callback = (OnRecordingStoppedListener) activity;

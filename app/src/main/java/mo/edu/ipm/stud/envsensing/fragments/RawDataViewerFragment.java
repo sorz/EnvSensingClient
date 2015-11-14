@@ -44,6 +44,13 @@ public class RawDataViewerFragment extends Fragment implements SwipeRefreshLayou
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        swipeLayout.setRefreshing(false);
+        swipeLayout.destroyDrawingCache();
+        swipeLayout.clearAnimation();    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
