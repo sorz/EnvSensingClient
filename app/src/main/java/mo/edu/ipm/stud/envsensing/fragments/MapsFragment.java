@@ -149,6 +149,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 Log.d(TAG, "Measurements loaded: " + measurements.size());
                 clusterManager.clearItems();
                 clusterManager.addItems(measurements);
+                clusterManager.cluster();
             }
         }.execute();
     }
