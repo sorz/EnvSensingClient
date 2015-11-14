@@ -17,6 +17,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.Date;
@@ -29,7 +30,7 @@ import mo.edu.ipm.stud.envsensing.entities.Measurement;
 /**
  * Display Google Maps.
  */
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, ClusterManager.OnClusterClickListener<Measurement>, ClusterManager.OnClusterItemClickListener<Measurement> {
     private final static String TAG = "MapsFragment";
     private final static int REQUEST_SELECT_DATE = 0;
 
@@ -102,6 +103,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         clusterManager = new ClusterManager<>(getActivity(), map);
         map.setOnCameraChangeListener(clusterManager);
         map.setOnMarkerClickListener(clusterManager);
+        clusterManager.setOnClusterClickListener(this);
+        clusterManager.setOnClusterItemClickListener(this);
 
         buttonSelectDate.setVisibility(View.VISIBLE);
     }
@@ -114,7 +117,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         long minDate = minMeasure.get(0).getTimestamp();
         long maxDate = new Date().getTime();
-        DatePickerFragment fragment = DatePickerFragment.newInstance(minDate, maxDate);
+        DatePickerDialogFragment fragment = DatePickerDialogFragment.newInstance(minDate, maxDate);
         fragment.setTargetFragment(this, REQUEST_SELECT_DATE);
         fragment.show(getFragmentManager(), "dialog");
     }
@@ -122,9 +125,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SELECT_DATE
-                && resultCode == DatePickerFragment.RESULT_SELECTED) {
-            Long dateFrom = data.getLongExtra(DatePickerFragment.RESULT_DATE_FROM, 0);
-            Long dateTo = data.getLongExtra(DatePickerFragment.RESULT_DATE_TO, 0);
+                && resultCode == DatePickerDialogFragment.RESULT_SELECTED) {
+            Long dateFrom = data.getLongExtra(DatePickerDialogFragment.RESULT_DATE_FROM, 0);
+            Long dateTo = data.getLongExtra(DatePickerDialogFragment.RESULT_DATE_TO, 0);
             refreshMarkers(dateFrom, dateTo);
         }
     }
@@ -152,5 +155,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 clusterManager.cluster();
             }
         }.execute();
+    }
+
+    @Override
+    public boolean onClusterClick(Cluster<Measurement> cluster) {
+        return false;
+    }
+
+    @Override
+    public boolean onClusterItemClick(Measurement measurement) {
+        return false;
     }
 }

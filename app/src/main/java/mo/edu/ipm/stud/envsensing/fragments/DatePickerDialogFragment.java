@@ -19,7 +19,7 @@ import mo.edu.ipm.stud.envsensing.R;
 /**
  * Show a calendar to select a range of date.
  */
-public class DatePickerFragment extends DialogFragment {
+public class DatePickerDialogFragment extends DialogFragment {
     private final static String ARGS_MIN_DATE = "min-date";
     private final static String ARGS_MAX_DATE = "max-date";
     public final static String RESULT_DATE_FROM = "date-from";
@@ -28,8 +28,8 @@ public class DatePickerFragment extends DialogFragment {
 
     private CalendarPickerView calendarView;
 
-    static DatePickerFragment newInstance(long minDate, long maxDate) {
-        DatePickerFragment fragment = new DatePickerFragment();
+    static DatePickerDialogFragment newInstance(long minDate, long maxDate) {
+        DatePickerDialogFragment fragment = new DatePickerDialogFragment();
 
         Bundle args = new Bundle();
         args.putLong(ARGS_MIN_DATE, minDate);
