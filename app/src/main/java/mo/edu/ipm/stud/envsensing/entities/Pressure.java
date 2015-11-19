@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing pressure.
  */
-public class Pressure extends SugarRecord<Pressure> implements MeasureValue {
+public class Pressure extends SugarRecord implements MeasureValue {
     private long measureId;
     private float value;
 

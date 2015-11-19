@@ -7,7 +7,7 @@ import com.orm.SugarRecord;
 /**
  * Storing location of one measurement.
  */
-public class LocationInfo extends SugarRecord<LocationInfo> {
+public class LocationInfo extends SugarRecord {
     private long measureId;
     private long time;
     private String provider;

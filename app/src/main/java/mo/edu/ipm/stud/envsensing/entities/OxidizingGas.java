@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing oxidizing gas.
  */
-public class OxidizingGas extends SugarRecord<OxidizingGas> implements MeasureValue {
+public class OxidizingGas extends SugarRecord implements MeasureValue {
     private long measureId;
     private float value;
 

@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing notes.
  */
-public class Note extends SugarRecord<Note> {
+public class Note extends SugarRecord {
     private long timestamp;
     private String note;
     // TODO: Add a user-chosen location here?

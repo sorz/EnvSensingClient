@@ -22,15 +22,15 @@ public class MeasurementValueCache extends LruCache<Pair<Long, Class>, SugarReco
         return instance;
     }
 
-    public <T extends SugarRecord<?>> T getValue(long measureId, Class<T> type) {
+    public <T extends SugarRecord> T getValue(long measureId, Class<T> type) {
         return (T) get(new Pair<Long, Class>(measureId, type));
     }
 
-    public <T extends SugarRecord<?>> void putValue(long measureId, T data) {
+    public <T extends SugarRecord> void putValue(long measureId, T data) {
         put(new Pair<Long, Class>(measureId, data.getClass()), data);
     }
 
-    public <T extends SugarRecord<?>> void removeValue(long measureId, Class<T> type) {
+    public <T extends SugarRecord> void removeValue(long measureId, Class<T> type) {
         remove(new Pair<Long, Class>(measureId, type));
     }
 

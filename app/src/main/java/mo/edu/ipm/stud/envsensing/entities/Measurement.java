@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Logging the date time of a specific measurement.
  */
-public class Measurement extends SugarRecord<Measurement> implements ClusterItem, Parcelable {
+public class Measurement extends SugarRecord implements ClusterItem, Parcelable {
     private long timestamp;
     private boolean uploaded;
     private String tag;
@@ -44,7 +44,7 @@ public class Measurement extends SugarRecord<Measurement> implements ClusterItem
     }
 
     @Nullable
-    public <T extends SugarRecord<?>> T getValue(Class<T> type) {
+    public <T extends SugarRecord> T getValue(Class<T> type) {
         MeasurementValueCache cache = MeasurementValueCache.getInstance();
         T value = cache.getValue(getId(), type);
         if (value != null)
@@ -60,7 +60,7 @@ public class Measurement extends SugarRecord<Measurement> implements ClusterItem
     }
 
     @Nullable
-    public <T extends SugarRecord<?>> T getValueWithoutCache(Class<T> type) {
+    public <T extends SugarRecord> T getValueWithoutCache(Class<T> type) {
         // TODO: Remove redundancy.
         List<T> result = Temperature.find(type, "MEASURE_ID = ?", "" + getId());
         if (result.size() == 0)

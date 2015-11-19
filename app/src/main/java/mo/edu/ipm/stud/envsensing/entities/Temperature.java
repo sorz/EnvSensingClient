@@ -5,7 +5,7 @@ import com.orm.SugarRecord;
 /**
  * Storing air temperature.
  */
-public class Temperature extends SugarRecord<Temperature> implements MeasureValue {
+public class Temperature extends SugarRecord implements MeasureValue {
     private long measureId;
     private float value;
 
