@@ -109,7 +109,7 @@ public class RecordService extends Service implements LocationListener {
         notificationIntent.setAction(MainActivity.ACTION_SHOW_RECORD_STATUS);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .setWhen(System.currentTimeMillis())
                 .setTicker(getText(R.string.record_service_running))
