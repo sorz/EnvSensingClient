@@ -104,7 +104,7 @@ public class UploadService extends Service {
 
     private void updateNotification(float progress) {
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_stat_file_cloud_upload)
                 .setContentIntent(stopServiceIntent)
                 .setWhen(System.currentTimeMillis())
                 .setContentTitle(getText(R.string.uploading))
