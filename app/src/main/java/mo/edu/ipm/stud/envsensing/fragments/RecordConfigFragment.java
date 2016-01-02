@@ -1,13 +1,18 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v13.app.FragmentCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +29,7 @@ import mo.edu.ipm.stud.envsensing.services.RecordService;
  */
 public class RecordConfigFragment extends Fragment {
     static private final int REQUEST_ENABLE_BT = 0;
+    static private final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 0;
 
     private OnRecordingStartedListener callback;
     private SharedPreferences preferences;
@@ -124,6 +130,13 @@ public class RecordConfigFragment extends Fragment {
             Toast.makeText(getActivity(), R.string.illegal_duration, Toast.LENGTH_SHORT).show();
             return;
         }
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            FragmentCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_LOCATION);
+            return;
+        }
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Toast.makeText(getActivity(),
@@ -147,6 +160,23 @@ public class RecordConfigFragment extends Fragment {
                     // This request only be sent when user request to start service.
                     // So we start it immediately after this request be accepted.
                     startService();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Still need to check Bluetooth permission, so we call it to check.
+                    checkThenStartService();
+                } else {
+                    Toast.makeText(getActivity(), R.string.lack_location_permssion,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 

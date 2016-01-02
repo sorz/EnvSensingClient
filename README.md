@@ -14,6 +14,7 @@ Following libraries and tools are used in this repository.
 
 ### Libraries
 * [Android v7 Support Libraries](https://developer.android.com/tools/support-library/features.html#v7)
+* [Android v13 Support Libraries](https://developer.android.com/tools/support-library/features.html#v13)
 * [Android Design Support Library](http://android-developers.blogspot.com/2015/05/android-design-support-library.html)
 * [Google Play Maps](https://developers.google.com/maps/documentation/android-api/intro)
 * [Google Maps Android API Utility Library](https://developers.google.com/maps/documentation/android-api/utility/)

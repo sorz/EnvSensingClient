@@ -1,11 +1,13 @@
 package mo.edu.ipm.stud.envsensing.services;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,6 +21,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.sensorcon.sensordrone.android.Drone;
@@ -211,8 +214,11 @@ public class RecordService extends Service implements LocationListener {
         criteria.setBearingRequired(false);
         criteria.setAltitudeRequired(false);
         criteria.setSpeedRequired(false);
-        // TODO: check permission?
-        locationManager.requestSingleUpdate(criteria, this, getMainLooper());
+
+        // For Android 6.0 or above, do not get location if user didn't permit.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED)
+            locationManager.requestSingleUpdate(criteria, this, getMainLooper());
 
         // TODO: Active check connection status?
         if (drone.isConnected) {

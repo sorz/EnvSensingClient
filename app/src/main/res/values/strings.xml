@@ -141,4 +141,5 @@
     <string name="choose_date_range">Choose date range</string>
     <string name="data_list_dialog_title">%s records in this area</string>
     <string name="title_data_dialog">Record Information</string>
+    <string name="lack_location_permssion">Sorry, cannot start recording without location permission.</string>
 </resources>
