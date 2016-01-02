@@ -124,7 +124,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Cluste
             return;  // TODO: tell user.
 
         long minDate = minMeasure.get(0).getTimestamp();
-        long maxDate = new Date().getTime();
+        long maxDate = new Date().getTime() + 24 * 3600 * 1000;  // Add one day
         DatePickerDialogFragment fragment = DatePickerDialogFragment.newInstance(minDate, maxDate);
         fragment.setTargetFragment(this, REQUEST_SELECT_DATE);
         fragment.show(getFragmentManager(), "dialog");
