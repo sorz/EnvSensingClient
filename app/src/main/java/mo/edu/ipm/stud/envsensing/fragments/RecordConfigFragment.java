@@ -173,7 +173,7 @@ public class RecordConfigFragment extends Fragment {
                     // Still need to check Bluetooth permission, so we call it to check.
                     checkThenStartService();
                 } else {
-                    Toast.makeText(getActivity(), R.string.lack_location_permssion,
+                    Toast.makeText(getActivity(), R.string.lack_location_permission,
                             Toast.LENGTH_SHORT).show();
                 }
             }

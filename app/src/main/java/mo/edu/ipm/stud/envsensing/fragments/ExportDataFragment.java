@@ -1,9 +1,14 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v13.app.FragmentCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,11 +34,11 @@ public class ExportDataFragment extends Fragment {
     private static final String TAG = "ExportDataFragment";
     private static final String DEFAULT_FILENAME = "sensors-%s.csv";
     private static final String FILENAME_DATE_FORMAT = "yyMMdd.hhmmss";
+    private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
 
     private OnDataExportedListener callback;
     private File destFile;
 
-    private TextView textPath;
     private Button buttonExport;
     private ProgressBar progressBar;
 
@@ -50,7 +55,7 @@ public class ExportDataFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_export_data, container, false);
-        textPath = (TextView) view.findViewById(R.id.text_export_path);
+        TextView textPath = (TextView) view.findViewById(R.id.text_export_path);
         buttonExport = (Button) view.findViewById(R.id.button_export);
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 
@@ -69,7 +74,7 @@ public class ExportDataFragment extends Fragment {
         buttonExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                export();
+                checkPermissionThenExport();
             }
         });
 
@@ -102,6 +107,33 @@ public class ExportDataFragment extends Fragment {
     private File getDefaultExportFilePath() {
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         return new File(path, getDefaultFilename());
+    }
+
+    private void checkPermissionThenExport() {
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            export();
+        } else {
+            FragmentCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    export();
+                } else {
+                    Toast.makeText(getActivity(), R.string.lack_write_storage_permission,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private void export() {
