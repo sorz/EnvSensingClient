@@ -20,6 +20,7 @@ Following libraries and tools are used in this repository.
 * [Google Maps Android API Utility Library](https://developers.google.com/maps/documentation/android-api/utility/)
 * [Sugar ORM](http://satyan.github.io/sugar/)
 * [Volley](http://developer.android.com/training/volley/index.html)
+* [OkHttp](http://square.github.io/okhttp/)
 * [MaterialDrawer](https://github.com/mikepenz/MaterialDrawer)
 * [Melnykov's FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
 * [TimesSquare for Android](https://github.com/square/android-times-square)
