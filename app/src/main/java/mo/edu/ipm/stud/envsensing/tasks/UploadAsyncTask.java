@@ -25,6 +25,7 @@ import mo.edu.ipm.stud.envsensing.entities.MeasureValue;
 import mo.edu.ipm.stud.envsensing.entities.Measurement;
 import mo.edu.ipm.stud.envsensing.entities.Monoxide;
 import mo.edu.ipm.stud.envsensing.entities.OxidizingGas;
+import mo.edu.ipm.stud.envsensing.entities.Pressure;
 import mo.edu.ipm.stud.envsensing.entities.ReducingGas;
 import mo.edu.ipm.stud.envsensing.entities.Temperature;
 import mo.edu.ipm.stud.envsensing.requests.JsonArrayAuthRequest;
@@ -142,6 +143,7 @@ public class UploadAsyncTask extends AsyncTask<Void, Float, Pair<Boolean, Long>>
         MeasureValue[] values = new MeasureValue[6];
         int i = 0;
         values[i++] = measure.getValueWithoutCache(Temperature.class);
+        values[i++] = measure.getValueWithoutCache(Pressure.class);
         values[i++] = measure.getValueWithoutCache(Humidity.class);
         values[i++] = measure.getValueWithoutCache(Monoxide.class);
         values[i++] = measure.getValueWithoutCache(OxidizingGas.class);
