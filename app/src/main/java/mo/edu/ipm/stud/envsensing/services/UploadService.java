@@ -18,8 +18,8 @@ import mo.edu.ipm.stud.envsensing.tasks.UploadAsyncTask;
 public class UploadService extends Service {
     static private final String TAG = "UploadService";
     static private final int NOTIFICATION_ID = 1;
-    static public final String ACTION_START = RecordService.class.getName() + ".ACTION_START";
-    static public final String ACTION_STOP = RecordService.class.getName() + ".ACTION_STOP";
+    static public final String ACTION_START = UploadService.class.getName() + ".ACTION_START";
+    static public final String ACTION_STOP = UploadService.class.getName() + ".ACTION_STOP";
 
     static private boolean running = false;
 
