@@ -2,13 +2,12 @@ package mo.edu.ipm.stud.envsensing.services;
 
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -30,23 +29,35 @@ public class SensorService extends Service {
     static public final String ACTION_CONNECT = SensorService.class.getName() + ".ACTION_CONNECT";
     static public final String ACTION_NEW_TASK = SensorService.class.getName() + ".ACTION_NEW_TASK";
     static public final String ACTION_STOP_TASK = SensorService.class.getName() + ".ACTION_STOP_TASK";
-    static private final String ACTION_DO_MEARUEING = SensorService.class.getName() + ".ACTION_DO_MEASURING";
+    static private final String ACTION_DO_MEASURING = SensorService.class.getName() + ".ACTION_DO_MEASURING";
     static private final String ACTION_GO_READY = SensorService.class.getName() + ".GO_READY";
-    static private final int HEATING_SECONDS = 10;
+    static public final String EXTRA_TASK_END = "extra-task-end";
+    static public final String EXTRA_TASK_TAG = "extra-task-tag";
+
+    static private final int HEATING_SECONDS = 10;  // TODO: change heating time.
+    static private final int MEASURE_TIMEOUT = 12 * 1000; // 12 seconds
 
     static private boolean running = false;
 
     // System services
-    private NotificationManager notificationManager;
     private SharedPreferences preferences;
     private AlarmManager alarmManager;
 
-    private enum SensorState {
+    public enum SensorState {
         DISCONNECTED, CONNECTING, HEATING, READY, TASK_REST, TASK_MEASURING
     }
 
     private Drone drone;
     private SensorState serviceState = SensorState.DISCONNECTED;
+
+    // Task related
+    private Intent currentTaskIntent;
+    private PendingIntent taskDoMeasuringPendingIntent;
+    private long taskDoMeasuringInterval;
+    private long taskDoMeasuringWindowLength;
+    private long taskStartTime;
+    private long taskAutoEndTime;
+    private int taskTotalMeasuringCount;
 
     @Nullable
     @Override
@@ -58,11 +69,14 @@ public class SensorService extends Service {
         return running;
     }
 
+    public SensorState getState() {
+        return serviceState;
+    }
+
     @Override
     public void onCreate() {
         running = true;
         drone = new Drone();
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -85,6 +99,10 @@ public class SensorService extends Service {
             actionConnect();
         } else if (ACTION_GO_READY.equals(intent.getAction())) {
             actionGoReady();
+        } else if (ACTION_NEW_TASK.equals(intent.getAction())) {
+            actionNewTask(intent);
+        } else if (ACTION_DO_MEASURING.equals(intent.getAction())) {
+            actionDoMeasuring();
         }
 
         return START_NOT_STICKY;
@@ -152,6 +170,53 @@ public class SensorService extends Service {
         }
         // TODO: Check task queue.
         updateServiceState(SensorState.READY);
+    }
+
+    private void actionNewTask(Intent intent) {
+        if (serviceState == SensorState.HEATING) {
+            // TODO: add task to queue.
+            Log.e(TAG, "Pending task not yet implemented, ignored.");
+        } else if (serviceState != SensorState.READY) {
+            Log.wtf(TAG, String.format(
+                    "Wrong state. Cannot start new task under %s.", serviceState));
+            return;
+        }
+        currentTaskIntent = intent;
+        taskStartTime = SystemClock.elapsedRealtime();
+        taskAutoEndTime = intent.getLongExtra(EXTRA_TASK_END, 0);
+        taskTotalMeasuringCount = 0;
+        taskDoMeasuringInterval = Integer.parseInt(
+                preferences.getString(
+                        getString(R.string.pref_recording_interval), "300")) * 1000;
+        taskDoMeasuringWindowLength = taskDoMeasuringInterval / 2;
+        if (preferences.getBoolean(getString(R.string.pref_recording_exact_interval), false))
+            taskDoMeasuringWindowLength = 1000;
+
+        Intent measuringIntent = new Intent(this, SensorService.class);
+        measuringIntent.setAction(ACTION_DO_MEASURING);
+        taskDoMeasuringPendingIntent = PendingIntent.getService(this, 0, measuringIntent, 0);
+
+        alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                taskStartTime, taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
+    }
+
+    private void actionDoMeasuring() {
+        if (serviceState != SensorState.TASK_REST) {
+            Log.wtf(TAG, String.format("Wrong state. Cannot do measuring under %s.", serviceState));
+            return;
+        }
+        // TODO: do measuring.
+        Log.d(TAG, "Do measuring...");
+
+        // Schedule next measuring or end task.
+        taskTotalMeasuringCount ++;
+        long nextMeasuringTime = taskStartTime + taskTotalMeasuringCount * taskDoMeasuringInterval;
+        if (nextMeasuringTime > taskAutoEndTime) {
+            updateServiceState(SensorState.READY);
+        } else {
+            alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    nextMeasuringTime, taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
+        }
     }
 
     /**
