@@ -143,4 +143,16 @@
     <string name="title_data_dialog">Record Information</string>
     <string name="lack_location_permission">Sorry, cannot start recording without location permission.</string>
     <string name="lack_write_storage_permission">Sorry, cannot export data without write external storage permission.</string>
+    <string name="notification_disconnected_text">Touch to connect</string>
+    <string name="notification_disconnected_title">Sensordrone Disconnected</string>
+    <string name="notification_connecting_title">Connecting Sensordrone</string>
+    <string name="notification_connecting_text">Wait for seconds…</string>
+    <string name="notification_heating_title">Heating up Sensordrone</string>
+    <string name="notification_heating_text">Waiting for a few minutes…</string>
+    <string name="notification_rest_title">Sensordrone Is Working</string>
+    <string name="notification_measuring_title">Sensordrone Is Working</string>
+    <string name="notification_rest_text">Waiting for the next measuring.</string>
+    <string name="notification_measuring_text">Doing measuring…</string>
+    <string name="notification_ready_title">Sensordrone Is Ready</string>
+    <string name="notification_ready_text">Touch to start measuring.</string>
 </resources>

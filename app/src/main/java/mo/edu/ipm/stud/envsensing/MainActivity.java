@@ -31,6 +31,7 @@ import mo.edu.ipm.stud.envsensing.fragments.SettingsFragment;
 import mo.edu.ipm.stud.envsensing.fragments.UserLoginFragment;
 import mo.edu.ipm.stud.envsensing.fragments.UserRegisterFragment;
 import mo.edu.ipm.stud.envsensing.services.RecordService;
+import mo.edu.ipm.stud.envsensing.services.SensorService;
 
 public class MainActivity extends AppCompatActivity
         implements FragmentManager.OnBackStackChangedListener,
@@ -116,6 +117,13 @@ public class MainActivity extends AppCompatActivity
             showSensorSelectionDialog();
         } else {
             drawer.setSelection(SECTION_RECORDING);
+        }
+
+        // Starting sensor service.
+        if (!SensorService.isRunning()) {
+            Intent intent = new Intent(this, SensorService.class);
+            intent.setAction(SensorService.ACTION_CONNECT);
+            startService(intent);
         }
     }
 
