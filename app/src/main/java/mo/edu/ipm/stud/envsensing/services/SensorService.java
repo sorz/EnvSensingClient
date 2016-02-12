@@ -1,13 +1,16 @@
 package mo.edu.ipm.stud.envsensing.services;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -28,12 +31,15 @@ public class SensorService extends Service {
     static public final String ACTION_NEW_TASK = SensorService.class.getName() + ".ACTION_NEW_TASK";
     static public final String ACTION_STOP_TASK = SensorService.class.getName() + ".ACTION_STOP_TASK";
     static private final String ACTION_DO_MEARUEING = SensorService.class.getName() + ".ACTION_DO_MEASURING";
+    static private final String ACTION_GO_READY = SensorService.class.getName() + ".GO_READY";
+    static private final int HEATING_SECONDS = 10;
 
     static private boolean running = false;
 
     // System services
     private NotificationManager notificationManager;
     private SharedPreferences preferences;
+    private AlarmManager alarmManager;
 
     private enum SensorState {
         DISCONNECTED, CONNECTING, HEATING, READY, TASK_REST, TASK_MEASURING
@@ -57,6 +63,7 @@ public class SensorService extends Service {
         running = true;
         drone = new Drone();
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         updateServiceState(SensorState.DISCONNECTED);
@@ -72,9 +79,12 @@ public class SensorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Received start id " + startId + ": " + intent);
+        if (intent == null)
+            return START_NOT_STICKY;
         if (ACTION_CONNECT.equals(intent.getAction())) {
             actionConnect();
-            return START_STICKY;
+        } else if (ACTION_GO_READY.equals(intent.getAction())) {
+            actionGoReady();
         }
 
         return START_NOT_STICKY;
@@ -107,6 +117,7 @@ public class SensorService extends Service {
             protected void onPostExecute(Boolean success) {
                 if (success) {
                     updateServiceState(SensorState.HEATING);
+                    actionHeating();
                 } else {
                     Toast.makeText(SensorService.this,
                             R.string.connect_fail, Toast.LENGTH_SHORT).show();
@@ -114,6 +125,33 @@ public class SensorService extends Service {
                 }
             }
         }.execute(mac);
+    }
+
+    private void actionHeating() {
+        drone.enableTemperature();
+        drone.enableHumidity();
+        drone.enablePressure();
+        drone.enablePrecisionGas();
+        drone.enableOxidizingGas();
+        drone.enableReducingGas();
+
+        Intent intent = new Intent(this, SensorService.class);
+        intent.setAction(SensorService.ACTION_GO_READY);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        // TODO: AllowWhileIdle for Android 6.0+
+        alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + HEATING_SECONDS * 1000,
+                HEATING_SECONDS * 500, pendingIntent);
+    }
+
+    private void actionGoReady() {
+        if (serviceState != SensorState.HEATING && serviceState != SensorState.TASK_REST) {
+            Log.wtf(TAG, String.format("Wrong state. Cannot change from %s to %s.",
+                    serviceState, SensorState.READY));
+            return;
+        }
+        // TODO: Check task queue.
+        updateServiceState(SensorState.READY);
     }
 
     /**
@@ -125,8 +163,12 @@ public class SensorService extends Service {
                 .setSmallIcon(R.drawable.ic_stat_av_hearing);
         switch (newState) {
             case DISCONNECTED:
+                Intent connectIntent = new Intent(this, SensorService.class);
+                connectIntent.setAction(SensorService.ACTION_CONNECT);
+                PendingIntent pendingIntent = PendingIntent.getService(this, 0, connectIntent, 0);
                 builder.setContentTitle(getText(R.string.notification_disconnected_title))
-                        .setContentText(getText(R.string.notification_disconnected_text));
+                        .setContentText(getText(R.string.notification_disconnected_text))
+                        .setContentIntent(pendingIntent);
                 break;
             case CONNECTING:
                 builder.setContentTitle(getText(R.string.notification_connecting_title))
