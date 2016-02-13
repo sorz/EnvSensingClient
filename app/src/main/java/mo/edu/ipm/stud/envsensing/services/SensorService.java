@@ -13,6 +13,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -25,6 +26,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.sensorcon.sensordrone.android.Drone;
+
+import java.util.Date;
 
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.entities.Humidity;
@@ -57,6 +60,7 @@ public class SensorService extends Service implements LocationListener {
     static private final int MEASURE_TIMEOUT = 12 * 1000; // 12 seconds
 
     static private boolean running = false;
+    private final IBinder binder = new LocalBinder();
 
     // System services
     private SharedPreferences preferences;
@@ -71,6 +75,7 @@ public class SensorService extends Service implements LocationListener {
     private SensorState serviceState = SensorState.DISCONNECTED;
 
     // Task management related
+    private Intent pendingTaskIntent;
     private Intent currentTaskIntent;
     private PendingIntent taskDoMeasuringPendingIntent;
     private long taskDoMeasuringInterval;
@@ -89,11 +94,16 @@ public class SensorService extends Service implements LocationListener {
     private boolean currentMeasuringFail;
     private boolean currentLocationDone;
 
+    public class LocalBinder extends Binder {
+        public SensorService getService() {
+            return SensorService.this;
+        }
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     static public boolean isRunning() {
@@ -118,7 +128,6 @@ public class SensorService extends Service implements LocationListener {
                 finishCurrentMeasuring();
             }
         };
-
         updateServiceState(SensorState.DISCONNECTED);
     }
 
@@ -126,7 +135,12 @@ public class SensorService extends Service implements LocationListener {
     public void onDestroy() {
         super.onDestroy();
         running = false;
-        //stopForeground(true);
+        stopForeground(true);
+        if (drone.isConnected) {
+            for (int i=0; i<10; i++)
+                drone.quickDisable(i);
+            drone.disconnect();
+        }
     }
 
     @Override
@@ -145,7 +159,6 @@ public class SensorService extends Service implements LocationListener {
         } else if (ACTION_STOP_TASK.equals(intent.getAction())) {
             actionStopTask();
         }
-
         return START_NOT_STICKY;
     }
 
@@ -209,20 +222,22 @@ public class SensorService extends Service implements LocationListener {
                     serviceState, SensorState.READY));
             return;
         }
-        // TODO: Check task queue.
         updateServiceState(SensorState.READY);
+        if (pendingTaskIntent != null)
+            actionNewTask(pendingTaskIntent);
     }
 
     private void actionNewTask(Intent intent) {
         if (serviceState == SensorState.HEATING) {
-            // TODO: add task to queue.
-            Log.e(TAG, "Pending task not yet implemented, ignored.");
+            pendingTaskIntent = intent;
+            return;
         } else if (serviceState != SensorState.READY) {
             Log.wtf(TAG, String.format(
                     "Wrong state. Cannot start new task under %s.", serviceState));
             return;
         }
         currentTaskIntent = intent;
+        pendingTaskIntent = null;
         taskNextMeasuringTime = SystemClock.elapsedRealtime();
         taskAutoEndTime = intent.getLongExtra(EXTRA_TASK_END, 0);
         taskDoMeasuringInterval = Integer.parseInt(
@@ -253,7 +268,7 @@ public class SensorService extends Service implements LocationListener {
 
         if (serviceState == SensorState.CONNECTING || serviceState == SensorState.HEATING) {
             // Remove the padding task.
-            // TODO: remove the pending task.
+            pendingTaskIntent = null;
         } else if (serviceState == SensorState.TASK_REST) {
             // Stop current task.
             alarmManager.cancel(taskDoMeasuringPendingIntent);
@@ -270,7 +285,8 @@ public class SensorService extends Service implements LocationListener {
         }
         if (!drone.isConnected) {
             updateServiceState(SensorState.DISCONNECTED);
-            // TODO: add task intent into queue.
+            pendingTaskIntent = currentTaskIntent;
+            actionConnect();
         }
         Log.d(TAG, "Do measuring...");
         String tag = intent.getStringExtra(EXTRA_TASK_TAG);
@@ -369,7 +385,9 @@ public class SensorService extends Service implements LocationListener {
             currentMeasurement.delete();
             taskTotalMeasuringFailCounter ++;
             if (!drone.isConnected) {
-                // TODO: add pending task and reconnect.
+                updateServiceState(SensorState.DISCONNECTED);
+                pendingTaskIntent = currentTaskIntent;
+                actionConnect();
             }
         }
         currentMeasurement = null;
@@ -446,6 +464,11 @@ public class SensorService extends Service implements LocationListener {
 
     public int getCurrentTaskMeasuringFailCount() {
         return taskTotalMeasuringFailCounter;
+    }
+
+    public Date getCurrentTaskAutoStopTime() {
+        return new Date(System.currentTimeMillis() - SystemClock.elapsedRealtime()
+                + taskAutoEndTime);
     }
 
     @Override
