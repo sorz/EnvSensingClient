@@ -142,6 +142,8 @@ public class SensorService extends Service implements LocationListener {
             actionNewTask(intent);
         } else if (ACTION_DO_MEASURING.equals(intent.getAction())) {
             actionDoMeasuring(intent);
+        } else if (ACTION_STOP_TASK.equals(intent.getAction())) {
+            actionStopTask();
         }
 
         return START_NOT_STICKY;
@@ -239,6 +241,28 @@ public class SensorService extends Service implements LocationListener {
                 taskNextMeasuringTime, taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
     }
 
+    /**
+     * Stop current task (in measuring or rest) or remove pending task.
+     */
+    private void actionStopTask() {
+        if (serviceState == SensorState.TASK_MEASURING)
+            // Make current measuring timeout immediately.
+            finishCurrentMeasuring();
+        // After finishCurrentMeasuring(), the state may changed to TASK_REST or CONNECTING
+        // depending on the result of measuring. So we have to recheck the state following.
+
+        if (serviceState == SensorState.CONNECTING || serviceState == SensorState.HEATING) {
+            // Remove the padding task.
+            // TODO: remove the pending task.
+        } else if (serviceState == SensorState.TASK_REST) {
+            // Stop current task.
+            alarmManager.cancel(taskDoMeasuringPendingIntent);
+            updateServiceState(SensorState.READY);
+        } else {
+            Log.wtf(TAG, String.format("Wrong state. Cannot stop task under %s.", serviceState));
+        }
+    }
+
     private void actionDoMeasuring(Intent intent) {
         if (serviceState != SensorState.TASK_REST) {
             Log.wtf(TAG, String.format("Wrong state. Cannot do measuring under %s.", serviceState));
@@ -254,6 +278,7 @@ public class SensorService extends Service implements LocationListener {
         // Call finishCurrentMeasuring() when timeout occur.
         // It should be cancelled if measuring finish before timeout.
         measuringTimeoutHandler.postDelayed(measuringTimeoutRunnable, MEASURE_TIMEOUT);
+        updateServiceState(SensorState.TASK_MEASURING);
 
         // Initial related variables.
         currentMeasuringSuccess = currentMeasuringFail = currentLocationDone = false;
@@ -278,6 +303,8 @@ public class SensorService extends Service implements LocationListener {
             @Override
             public void onMeasureDone(boolean[] sensors) {
                 Log.d(TAG, "Measured.");
+                if (currentMeasurement == null)
+                    return;
                 // This measuring is treated as success only if ALL sensor data are collected
                 // successfully and correctly.
                 for (boolean success : sensors)
@@ -309,7 +336,7 @@ public class SensorService extends Service implements LocationListener {
         while (taskNextMeasuringTime < SystemClock.elapsedRealtime())
             taskNextMeasuringTime += taskDoMeasuringInterval;
         if (taskNextMeasuringTime > taskAutoEndTime) {
-            updateServiceState(SensorState.READY);
+            taskNextMeasuringTime = -1;
         } else {
             alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, taskNextMeasuringTime,
                     taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
@@ -341,8 +368,13 @@ public class SensorService extends Service implements LocationListener {
             Pressure.executeQuery(query, "PRESSURE");
             currentMeasurement.delete();
             taskTotalMeasuringFailCounter ++;
+            if (!drone.isConnected) {
+                // TODO: add pending task and reconnect.
+            }
         }
         currentMeasurement = null;
+        updateServiceState(taskNextMeasuringTime > SystemClock.elapsedRealtime() ?
+                SensorState.TASK_REST : SensorState.READY);
         if (wakeLock.isHeld())
             wakeLock.release();
     }
@@ -402,6 +434,18 @@ public class SensorService extends Service implements LocationListener {
         }
         startForeground(ONGOING_NOTIFICATION_ID, builder.build());
         serviceState = newState;
+    }
+
+    public long getCurrentTaskDoMeasuringInterval() {
+        return taskDoMeasuringInterval;
+    }
+
+    public int getCurrentTaskMeasuringSuccessCount() {
+        return taskTotalMeasuringSuccessCounter;
+    }
+
+    public int getCurrentTaskMeasuringFailCount() {
+        return taskTotalMeasuringFailCounter;
     }
 
     @Override
