@@ -4,13 +4,18 @@ import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -23,8 +28,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import mo.edu.ipm.stud.envsensing.fragments.ExportDataFragment;
 import mo.edu.ipm.stud.envsensing.fragments.MapsFragment;
 import mo.edu.ipm.stud.envsensing.fragments.RawDataViewerFragment;
-import mo.edu.ipm.stud.envsensing.fragments.RecordConfigFragment;
-import mo.edu.ipm.stud.envsensing.fragments.RecordStatusFragment;
+import mo.edu.ipm.stud.envsensing.fragments.SensorConnectFragment;
+import mo.edu.ipm.stud.envsensing.fragments.SensorNewTaskFragment;
+import mo.edu.ipm.stud.envsensing.fragments.SensorInTaskFragment;
 import mo.edu.ipm.stud.envsensing.fragments.SensorSelectionFragment;
 import mo.edu.ipm.stud.envsensing.fragments.SensorStatusFragment;
 import mo.edu.ipm.stud.envsensing.fragments.SettingsFragment;
@@ -39,21 +45,40 @@ public class MainActivity extends AppCompatActivity
         Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener,
-        RecordConfigFragment.OnRecordingStartedListener,
-        RecordStatusFragment.OnRecordingStoppedListener,
+        SensorNewTaskFragment.OnRecordingStartedListener,
+        SensorInTaskFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
         UserLoginFragment.OnUserLoginListener,
-        UserRegisterFragment.OnUserRegisterListener {
+        UserRegisterFragment.OnUserRegisterListener,
+        SensorService.OnSensorStateChangedListener {
     public static final String ACTION_SHOW_RECORD_STATUS = MainActivity.class.getName() +
             ".ACTION_SHOW_RECORD_STATUS";
+    private static final String TAG = "MainActivity";
     private static final int SECTION_SENSOR_STATUS = 1;
     private static final int SECTION_SETTINGS = 2;
-    private static final int SECTION_RECORDING = 3;
+    private static final int SECTION_SENSOR_CONTROL = 3;
     private static final int SECTION_RAW_DATA_VIEWER = 4;
     private static final int SECTION_MAPS = 5;
 
     private Drawer drawer;
+    private int currentSection;
+    private SensorService sensorService;
+    private boolean sensorIsBound;
+
+    private ServiceConnection sensorConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            sensorService = ((SensorService.LocalBinder) service).getService();
+            sensorService.registerSensorStateChangedListener(MainActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            sensorService.unregisterSensorServiceStateChangedListener(MainActivity.this);
+            sensorService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +93,13 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().addOnBackStackChangedListener(this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        bindSensorService();
+
         // Enable RecordService display recording section directly.
         // In this case, do not add the drawer.
         if (ACTION_SHOW_RECORD_STATUS.equals(getIntent().getAction()) &&
                 RecordService.isRunning()) {
-            switchSection(SECTION_RECORDING);
+            switchSection(SECTION_SENSOR_CONTROL);
             return;
         }
 
@@ -88,9 +115,9 @@ public class MainActivity extends AppCompatActivity
                 .withAccountHeader(headerBuilder.build())
                 .addDrawerItems(
                         new PrimaryDrawerItem()
-                                .withName(R.string.title_section_recording)
+                                .withName(R.string.title_sensor_control)
                                 .withIcon(R.drawable.ic_hearing_black_24dp)
-                                .withIdentifier(SECTION_RECORDING),
+                                .withIdentifier(SECTION_SENSOR_CONTROL),
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_maps)
                                 .withIcon(R.drawable.ic_map_black_24dp)
@@ -116,24 +143,24 @@ public class MainActivity extends AppCompatActivity
             drawer.setSelection(SECTION_SETTINGS);
             showSensorSelectionDialog();
         } else {
-            drawer.setSelection(SECTION_RECORDING);
+            drawer.setSelection(SECTION_SENSOR_CONTROL);
         }
 
-        // Starting sensor service.
-        if (!SensorService.isRunning()) {
-            Intent intent = new Intent(this, SensorService.class);
-            intent.setAction(SensorService.ACTION_CONNECT);
-            startService(intent);
-        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindSensorService();
     }
 
     @Override
     public void onNewIntent(Intent intent) {
         if (ACTION_SHOW_RECORD_STATUS.equals(intent.getAction())) {
             if (drawer == null)
-                switchSection(SECTION_RECORDING);
+                switchSection(SECTION_SENSOR_CONTROL);
             else
-                drawer.setSelection(SECTION_RECORDING);
+                drawer.setSelection(SECTION_SENSOR_CONTROL);
         }
     }
 
@@ -146,11 +173,26 @@ public class MainActivity extends AppCompatActivity
             case SECTION_SETTINGS:
                 fragment = new SettingsFragment();
                 break;
-            case SECTION_RECORDING:
-                if (RecordService.isRunning())
-                    fragment = new RecordStatusFragment();
-                else
-                    fragment = new RecordConfigFragment();
+            case SECTION_SENSOR_CONTROL:
+                if (sensorService != null) {
+                    SensorService.SensorState state = sensorService.getState();
+                    if (state == SensorService.SensorState.DISCONNECTED ||
+                            state == SensorService.SensorState.CONNECTING)
+                        fragment = new SensorConnectFragment();
+                    else if (state == SensorService.SensorState.HEATING ||
+                            state == SensorService.SensorState.READY)
+                        fragment = new SensorNewTaskFragment();
+                    else if (state == SensorService.SensorState.TASK_MEASURING ||
+                            state == SensorService.SensorState.TASK_REST)
+                        fragment = new SensorInTaskFragment();
+                    else {
+                        Log.wtf(TAG, "Unknown sensor state: " + state);
+                        return;
+                    }
+                } else {
+                    Log.d(TAG, "SensorService doesn't start!");
+                    fragment = new SensorConnectFragment();
+                }
                 break;
             case SECTION_RAW_DATA_VIEWER:
                 fragment = new RawDataViewerFragment();
@@ -162,6 +204,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new Fragment();
                 break;
         }
+        currentSection = id;
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
@@ -174,6 +217,23 @@ public class MainActivity extends AppCompatActivity
         if (addToBackStack)
             transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    public SensorService getSensorService() {
+        return sensorService;
+    }
+
+    private void bindSensorService() {
+        Intent intent = new Intent(this, SensorService.class);
+        bindService(intent, sensorConnection, Context.BIND_AUTO_CREATE);
+        sensorIsBound = true;
+    }
+
+    private void unbindSensorService() {
+        if (sensorIsBound) {
+            unbindService(sensorConnection);
+            sensorIsBound = false;
+        }
     }
 
     @Override
@@ -232,6 +292,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSensorStateChanged(SensorService.SensorState newState) {
+        Log.d(TAG, "Sensor state changed to " + newState + ".");
+        if (currentSection == SECTION_SENSOR_CONTROL)
+           switchSection(currentSection);
+    }
+
+    @Override
     public void onDisplaySensorSelectionDialog() {
         showSensorSelectionDialog();
     }
@@ -253,7 +320,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRecordingStarted() {
-        switchFragment(new RecordStatusFragment(), false);
+        switchFragment(new SensorInTaskFragment(), false);
     }
 
     @Override
@@ -262,7 +329,7 @@ public class MainActivity extends AppCompatActivity
             // This activity start with ACTION_SHOW_RECORD_STATUS by RecordService.
             finish();
         else
-            switchFragment(new RecordConfigFragment(), false);
+            switchFragment(new SensorNewTaskFragment(), false);
     }
 
     @Override

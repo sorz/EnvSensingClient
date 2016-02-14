@@ -25,8 +25,8 @@ import mo.edu.ipm.stud.envsensing.services.RecordService;
 /**
  * A {@link Fragment} used to display status and stop the running recording task.
  */
-public class RecordStatusFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-    static private final String TAG = "RecordStatusFragment";
+public class SensorInTaskFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+    static private final String TAG = "SensorInTaskFragment";
 
     private OnRecordingStoppedListener callback;
     private RecordService service;
@@ -99,7 +99,7 @@ public class RecordStatusFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_record_status, container, false);
+        View view = inflater.inflate(R.layout.fragment_sensor_in_task, container, false);
         swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         textStartTime = (TextView) view.findViewById(R.id.text_start_time);
         textStopTime = (TextView) view.findViewById(R.id.text_stop_time);

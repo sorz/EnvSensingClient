@@ -28,6 +28,8 @@ import android.widget.Toast;
 import com.sensorcon.sensordrone.android.Drone;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.entities.Humidity;
@@ -93,6 +95,11 @@ public class SensorService extends Service implements LocationListener {
     private boolean currentMeasuringSuccess;
     private boolean currentMeasuringFail;
     private boolean currentLocationDone;
+
+    private Set<OnSensorStateChangedListener> sensorStateChangedListeners = new HashSet<>();
+    public interface OnSensorStateChangedListener {
+        public void onSensorStateChanged(SensorState newState);
+    }
 
     public class LocalBinder extends Binder {
         public SensorService getService() {
@@ -452,6 +459,8 @@ public class SensorService extends Service implements LocationListener {
         }
         startForeground(ONGOING_NOTIFICATION_ID, builder.build());
         serviceState = newState;
+        for (OnSensorStateChangedListener listener : sensorStateChangedListeners)
+            listener.onSensorStateChanged(newState);
     }
 
     public long getCurrentTaskDoMeasuringInterval() {
@@ -469,6 +478,14 @@ public class SensorService extends Service implements LocationListener {
     public Date getCurrentTaskAutoStopTime() {
         return new Date(System.currentTimeMillis() - SystemClock.elapsedRealtime()
                 + taskAutoEndTime);
+    }
+
+    public void registerSensorStateChangedListener(OnSensorStateChangedListener listener) {
+        sensorStateChangedListeners.add(listener);
+    }
+
+    public void unregisterSensorServiceStateChangedListener(OnSensorStateChangedListener listener) {
+        sensorStateChangedListeners.remove(listener);
     }
 
     @Override

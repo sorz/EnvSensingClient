@@ -23,11 +23,12 @@ import android.widget.Toast;
 
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.services.RecordService;
+import mo.edu.ipm.stud.envsensing.services.SensorService;
 
 /**
  * A {@link Fragment} used to configure and start a new recording task.
  */
-public class RecordConfigFragment extends Fragment {
+public class SensorNewTaskFragment extends Fragment {
     static private final int REQUEST_ENABLE_BT = 0;
     static private final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 0;
 
@@ -57,7 +58,7 @@ public class RecordConfigFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_record_config, container, false);
+        View view = inflater.inflate(R.layout.fragment_sensor_new_task, container, false);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         Button buttonStart = (Button) view.findViewById(R.id.button_start);
         View experiment = view.findViewById(R.id.experiment);
@@ -88,7 +89,7 @@ public class RecordConfigFragment extends Fragment {
             buttonMeasure.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    makeSingleMeasure();
+                    //makeSingleMeasure();
                 }
             });
         } else {
@@ -144,7 +145,7 @@ public class RecordConfigFragment extends Fragment {
             return;
         }
         if (bluetoothAdapter.isEnabled()) {
-            startService();
+            //startService();
         } else {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -159,7 +160,8 @@ public class RecordConfigFragment extends Fragment {
                 if (resultCode == Activity.RESULT_OK)
                     // This request only be sent when user request to start service.
                     // So we start it immediately after this request be accepted.
-                    startService();
+                    //startService();
+                ;
         }
     }
 
@@ -180,39 +182,23 @@ public class RecordConfigFragment extends Fragment {
         }
     }
 
-    private void startService() {
-        if (!RecordService.isRunning()) {
-            long durationSeconds = pickerHours.getValue() * 3600 + pickerMinutes.getValue() * 60;
-            if (durationSeconds <= 0)
-                return;
-            String tag = textTag.getText().toString();
-
-            Intent intent = new Intent(getActivity(), RecordService.class);
-            intent.setAction(RecordService.ACTION_NEW);
-            intent.putExtra(RecordService.EXTRA_RECORDING_START, SystemClock.elapsedRealtime());
-            intent.putExtra(RecordService.EXTRA_RECORDING_END,
-                    SystemClock.elapsedRealtime() + durationSeconds * 1000);
-            intent.putExtra(RecordService.EXTRA_MEASURE_TAG, tag);
-            getActivity().startService(intent);
-        }
-
-        // Try to let service start first, after that, we switch to status fragment.
-        View view = getView();
-        if (view != null)
-            getView().post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onRecordingStarted();
-                }
-            });
+    private void startConnectSensorService() {
+        Intent intent = new Intent(getActivity(), SensorService.class);
+        intent.setAction(SensorService.ACTION_CONNECT);
+        getActivity().startService(intent);
     }
 
-    private void makeSingleMeasure() {
-        if (RecordService.isRunning())
+    private void startNewTaskService() {
+        long durationSeconds = pickerHours.getValue() * 3600 + pickerMinutes.getValue() * 60;
+        if (durationSeconds <= 0)
             return;
-        Intent intent = new Intent(getActivity(), RecordService.class);
-        intent.setAction(RecordService.ACTION_SINGLE_MEASURE);
-        intent.putExtra(RecordService.EXTRA_MEASURE_TAG, textTag.getText().toString());
+        String tag = textTag.getText().toString();
+
+        Intent intent = new Intent(getActivity(), SensorService.class);
+        intent.setAction(SensorService.ACTION_NEW_TASK);
+        intent.putExtra(SensorService.EXTRA_TASK_END,
+                SystemClock.elapsedRealtime() + durationSeconds * 1000);
+        intent.putExtra(RecordService.EXTRA_MEASURE_TAG, tag);
         getActivity().startService(intent);
     }
 }
