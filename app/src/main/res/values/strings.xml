@@ -48,7 +48,7 @@
     <string name="pref_recording_exact_interval_summary">More accurate as well as more battery usage.</string>
     <string name="pref_recording_exact_interval_title">Precise interval</string>
     <string name="recording_duration">Duration</string>
-    <string name="auto_stop_in">auto stop recording in</string>
+    <string name="auto_stop_in">Auto stop recording in</string>
     <string name="unit_hours">hours</string>
     <string name="unit_minutes">minutes</string>
     <string name="illegal_duration">Please set a duration first.</string>
@@ -158,4 +158,11 @@
     <string name="notification_ready_text">Touch to start measuring.</string>
     <string name="sensor_status">Status</string>
     <string name="title_sensor_control">Sensor Control</string>
+    <string name="sensor_state_title">Sensor State</string>
+    <string name="sensor_state_unknown">Unknown (waiting…)</string>
+    <string name="sensor_state_disconnect">Disconnected</string>
+    <string name="sensor_state_connecting">Connecting</string>
+    <string name="new_task_title">New Task</string>
+    <string name="sensor_state_ready">Ready to start task</string>
+    <string name="sensor_state_heating">Heating (waiting for a few minutes)</string>
 </resources>

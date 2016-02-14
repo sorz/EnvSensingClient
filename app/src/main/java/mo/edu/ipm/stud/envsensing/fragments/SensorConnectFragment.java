@@ -28,7 +28,7 @@ public class SensorConnectFragment extends Fragment {
     static private final int REQUEST_ENABLE_BT = 0;
 
     private SharedPreferences preferences;
-    private TextView textConnectState;
+    private TextView textSensorState;
     private Button buttonConnect;
 
     @Override
@@ -49,7 +49,7 @@ public class SensorConnectFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sensor_connect, container, false);
         buttonConnect = (Button) view.findViewById(R.id.button_connect);
-        textConnectState = (TextView) view.findViewById(R.id.text_connect_status);
+        textSensorState = (TextView) view.findViewById(R.id.text_sensor_state);
 
         buttonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,13 +80,14 @@ public class SensorConnectFragment extends Fragment {
             }, 500);
             return;
         }
+
         switch (service.getState()) {
             case DISCONNECTED:
-                textConnectState.setText(R.string.sensor_not_connect);
+                textSensorState.setText(R.string.sensor_state_disconnect);
                 buttonConnect.setEnabled(true);
                 break;
             case CONNECTING:
-                textConnectState.setText(R.string.sensor_is_connecting);
+                textSensorState.setText(R.string.sensor_state_connecting);
                 buttonConnect.setEnabled(false);
                 break;
             default:
@@ -101,7 +102,7 @@ public class SensorConnectFragment extends Fragment {
         // https://stackoverflow.com/questions/26369905/activitys-ondestroy-fragments-
         // ondestroyview-set-null-practices
         super.onDestroyView();
-        textConnectState = null;
+        textSensorState = null;
         buttonConnect = null;
 
     }
@@ -126,7 +127,7 @@ public class SensorConnectFragment extends Fragment {
             return;
         }
         if (bluetoothAdapter.isEnabled()) {
-            checkPermissionThenConnectSensor();
+            connectSensorWithoutCheckPermission();
         } else {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);

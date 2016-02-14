@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import mo.edu.ipm.stud.envsensing.MainActivity;
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.services.RecordService;
 import mo.edu.ipm.stud.envsensing.services.SensorService;
@@ -29,30 +31,20 @@ import mo.edu.ipm.stud.envsensing.services.SensorService;
  * A {@link Fragment} used to configure and start a new recording task.
  */
 public class SensorNewTaskFragment extends Fragment {
-    static private final int REQUEST_ENABLE_BT = 0;
+    static private final String TAG = "SensorNewTaskFragment";
     static private final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 0;
 
-    private OnRecordingStartedListener callback;
     private SharedPreferences preferences;
 
+    private TextView textSensorState;
     private NumberPicker pickerHours;
     private NumberPicker pickerMinutes;
     private TextView textTag;
-
-    public interface OnRecordingStartedListener {
-        public void onRecordingStarted();
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.title_record_config);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        callback = (OnRecordingStartedListener) activity;
     }
 
     @Override
@@ -64,6 +56,7 @@ public class SensorNewTaskFragment extends Fragment {
         View experiment = view.findViewById(R.id.experiment);
         Button buttonMeasure = (Button) view.findViewById(R.id.button_measure);
         textTag = (TextView) view.findViewById(R.id.text_tag);
+        textSensorState = (TextView) view.findViewById(R.id.text_sensor_state);
 
         pickerHours = (NumberPicker) view.findViewById(R.id.pickerHours);
         pickerMinutes = (NumberPicker) view.findViewById(R.id.pickerMinutes);
@@ -80,7 +73,7 @@ public class SensorNewTaskFragment extends Fragment {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkThenStartService();
+                checkThenStartNewTask();
             }
         });
 
@@ -96,12 +89,29 @@ public class SensorNewTaskFragment extends Fragment {
             experiment.setVisibility(View.GONE);
         }
 
+        // Check state.
+        SensorService service = ((MainActivity) getActivity()).getSensorService();
+        switch (service.getState()) {
+            case HEATING:
+                textSensorState.setText(R.string.sensor_state_heating);
+                buttonMeasure.setEnabled(false);
+                break;
+            case READY:
+                textSensorState.setText(R.string.sensor_state_ready);
+                buttonMeasure.setEnabled(true);
+                break;
+            default:
+                Log.wtf(TAG, "This fragment cannot handle the state.");
+                break;
+        }
+
         return view;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        textSensorState = null;
         pickerHours = null;
         pickerMinutes = null;
         textTag = null;
@@ -121,7 +131,7 @@ public class SensorNewTaskFragment extends Fragment {
         editor.apply();
     }
 
-    private void checkThenStartService() {
+    private void checkThenStartNewTask() {
         if (preferences.getString(getString(R.string.pref_bluetooth_mac), null) == null) {
             Toast.makeText(getActivity(),
                     R.string.need_to_select_sensor, Toast.LENGTH_SHORT).show();
@@ -136,32 +146,8 @@ public class SensorNewTaskFragment extends Fragment {
             FragmentCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_LOCATION);
-            return;
-        }
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            Toast.makeText(getActivity(),
-                    R.string.bluetooth_not_found, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (bluetoothAdapter.isEnabled()) {
-            //startService();
         } else {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            // startService() will be called in onActivityResult().
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_ENABLE_BT:
-                if (resultCode == Activity.RESULT_OK)
-                    // This request only be sent when user request to start service.
-                    // So we start it immediately after this request be accepted.
-                    //startService();
-                ;
+            startNewTaskService();
         }
     }
 
@@ -172,20 +158,13 @@ public class SensorNewTaskFragment extends Fragment {
             case PERMISSIONS_REQUEST_ACCESS_LOCATION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Still need to check Bluetooth permission, so we call it to check.
-                    checkThenStartService();
+                    startNewTaskService();
                 } else {
                     Toast.makeText(getActivity(), R.string.lack_location_permission,
                             Toast.LENGTH_SHORT).show();
                 }
             }
         }
-    }
-
-    private void startConnectSensorService() {
-        Intent intent = new Intent(getActivity(), SensorService.class);
-        intent.setAction(SensorService.ACTION_CONNECT);
-        getActivity().startService(intent);
     }
 
     private void startNewTaskService() {

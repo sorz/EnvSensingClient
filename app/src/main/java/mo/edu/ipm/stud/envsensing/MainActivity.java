@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity
         Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener,
-        SensorNewTaskFragment.OnRecordingStartedListener,
         SensorInTaskFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
@@ -316,11 +315,6 @@ public class MainActivity extends AppCompatActivity
         editor.apply();
 
         getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onRecordingStarted() {
-        switchFragment(new SensorInTaskFragment(), false);
     }
 
     @Override
