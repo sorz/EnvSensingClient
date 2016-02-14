@@ -24,6 +24,7 @@
     <string name="press_to_select">Press to select</string>
     <string name="connect_fail">Connect fail.</string>
     <string name="sensor_not_connect">Sensordrone is not connected.</string>
+    <string name="sensor_is_connecting">Sensordrone is connecting.</string>
     <string name="connect">Connect</string>
     <string name="sensor_connected">Sensordrone is connected.</string>
     <string name="disconnect">Disconnect</string>
@@ -155,4 +156,6 @@
     <string name="notification_measuring_text">Doing measuring…</string>
     <string name="notification_ready_title">Sensordrone Is Ready</string>
     <string name="notification_ready_text">Touch to start measuring.</string>
+    <string name="sensor_status">Status</string>
+    <string name="title_sensor_control">Sensor Control</string>
 </resources>
