@@ -30,7 +30,6 @@ public class SensorMeasureAsyncTask
 
     private Drone drone;
     private boolean[] measured = new boolean[TOTAL_SENSOR];
-    private boolean[] failed = new boolean[TOTAL_SENSOR];
     private OnMeasureDone callback;
     private Handler timeoutHandler = new Handler();
     private Runnable timeoutRunnable;
@@ -58,25 +57,17 @@ public class SensorMeasureAsyncTask
                 SensorMeasureAsyncTask.this.callback.onMeasureDone(measured);
             }
         };
+        Log.d(TAG, "Sending measure requests.");
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
         drone.registerDroneListener(this);
 
-        failed[SENSOR_TEMPERATURE] = drone.temperatureStatus ?
-                !drone.measureTemperature() : !drone.enableTemperature();
-        failed[SENSOR_HUMIDITY] = drone.humidityStatus ?
-                !drone.measureHumidity() : !drone.enableHumidity();
-        failed[SENSOR_MONOXIDE] = drone.precisionGasStatus ?
-                !drone.measurePrecisionGas() : !drone.enablePrecisionGas();
-        failed[SENSOR_PRESSURE] = drone.pressureStatus ?
-                !drone.measurePressure() : !drone.enablePressure();
-        failed[SENSOR_OXIDIZING] = drone.oxidizingGasStatus ?
-                !drone.measureOxidizingGas() : !drone.enableOxidizingGas();
-        failed[SENSOR_REDUCING] = drone.reducingGasStatus ?
-                !drone.measureReducingGas() : !drone.enableReducingGas();
-
-        // TODO: Add more sensors here?
-        // TODO: Handle all failed case before timeout.
-
+        drone.measureTemperature();
+        drone.measureHumidity();
+        drone.measurePrecisionGas();
+        drone.measurePressure();
+        drone.measureOxidizingGas();
+        drone.measureReducingGas();
+        Log.d(TAG, "Sent.");
         return null;
     }
 
@@ -84,26 +75,8 @@ public class SensorMeasureAsyncTask
     @Override
     public void parseEvent(DroneEventObject event) {
         Log.d(TAG, "Event: " + event);
-        if (event.matches(DroneEventObject.droneEventType.TEMPERATURE_ENABLED)
-                & !measured[SENSOR_TEMPERATURE])
-            drone.measureTemperature();
-        else if (event.matches(DroneEventObject.droneEventType.HUMIDITY_ENABLED)
-                & !measured[SENSOR_HUMIDITY])
-            drone.measureHumidity();
-        else if (event.matches(DroneEventObject.droneEventType.PRECISION_GAS_ENABLED)
-                & !measured[SENSOR_MONOXIDE])
-            drone.measurePrecisionGas();
-        else if (event.matches(DroneEventObject.droneEventType.PRESSURE_ENABLED)
-                & !measured[SENSOR_PRESSURE])
-            drone.measurePressure();
-        else if (event.matches(DroneEventObject.droneEventType.OXIDIZING_GAS_ENABLED)
-                & !measured[SENSOR_OXIDIZING])
-            drone.measureOxidizingGas();
-        else if (event.matches(DroneEventObject.droneEventType.REDUCING_GAS_ENABLED)
-                & !measured[SENSOR_REDUCING])
-            drone.measureReducingGas();
 
-        else if (event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED))
+        if (event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED))
             measured[SENSOR_TEMPERATURE] = true;
         else if (event.matches(DroneEventObject.droneEventType.HUMIDITY_MEASURED))
             measured[SENSOR_HUMIDITY] = true;
@@ -130,7 +103,7 @@ public class SensorMeasureAsyncTask
      */
     private boolean hasFinished() {
         for (int i=0; i<TOTAL_SENSOR; ++i)
-            if (!(measured[i] || failed[i]))
+            if (!(measured[i]))
                 return false;
         return true;
     }
