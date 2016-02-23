@@ -58,8 +58,8 @@ public class SensorService extends Service implements LocationListener {
     static public final String EXTRA_TASK_END = "extra-task-end";
     static public final String EXTRA_TASK_TAG = "extra-task-tag";
 
-    static private final int HEATING_SECONDS = 10;  // TODO: change heating time.
-    static private final int MEASURE_TIMEOUT = 12 * 1000; // 12 seconds
+    static private final int HEATING_SECONDS = 5;  // TODO: change heating time.
+    static private final int MEASURE_TIMEOUT = 15 * 1000; // 12 seconds
 
     static private boolean running = false;
     private final IBinder binder = new LocalBinder();
@@ -128,6 +128,8 @@ public class SensorService extends Service implements LocationListener {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         measuringTimeoutHandler = new Handler();
         measuringTimeoutRunnable = new Runnable() {
             @Override
@@ -186,7 +188,7 @@ public class SensorService extends Service implements LocationListener {
             Toast.makeText(this, R.string.bluetooth_disabled, Toast.LENGTH_SHORT).show();
             return;
         }
-        new SensorConnectAsyncTask() {
+        new SensorConnectAsyncTask(drone) {
             @Override
             protected void onPreExecute () {
                 updateServiceState(SensorState.CONNECTING);
@@ -261,6 +263,7 @@ public class SensorService extends Service implements LocationListener {
 
         alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 taskNextMeasuringTime, taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
+        updateServiceState(SensorState.TASK_REST);
     }
 
     /**
@@ -291,9 +294,11 @@ public class SensorService extends Service implements LocationListener {
             return;
         }
         if (!drone.isConnected) {
+            Log.i(TAG, "Drone has been disconnected, cannot do measuring. Try to reconnect.");
             updateServiceState(SensorState.DISCONNECTED);
             pendingTaskIntent = currentTaskIntent;
             actionConnect();
+            return;
         }
         Log.d(TAG, "Do measuring...");
         String tag = intent.getStringExtra(EXTRA_TASK_TAG);
@@ -308,6 +313,7 @@ public class SensorService extends Service implements LocationListener {
         currentMeasurement = new Measurement();
         if (tag != null && !tag.isEmpty())
             currentMeasurement.setTag(tag);
+        currentMeasurement.save();  // Locations and Measurements require an ID.
 
         // Request location update.
         Criteria criteria = new Criteria();
@@ -322,7 +328,7 @@ public class SensorService extends Service implements LocationListener {
 
         // Request sensor data.
         Log.d(TAG, "Sending measure requests.");
-        new SensorMeasureAsyncTask(this).execute(new SensorMeasureAsyncTask.OnMeasureDone() {
+        new SensorMeasureAsyncTask(drone).execute(new SensorMeasureAsyncTask.OnMeasureDone() {
             @Override
             public void onMeasureDone(boolean[] sensors) {
                 Log.d(TAG, "Measured.");
@@ -381,14 +387,14 @@ public class SensorService extends Service implements LocationListener {
             taskTotalMeasuringSuccessCounter++;
         } else {
             // At least one error occur, rollback database.
-            String query = "DELETE FROM ? WHERE measureId = " + currentMeasurement.getId();
-            LocationInfo.executeQuery(query, "LOCATION_INFO");
-            Temperature.executeQuery(query, "TEMPERATURE");
-            Humidity.executeQuery(query, "HUMIDITY");
-            Monoxide.executeQuery(query, "MONOXIDE");
-            OxidizingGas.executeQuery(query, "OXIDIZING_GAS");
-            ReducingGas.executeQuery(query, "REDUCING_GAS");
-            Pressure.executeQuery(query, "PRESSURE");
+            String query = "DELETE FROM %s WHERE MEASURE_Id = " + currentMeasurement.getId();
+            LocationInfo.executeQuery(String.format(query, "LOCATION_INFO" ));
+            Temperature.executeQuery(String.format(query, "TEMPERATURE"));
+            Humidity.executeQuery(String.format(query, "HUMIDITY"));
+            Monoxide.executeQuery(String.format(query, "MONOXIDE"));
+            OxidizingGas.executeQuery(String.format(query, "OXIDIZING_GAS"));
+            ReducingGas.executeQuery(String.format(query, "REDUCING_GAS"));
+            Pressure.executeQuery(String.format(query, "PRESSURE"));
             currentMeasurement.delete();
             taskTotalMeasuringFailCounter ++;
             if (!drone.isConnected) {

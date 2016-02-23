@@ -1,18 +1,12 @@
 package mo.edu.ipm.stud.envsensing.tasks;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.sensorcon.sensordrone.DroneEventHandler;
 import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
-
-import mo.edu.ipm.stud.envsensing.R;
-import mo.edu.ipm.stud.envsensing.SensorDrone;
 
 
 /**
@@ -35,7 +29,6 @@ public class SensorMeasureAsyncTask
     public static final int SENSOR_REDUCING = 5;
 
     private Drone drone;
-    private boolean autoDisable;
     private boolean[] measured = new boolean[TOTAL_SENSOR];
     private boolean[] failed = new boolean[TOTAL_SENSOR];
     private OnMeasureDone callback;
@@ -50,25 +43,19 @@ public class SensorMeasureAsyncTask
         public void onMeasureDone(boolean[] measured);
     }
 
-    public SensorMeasureAsyncTask(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        autoDisable = preferences.getBoolean(
-                context.getString(R.string.pref_recording_auto_disable), false);
+    public SensorMeasureAsyncTask(Drone drone) {
+        this.drone = drone;
     }
 
     @Override
     protected Void doInBackground(OnMeasureDone... callback) {
-        drone = SensorDrone.getInstance();
         this.callback = callback[0];
         timeoutRunnable = new Runnable() {
             @Override
             public void run() {
                 Log.d(TAG, "Measure timeout, callback.");
                 drone.unregisterDroneListener(SensorMeasureAsyncTask.this);
-                if (autoDisable)
-                    disableHighPowerSensor();
                 SensorMeasureAsyncTask.this.callback.onMeasureDone(measured);
-                SensorDrone.release();
             }
         };
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
@@ -116,8 +103,6 @@ public class SensorMeasureAsyncTask
                 & !measured[SENSOR_REDUCING])
             drone.measureReducingGas();
 
-        // TODO: Add more sensors here?
-
         else if (event.matches(DroneEventObject.droneEventType.TEMPERATURE_MEASURED))
             measured[SENSOR_TEMPERATURE] = true;
         else if (event.matches(DroneEventObject.droneEventType.HUMIDITY_MEASURED))
@@ -131,25 +116,12 @@ public class SensorMeasureAsyncTask
         else if (event.matches(DroneEventObject.droneEventType.REDUCING_GAS_MEASURED))
             measured[SENSOR_REDUCING] = true;
 
-        // TODO: Add more sensors here?
-
         if (hasFinished()) {
             Log.d(TAG, "Measure finish, callback.");
             drone.unregisterDroneListener(this);
             timeoutHandler.removeCallbacks(timeoutRunnable);
-            if (autoDisable)
-                disableHighPowerSensor();
             callback.onMeasureDone(measured);
-            SensorDrone.release();
         }
-    }
-
-    private void disableHighPowerSensor() {
-        Log.d(TAG, "Disable high power sensors");
-        if (drone.statusOfOxidizingGas())
-            drone.disableOxidizingGas();
-        if (drone.statusOfReducingGas())
-            drone.disableReducingGas();
     }
 
     /**
