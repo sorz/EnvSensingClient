@@ -18,7 +18,7 @@ public class SensorMeasureAsyncTask
         extends AsyncTask<SensorMeasureAsyncTask.OnMeasureDone, Void, Void>
         implements DroneEventHandler {
     private static final String TAG = "SensorMeasureAsyncTask";
-    private static final long TIMEOUT = 10 * 1000; // 10 seconds
+    private static final long TIMEOUT = 20 * 1000; // 20 seconds
 
     public static final int TOTAL_SENSOR = 6;
     public static final int SENSOR_TEMPERATURE = 0;
@@ -61,13 +61,18 @@ public class SensorMeasureAsyncTask
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT);
         drone.registerDroneListener(this);
 
-        drone.measureTemperature();
-        drone.measureHumidity();
-        drone.measurePrecisionGas();
-        drone.measurePressure();
-        drone.measureOxidizingGas();
-        drone.measureReducingGas();
-        Log.d(TAG, "Sent.");
+        boolean success;
+        success = drone.measureTemperature();
+        success &= drone.measureHumidity();
+        success &= drone.measurePressure();
+        success &= drone.measurePrecisionGas();
+        success &= drone.measureOxidizingGas();
+        success &= drone.measureReducingGas();
+        if (!success) {
+            Log.w(TAG, "Sent measure requests failed.");
+        } else {
+            Log.d(TAG, "Sent successfully.");
+        }
         return null;
     }
 

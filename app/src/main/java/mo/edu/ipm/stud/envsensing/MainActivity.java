@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity
                         Log.wtf(TAG, "Unknown sensor state: " + state);
                         return;
                     }
+                    Log.d(TAG, "change to " + fragment);
                 } else {
                     Log.d(TAG, "SensorService doesn't start!");
                     fragment = new SensorConnectFragment();

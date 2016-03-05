@@ -25,8 +25,11 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.sensorcon.sensordrone.DroneEventHandler;
+import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +50,7 @@ import mo.edu.ipm.stud.envsensing.tasks.SensorMeasureAsyncTask;
 /**
  * Manage sensor status.
  */
-public class SensorService extends Service implements LocationListener {
+public class SensorService extends Service implements LocationListener, DroneEventHandler {
     static private final String TAG = "SensorService";
     static private final int ONGOING_NOTIFICATION_ID = 1;
     static public final String ACTION_CONNECT = SensorService.class.getName() + ".ACTION_CONNECT";
@@ -59,7 +62,7 @@ public class SensorService extends Service implements LocationListener {
     static public final String EXTRA_TASK_TAG = "extra-task-tag";
 
     static private final int HEATING_SECONDS = 5;  // TODO: change heating time.
-    static private final int MEASURE_TIMEOUT = 15 * 1000; // 12 seconds
+    static private final int MEASURE_TIMEOUT = 25 * 1000; // 25 seconds
 
     static private boolean running = false;
     private final IBinder binder = new LocalBinder();
@@ -125,6 +128,7 @@ public class SensorService extends Service implements LocationListener {
     public void onCreate() {
         running = true;
         drone = new Drone();
+        drone.registerDroneListener(this);
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -150,6 +154,8 @@ public class SensorService extends Service implements LocationListener {
                 drone.quickDisable(i);
             drone.disconnect();
         }
+        drone.unregisterDroneListener(this);
+        Log.d(TAG, "Service destroyed.");
     }
 
     @Override
@@ -336,40 +342,42 @@ public class SensorService extends Service implements LocationListener {
                     return;
                 // This measuring is treated as success only if ALL sensor data are collected
                 // successfully and correctly.
-                for (boolean success : sensors)
-                    if (!success) {
-                        Log.w(TAG, "Measuring failed. One or more sensor failed.");
-                        // Connection probably broken, disconnect.
-                        drone.disconnectNow();
-                        notifyCurrentMeasuringDone(false);
-                        return;
+                boolean atLeastOneSuccess = false;
+                for (boolean success : sensors) {
+                    if (success) {
+                        atLeastOneSuccess = true;
+                        break;
                     }
+                }
+                if (!atLeastOneSuccess) {
+                    Log.w(TAG, "Measuring failed. All sensors failed to read.");
+                    // Connection probably broken, disconnect.
+                    drone.disconnectNow();
+                    notifyCurrentMeasuringDone(false);
+                    return;
+                }
                 try {
-                    new Temperature(currentMeasurement, drone.temperature_Kelvin).save();
-                    new Humidity(currentMeasurement, drone.humidity_Percent).save();
-                    new Monoxide(currentMeasurement, drone.precisionGas_ppmCarbonMonoxide).save();
-                    new Pressure(currentMeasurement, drone.pressure_Pascals).save();
-                    new OxidizingGas(currentMeasurement, drone.oxidizingGas_Ohm).save();
-                    new ReducingGas(currentMeasurement, drone.reducingGas_Ohm).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_TEMPERATURE])
+                        new Temperature(currentMeasurement, drone.temperature_Kelvin).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_HUMIDITY])
+                        new Humidity(currentMeasurement, drone.humidity_Percent).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_MONOXIDE])
+                        new Monoxide(currentMeasurement, drone.precisionGas_ppmCarbonMonoxide).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_PRESSURE])
+                        new Pressure(currentMeasurement, drone.pressure_Pascals).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_OXIDIZING])
+                        new OxidizingGas(currentMeasurement, drone.oxidizingGas_Ohm).save();
+                    if (sensors[SensorMeasureAsyncTask.SENSOR_REDUCING])
+                        new ReducingGas(currentMeasurement, drone.reducingGas_Ohm).save();
                 } catch (InvalidValueException e) {
                     Log.w(TAG, e.getMessage());
-                    Log.w(TAG, "Measuring failed. One or more sensor value invalid.");
+                    Log.w(TAG, "One or more sensor value invalid. Ignore.");
                     notifyCurrentMeasuringDone(false);
                     return;
                 }
                 notifyCurrentMeasuringDone(true);
             }
         });
-
-        // Schedule next measuring or end task.
-        while (taskNextMeasuringTime < SystemClock.elapsedRealtime())
-            taskNextMeasuringTime += taskDoMeasuringInterval;
-        if (taskNextMeasuringTime > taskAutoEndTime) {
-            taskNextMeasuringTime = -1;
-        } else {
-            alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, taskNextMeasuringTime,
-                    taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
-        }
     }
     /**
      * Called when
@@ -406,6 +414,17 @@ public class SensorService extends Service implements LocationListener {
         currentMeasurement = null;
         updateServiceState(taskNextMeasuringTime > SystemClock.elapsedRealtime() ?
                 SensorState.TASK_REST : SensorState.READY);
+
+        // Schedule next measuring or end task.
+        while (taskNextMeasuringTime < SystemClock.elapsedRealtime())
+            taskNextMeasuringTime += taskDoMeasuringInterval;
+        if (taskNextMeasuringTime > taskAutoEndTime) {
+            taskNextMeasuringTime = -1;
+        } else {
+            alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, taskNextMeasuringTime,
+                    taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
+        }
+
         if (wakeLock.isHeld())
             wakeLock.release();
     }
@@ -492,6 +511,11 @@ public class SensorService extends Service implements LocationListener {
 
     public void unregisterSensorServiceStateChangedListener(OnSensorStateChangedListener listener) {
         sensorStateChangedListeners.remove(listener);
+    }
+
+    @Override
+    public void parseEvent(DroneEventObject event) {
+        Log.d(TAG, "Event: " + event);
     }
 
     @Override
