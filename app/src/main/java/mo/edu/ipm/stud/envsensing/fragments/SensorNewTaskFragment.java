@@ -1,9 +1,7 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Fragment;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -24,7 +22,6 @@ import android.widget.Toast;
 
 import mo.edu.ipm.stud.envsensing.MainActivity;
 import mo.edu.ipm.stud.envsensing.R;
-import mo.edu.ipm.stud.envsensing.services.RecordService;
 import mo.edu.ipm.stud.envsensing.services.SensorService;
 
 /**
@@ -177,7 +174,7 @@ public class SensorNewTaskFragment extends Fragment {
         intent.setAction(SensorService.ACTION_NEW_TASK);
         intent.putExtra(SensorService.EXTRA_TASK_END,
                 SystemClock.elapsedRealtime() + durationSeconds * 1000);
-        intent.putExtra(RecordService.EXTRA_MEASURE_TAG, tag);
+        intent.putExtra(SensorService.EXTRA_TASK_TAG, tag);
         getActivity().startService(intent);
     }
 }

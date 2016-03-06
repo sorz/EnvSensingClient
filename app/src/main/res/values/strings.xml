@@ -157,7 +157,7 @@
     <string name="notification_ready_title">Sensordrone Is Ready</string>
     <string name="notification_ready_text">Touch to start measuring.</string>
     <string name="sensor_status">Status</string>
-    <string name="title_sensor_control">Sensor Control</string>
+    <string name="title_sensor_control">Sensor control</string>
     <string name="sensor_state_title">Sensor State</string>
     <string name="sensor_state_unknown">Unknown (waiting…)</string>
     <string name="sensor_state_disconnect">Disconnected</string>

@@ -29,11 +29,11 @@ import com.sensorcon.sensordrone.DroneEventHandler;
 import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import mo.edu.ipm.stud.envsensing.MainActivity;
 import mo.edu.ipm.stud.envsensing.R;
 import mo.edu.ipm.stud.envsensing.entities.Humidity;
 import mo.edu.ipm.stud.envsensing.entities.InvalidValueException;
@@ -451,12 +451,8 @@ public class SensorService extends Service implements LocationListener, DroneEve
                 .setSmallIcon(R.drawable.ic_stat_av_hearing);
         switch (newState) {
             case DISCONNECTED:
-                Intent connectIntent = new Intent(this, SensorService.class);
-                connectIntent.setAction(SensorService.ACTION_CONNECT);
-                PendingIntent pendingIntent = PendingIntent.getService(this, 0, connectIntent, 0);
                 builder.setContentTitle(getText(R.string.notification_disconnected_title))
-                        .setContentText(getText(R.string.notification_disconnected_text))
-                        .setContentIntent(pendingIntent);
+                        .setContentText(getText(R.string.notification_disconnected_text));
                 break;
             case CONNECTING:
                 builder.setContentTitle(getText(R.string.notification_connecting_title))
@@ -482,6 +478,17 @@ public class SensorService extends Service implements LocationListener, DroneEve
                 Log.wtf(TAG, "Attempting change to an unknown state.");
                 break;
         }
+        PendingIntent pendingIntent;
+        if (newState == SensorState.DISCONNECTED) {
+            Intent intent = new Intent(this, SensorService.class);
+            intent.setAction(SensorService.ACTION_CONNECT);
+            pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        } else {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setAction(MainActivity.ACTION_SHOW_SENSOR_CONTROL);
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        }
+        builder.setContentIntent(pendingIntent);
         startForeground(ONGOING_NOTIFICATION_ID, builder.build());
         serviceState = newState;
         for (OnSensorStateChangedListener listener : sensorStateChangedListeners)
