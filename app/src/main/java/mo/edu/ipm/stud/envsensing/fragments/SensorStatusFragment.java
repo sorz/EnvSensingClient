@@ -22,7 +22,6 @@ import com.sensorcon.sensordrone.DroneEventObject;
 import com.sensorcon.sensordrone.android.Drone;
 
 import mo.edu.ipm.stud.envsensing.R;
-import mo.edu.ipm.stud.envsensing.SensorDrone;
 import mo.edu.ipm.stud.envsensing.tasks.SensorConnectAsyncTask;
 
 
@@ -53,7 +52,7 @@ public class SensorStatusFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        drone = SensorDrone.getInstance();
+        //drone = SensorDrone.getInstance();
         drone.registerDroneListener(this);
         preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
@@ -62,7 +61,7 @@ public class SensorStatusFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         drone.unregisterDroneListener(this);
-        SensorDrone.release();
+        //SensorDrone.release();
     }
 
     @Override
@@ -185,7 +184,7 @@ public class SensorStatusFragment extends Fragment
      */
     private void connectSensor() {
         String mac = preferences.getString(getString(R.string.pref_bluetooth_mac), "");
-        new SensorConnectAsyncTask() {
+        new SensorConnectAsyncTask(drone) {
             @Override
             protected void onPostExecute(Boolean result) {
                 if (!result)

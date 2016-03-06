@@ -412,17 +412,17 @@ public class SensorService extends Service implements LocationListener, DroneEve
             }
         }
         currentMeasurement = null;
-        updateServiceState(taskNextMeasuringTime > SystemClock.elapsedRealtime() ?
-                SensorState.TASK_REST : SensorState.READY);
 
         // Schedule next measuring or end task.
         while (taskNextMeasuringTime < SystemClock.elapsedRealtime())
             taskNextMeasuringTime += taskDoMeasuringInterval;
         if (taskNextMeasuringTime > taskAutoEndTime) {
             taskNextMeasuringTime = -1;
+            updateServiceState(SensorState.TASK_REST);
         } else {
             alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, taskNextMeasuringTime,
                     taskDoMeasuringWindowLength, taskDoMeasuringPendingIntent);
+            updateServiceState(SensorState.TASK_MEASURING);
         }
 
         if (wakeLock.isHeld())

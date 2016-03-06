@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity
         Drawer.OnDrawerNavigationListener,
         SensorSelectionFragment.OnSensorSelectedListener,
         SettingsFragment.OnDisplayDialogListener,
-        SensorInTaskFragment.OnRecordingStoppedListener,
         RawDataViewerFragment.OnExportDataListener,
         ExportDataFragment.OnDataExportedListener,
         UserLoginFragment.OnUserLoginListener,
@@ -316,15 +315,6 @@ public class MainActivity extends AppCompatActivity
         editor.apply();
 
         getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onRecordingStopped() {
-        if (drawer == null)
-            // This activity start with ACTION_SHOW_RECORD_STATUS by RecordService.
-            finish();
-        else
-            switchFragment(new SensorNewTaskFragment(), false);
     }
 
     @Override

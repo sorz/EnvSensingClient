@@ -1,15 +1,9 @@
 package mo.edu.ipm.stud.envsensing.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,34 +22,12 @@ import mo.edu.ipm.stud.envsensing.services.RecordService;
 public class SensorInTaskFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     static private final String TAG = "SensorInTaskFragment";
 
-    private OnRecordingStoppedListener callback;
-    private RecordService service;
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder binder) {
-            service = ((RecordService.LocalBinder) binder).getService();
-            Log.d(TAG, "Service connected.");
-            refreshTaskInfo();
-            refreshTaskStatus();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            service = null;
-            Log.d(TAG, "Service disconnected.");
-        }
-    };
     private SwipeRefreshLayout swipeLayout;
     private TextView textStartTime;
     private TextView textStopTime;
     private TextView textMeasureInterval;
     private TextView textSuccessCount;
     private TextView textFailCount;
-
-    public interface OnRecordingStoppedListener {
-        public void onRecordingStopped();
-    }
 
     @Override
     public void onResume() {
@@ -68,32 +40,20 @@ public class SensorInTaskFragment extends Fragment implements SwipeRefreshLayout
         super.onPause();
         swipeLayout.setRefreshing(false);
         swipeLayout.destroyDrawingCache();
-        swipeLayout.clearAnimation();    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        callback = (OnRecordingStoppedListener) activity;
+        swipeLayout.clearAnimation();
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!RecordService.isRunning()) {
-            callback.onRecordingStopped();
-            return;
-        }
-
-        Intent intent = new Intent(getActivity(), RecordService.class);
-        getActivity().bindService(intent, serviceConnection, Context.BIND_WAIVE_PRIORITY);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (service != null)
-            getActivity().unbindService(serviceConnection);
+
     }
 
     @Override
@@ -120,36 +80,24 @@ public class SensorInTaskFragment extends Fragment implements SwipeRefreshLayout
     }
 
     private void refreshTaskInfo() {
-        if (textStopTime == null)
-            return;
-        if (service == null) {
-            textStartTime.setText("");
-            textStopTime.setText("");
-            textMeasureInterval.setText("");
-            return;
-        }
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
-        textStartTime.setText(dateFormat.format(service.getStartTime()));
-        textStopTime.setText(dateFormat.format(service.getStopTime()));
-        textMeasureInterval.setText(getString(R.string.certain_seconds,
-                (int) service.getInterval() / 1000));
+        //textStartTime.setText(dateFormat.format(service.getStartTime()));
+        //textStopTime.setText(dateFormat.format(service.getStopTime()));
+//        textMeasureInterval.setText(getString(R.string.certain_seconds,
+//                (int) service.getInterval() / 1000));
     }
 
     private void refreshTaskStatus() {
         if (textStopTime == null)
             return;
-        if (service == null) {
-            textSuccessCount.setText("");
-            textFailCount.setText("");
-        }
-        textSuccessCount.setText("" + service.getMeasureSuccessCount());
-        textFailCount.setText("" + service.getMeasureFailCount());
+        //textSuccessCount.setText("" + service.getMeasureSuccessCount());
+        //textFailCount.setText("" + service.getMeasureFailCount());
     }
 
     @Override
     public void onRefresh() {
         if (!RecordService.isRunning()) {
-            callback.onRecordingStopped();
+            //callback.onRecordingStopped();
             return;
         }
         refreshTaskStatus();
@@ -170,6 +118,6 @@ public class SensorInTaskFragment extends Fragment implements SwipeRefreshLayout
             intent.setAction(RecordService.ACTION_STOP);
             getActivity().startService(intent);
         }
-        callback.onRecordingStopped();
+        //callback.onRecordingStopped();
     }
 }
