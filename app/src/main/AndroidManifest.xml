@@ -48,7 +48,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.RecordService" />
         <service android:name=".services.UploadService" />
         <service android:name=".services.SensorService" />
 
