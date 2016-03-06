@@ -165,4 +165,7 @@
     <string name="new_task_title">New Task</string>
     <string name="sensor_state_ready">Ready to start task</string>
     <string name="sensor_state_heating">Heating (waiting for a few minutes)</string>
+    <string name="in_task_title">Task Detail</string>
+    <string name="sensor_state_task_rest">In task (waiting for next measuring)</string>
+    <string name="sensor_state_task_measuring">In task (measuring)</string>
 </resources>
