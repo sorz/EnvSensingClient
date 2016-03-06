@@ -143,6 +143,11 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         activityIsInBackground = false;
+
+        // Sensor state may have been changed since activity went background.
+        // So we update activity here.
+        if (currentSection == SECTION_SENSOR_CONTROL)
+            switchSection(currentSection);
     }
 
     @Override

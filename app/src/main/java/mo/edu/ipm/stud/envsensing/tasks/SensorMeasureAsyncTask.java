@@ -107,9 +107,17 @@ public class SensorMeasureAsyncTask
      * @return true if all sensors are either finished or failed.
      */
     private boolean hasFinished() {
-        for (int i=0; i<TOTAL_SENSOR; ++i)
-            if (!(measured[i]))
-                return false;
-        return true;
+//        for (int i=0; i<TOTAL_SENSOR; ++i)
+//            if (!(measured[i]))
+//                return false;
+//        return true;
+
+        // Sensordrone has been broken...
+        // Only three sensors works, others all not response.
+        int count = 0;
+        for (boolean received : measured)
+            if (received)
+                count ++;
+        return count >= 3;
     }
 }

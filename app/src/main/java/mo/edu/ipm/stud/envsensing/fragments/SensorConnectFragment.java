@@ -70,7 +70,9 @@ public class SensorConnectFragment extends Fragment {
     }
 
     private void checkState() {
-        SensorService service = ((MainActivity) getActivity()).getSensorService();
+        SensorService service = null;
+        if (isAdded())
+            service = ((MainActivity) getActivity()).getSensorService();
         if (service == null) {
             new Handler().postDelayed(new Runnable() {
                 @Override
