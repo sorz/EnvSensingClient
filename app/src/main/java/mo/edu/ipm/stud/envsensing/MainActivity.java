@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     private static final int SECTION_SENSOR_CONTROL = 2;
     private static final int SECTION_RAW_DATA_VIEWER = 3;
     private static final int SECTION_MAPS = 4;
+    private static final int SECTION_EXIT = 5;
 
     private Drawer drawer;
     private int currentSection;
@@ -66,12 +67,12 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             sensorService = ((SensorService.LocalBinder) service).getService();
-            sensorService.registerSensorStateChangedListener(MainActivity.this);
+            sensorService.setSensorStateChangedListener(MainActivity.this);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName className) {
-            sensorService.unregisterSensorServiceStateChangedListener(MainActivity.this);
+            sensorService.unsetSensorServiceStateChangedListener();
             sensorService = null;
         }
     };
@@ -118,7 +119,11 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem()
                                 .withName(R.string.title_section_settings)
                                 .withIcon(R.drawable.ic_settings_black_24dp)
-                                .withIdentifier(SECTION_SETTINGS)
+                                .withIdentifier(SECTION_SETTINGS),
+                        new PrimaryDrawerItem()
+                                .withName(R.string.title_section_exit)
+                                .withIcon(R.drawable.ic_exit_to_app_black_24dp)
+                                .withIdentifier(SECTION_EXIT)
                 )
                 .withOnDrawerItemClickListener(this)
                 .withOnDrawerNavigationListener(this)
@@ -196,6 +201,10 @@ public class MainActivity extends AppCompatActivity
             case SECTION_MAPS:
                 fragment = new MapsFragment();
                 break;
+            case SECTION_EXIT:
+                Intent intent = new Intent(this, SensorService.class);
+                stopService(intent);
+                finish();
             default:
                 fragment = new Fragment();
                 break;

@@ -64,6 +64,7 @@ public class SettingsFragment extends PreferenceFragment
         Preference prefStartUpload = findPreference(getString(R.string.pref_start_upload));
         Preference prefResetUploadMark = findPreference(getString(R.string.pref_reset_upload_mark));
         Preference prefVersion = findPreference(getString(R.string.pref_version));
+        Preference prefHeatingSeconds = findPreference(getString(R.string.pref_preheating_seconds));
 
         prefBtMac.setSummary(preferences.getString(getString(R.string.pref_bluetooth_mac),
                 getString(R.string.press_to_select)));
@@ -149,9 +150,22 @@ public class SettingsFragment extends PreferenceFragment
         if (key.equals(prefBtMac.getKey())) {
             prefBtMac.setSummary(
                     sharedPreferences.getString(key, getString(R.string.press_to_select)));
-        }
-        if (key.equals(getString(R.string.pref_user_token))) {
+        } else if (key.equals(getString(R.string.pref_user_token))) {
             updateAccountStatus();
+        } else if (key.equals(getString(R.string.pref_preheating_seconds))) {
+            int value = 0;
+            try {
+                value = Integer.parseInt(sharedPreferences.getString(key, ""));
+            } catch (NumberFormatException e) {
+                // Ignore it.
+            }
+            if (value <= 0 || value > 3600) {
+                Toast.makeText(getActivity(), R.string.wrong_preheating_seconds,
+                        Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(getString(R.string.pref_preheating_seconds));
+                editor.apply();
+            }
         }
     }
 

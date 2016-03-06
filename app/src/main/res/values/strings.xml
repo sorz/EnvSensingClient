@@ -7,6 +7,8 @@
     <string name="pref_user_name" translatable="false">pref_user_name</string>
     <string name="pref_user_email" translatable="false">pref_user_email</string>
     <string name="pref_user_token" translatable="false">pref_user_token</string>
+    <string name="pref_preheating_seconds" translatable="false">pref_preheating_seconds</string>
+
 
     <string name="app_name">Environmental Sensing</string>
     <string name="title_section_settings">Settings</string>
@@ -168,4 +170,8 @@
     <string name="in_task_title">Task Detail</string>
     <string name="sensor_state_task_rest">In task (waiting for next measuring)</string>
     <string name="sensor_state_task_measuring">In task (measuring)</string>
+    <string name="title_section_exit">Exit</string>
+    <string name="pref_preheating_seconds_title">Preheating duration</string>
+    <string name="pref_preheating_seconds_summary">Waiting how many seconds before start measuring.</string>
+    <string name="wrong_preheating_seconds">Should be a positive integer which less than 3600.</string>
 </resources>

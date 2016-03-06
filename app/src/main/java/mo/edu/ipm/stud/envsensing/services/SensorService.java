@@ -61,7 +61,6 @@ public class SensorService extends Service implements LocationListener, DroneEve
     static public final String EXTRA_TASK_END = "extra-task-end";
     static public final String EXTRA_TASK_TAG = "extra-task-tag";
 
-    static private final int HEATING_SECONDS = 5;  // TODO: change heating time.
     static private final int MEASURE_TIMEOUT = 25 * 1000; // 25 seconds
 
     static private boolean running = false;
@@ -99,7 +98,7 @@ public class SensorService extends Service implements LocationListener, DroneEve
     private boolean currentMeasuringFail;
     private boolean currentLocationDone;
 
-    private Set<OnSensorStateChangedListener> sensorStateChangedListeners = new HashSet<>();
+    private OnSensorStateChangedListener sensorStateChangedListener;
     public interface OnSensorStateChangedListener {
         public void onSensorStateChanged(SensorState newState);
     }
@@ -222,13 +221,15 @@ public class SensorService extends Service implements LocationListener, DroneEve
         drone.enableOxidizingGas();
         drone.enableReducingGas();
 
+        int heatingSeconds = Integer.parseInt(
+                preferences.getString(getString(R.string.pref_preheating_seconds), "120"));
         Intent intent = new Intent(this, SensorService.class);
         intent.setAction(SensorService.ACTION_GO_READY);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
         // TODO: AllowWhileIdle for Android 6.0+
         alarmManager.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + HEATING_SECONDS * 1000,
-                HEATING_SECONDS * 500, pendingIntent);
+                SystemClock.elapsedRealtime() + heatingSeconds * 1000,
+                heatingSeconds * 500, pendingIntent);
     }
 
     private void actionGoReady() {
@@ -491,8 +492,8 @@ public class SensorService extends Service implements LocationListener, DroneEve
         builder.setContentIntent(pendingIntent);
         startForeground(ONGOING_NOTIFICATION_ID, builder.build());
         serviceState = newState;
-        for (OnSensorStateChangedListener listener : sensorStateChangedListeners)
-            listener.onSensorStateChanged(newState);
+        if (sensorStateChangedListener != null)
+            sensorStateChangedListener.onSensorStateChanged(newState);
     }
 
     public long getCurrentTaskDoMeasuringInterval() {
@@ -512,12 +513,12 @@ public class SensorService extends Service implements LocationListener, DroneEve
                 + taskAutoEndTime);
     }
 
-    public void registerSensorStateChangedListener(OnSensorStateChangedListener listener) {
-        sensorStateChangedListeners.add(listener);
+    public void setSensorStateChangedListener(OnSensorStateChangedListener listener) {
+        sensorStateChangedListener = listener;
     }
 
-    public void unregisterSensorServiceStateChangedListener(OnSensorStateChangedListener listener) {
-        sensorStateChangedListeners.remove(listener);
+    public void unsetSensorServiceStateChangedListener() {
+        setSensorStateChangedListener(null);
     }
 
     @Override
