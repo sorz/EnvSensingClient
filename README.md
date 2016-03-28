@@ -2,7 +2,6 @@
 This repository contains the client-side source code of *Mobile Environment Sensing System*,
 which is the subject of my final year project as an undergraduate course in year 4.
 
-Under early development.
 See also: [EnvSensingServer](https://github.com/sorz/EnvSensingServer)
 
 *This app require [Sensordrone](http://sensordrone.com/products/sensordrone-bluetooth-environmental-sensors.php)
